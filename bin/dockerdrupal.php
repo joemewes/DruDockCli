@@ -15,11 +15,24 @@ set_time_limit(0);
 ini_set('display_errors', 1);
 ini_set('log_errors', 0);
 
+if (version_compare(PHP_VERSION, '5.5.9', '<')) {
+    printf("This tool requires at least PHP 5.5.9. You currently have %s installed. Please upgrade your PHP version.\n", PHP_VERSION);
+    exit(1);
+}
+
 /**
  * @var Composer\Autoload\ClassLoader $loader
  */
-$loader = require __DIR__.'/../vendor/autoload.php';
-
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    $loader = require __DIR__ . '/../vendor/autoload.php';
+} elseif (file_exists(__DIR__ . '/../../../autoload.php')) {
+    // we are globally installed via Composer
+    $loader = require __DIR__ . '/../../../autoload.php';
+} else {
+    echo "Composer autoload file not found.\n";
+    echo "You need to run 'composer install'.\n";
+    exit(1);
+}
 
 $input = new ArgvInput();
 $env = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'dev');
