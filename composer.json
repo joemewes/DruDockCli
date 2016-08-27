@@ -1,0 +1,41 @@
+{
+  "name": "dockerdrupal/cli",
+  "description": "DockerDrupal CLI",
+  "keywords": ["Drupal", "Docker", "Console", "Development", "Symfony"],
+  "homepage": "https://www.4alldigital.io/docker-drupal/",
+  "license": "MIT",
+  "type": "project",
+  "require": {
+    "symfony/finder": "^3.1",
+    "symfony/console": "^3.1",
+    "php": "^5.5",
+    "doctrine/cache": "^1.6",
+    "guzzlehttp/guzzle": "^6.2",
+    "guzzlehttp/ringphp": "^1.1",
+    "symfony/yaml": "^3.1",
+    "symfony/filesystem": "^3.1",
+    "symfony/process": "^3.1",
+    "stecman/symfony-console-completion": "^0.7.0",
+    "symfony/event-dispatcher": "^3.1",
+    "padraic/phar-updater": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.3 <4.8",
+    "drush/drush": "^8.0",
+    "sensiolabs/security-checker": "^3.0",
+    "symfony/debug": "^3.1"
+  },
+  "authors": [
+    {
+      "name": "Joe Mewes"
+    }
+  ],
+  "bin": ["bin/dockerdrupal"],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "Docker\\Drupal\\": "src"
+    }
+  }
+}
