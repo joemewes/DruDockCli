@@ -18,3 +18,4 @@ docker exec -i $(docker ps --format {{.Names}} | grep redis) redis-cli flushall
 
 # open mailcatcher
 python -mwebbrowser http://localhost:1080
+
