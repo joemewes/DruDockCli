@@ -6,22 +6,22 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "symfony/finder": "^3.1",
-    "symfony/console": "^3.1",
+    "symfony/finder": "~2.8",
+    "symfony/console": "~2.8",
+    "symfony/yaml": "~2.8",
+    "symfony/filesystem": "~2.8",
+    "symfony/process": "~2.8",
+    "symfony/event-dispatcher": "~2.8",
+    "symfony/dependency-injection": "~2.8",
+    "symfony/http-kernel": "~2.8",
+    "symfony/class-loader": "~2.8",
+    "symfony/config": "~2.8",
+    "symfony/var-dumper": "~2.8",
+    "stecman/symfony-console-completion": "^0.5.1",
     "php": "^5.5",
     "doctrine/cache": "^1.6",
     "guzzlehttp/guzzle": "^6.2",
     "guzzlehttp/ringphp": "^1.1",
-    "symfony/yaml": "^3.1",
-    "symfony/filesystem": "^3.1",
-    "symfony/process": "^3.1",
-    "stecman/symfony-console-completion": "^0.5.1",
-    "symfony/event-dispatcher": "^3.1",
-    "symfony/dependency-injection": "~2.7",
-    "symfony/http-kernel": "~2.7",
-    "symfony/class-loader": "~2.7",
-    "symfony/config": "~2.7",
-    "symfony/var-dumper": "~2.7",
     "psr/log": "^1.0.0",
     "padraic/phar-updater": "^1.0"
   },
@@ -29,7 +29,7 @@
     "phpunit/phpunit": "^4.3 <4.8",
     "drush/drush": "^8.0",
     "sensiolabs/security-checker": "^3.0",
-    "symfony/debug": "^3.1"
+    "symfony/debug": "~2.8"
   },
   "authors": [
     {
