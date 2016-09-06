@@ -87,6 +87,7 @@ class Application extends ParentApplication
         }
 
         $commands[] = new Command\DemoCommand();
+        $commands[] = new Command\StopCommand();
 
         return $commands;
     }
