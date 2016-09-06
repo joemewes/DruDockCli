@@ -13,6 +13,7 @@
     - git clone https://github.com/4alldigital/DockerDrupal.git docker_<appname>
   -> lite
     - git clone https://github.com/4alldigital/DockerDrupal-lite.git docker_<appname>
+    
     ```
           .        
           ├── app
