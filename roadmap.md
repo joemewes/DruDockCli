@@ -73,11 +73,19 @@
    # get container name
    docker ps --format {{.Names}} | grep php
 
+   # STOP ALL running containers
+   docker stop $(docker ps -q)
+
    # \<CONTAINER\> bash
    docker exec -i $(docker ps --format {{.Names}} | grep php) bash
 
+   # Monitor APP sync
+   docker exec -i $(docker ps --format {{.Names}} | grep app) tail -f /var/log/unison.log   
+
    # drush ULI
    docker exec -i $(docker ps --format {{.Names}} | grep php) drush uli 1
+   # drush clear cache
+   docker exec -i $(docker ps --format {{.Names}} | grep php) drush cc all
 
    # redis clearcache
    docker exec -i $(docker ps --format {{.Names}} | grep redis) redis-cli flushall
@@ -89,4 +97,13 @@
    python -mwebbrowser http://docker.dev
 
    # multisite drush -> args :multi
-   docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docker.dev uli admin
+   docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docker.dev uli 1
+
+   # mysql log
+   docker exec -i $(docker ps --format {{.Names}} | grep db) tail -f /var/log/mysql/mysql.log
+
+   # Nginx log :error
+   docker exec -i $(docker ps --format {{.Names}} | grep nginx) tail -f /var/log/nginx/app-error.log
+
+   # Nginx RELOAD
+   docker exec -i $(docker ps --format {{.Names}} | grep nginx) nginx -s reload
