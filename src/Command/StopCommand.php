@@ -10,6 +10,7 @@ namespace Docker\Drupal\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Symfony\Component\Filesystem\Filesystem;
@@ -24,27 +25,19 @@ class StopCommand extends Command
     protected function configure()
     {
         $this
-//            ->setName('local:build')
-//            ->setAliases(['build'])
-//            ->addArgument('app', InputArgument::IS_ARRAY, 'Specify application(s) to build')
-//            ->setDescription('Build the current project locally')
+            ->setName('docker:stop')
+            ->setAliases(['stop'])
+            ->setDescription('Stop all containers')
+            ->setHelp("This command will stop all running containers even if you're in another app/project folder...")
+
+            //->addArgument('app', InputArgument::IS_ARRAY, 'Specify application(s) to build')
+            ->addOption('path', 'p', InputOption::VALUE_REQUIRED, '', getcwd())
 //            ->addOption(
 //                'abslinks',
 //                'a',
 //                InputOption::VALUE_NONE,
 //                'Use absolute links'
 //            )
-            // the name of the command (the part after "bin/console")
-           //->setName('demo:greet')
-            ->setName('stop')
-
-            // the short description shown wh ile running "php bin/console list"
-            ->setDescription('Stop all containers')
-
-            // the full command description shown when running the command with
-            // the "--help" option
-            ->setHelp("This command will stop all running containers even if you're in another app/project folder...")
-
 //            ->addArgument(
 //                'value',
 //                InputArgument::OPTIONAL,
@@ -56,8 +49,18 @@ class StopCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        system('docker images', $ret);
-//        docker stop $(docker ps -q)
+        //system('docker images', $ret);
+
+        $path = $input->getOption('path').'/LICENSE';
+        $license = implode(' ', array(
+            'Copyright (c)',
+        ));
+
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($path, $license.PHP_EOL);
+
+        $output->writeln(sprintf('Created the file %s', $path));
+
 //        $value = $input->getArgument('value');
 //        $fs = new Filesystem();
 //        $fs->mkdir('/tmp/photos', 0700);
