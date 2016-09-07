@@ -51,7 +51,6 @@ class InitCommand extends Command
 
         $message = 'Setting up Example app';
         $io->note($message);
-
         // example app source and destination
         $app_src = $appname.'/docker_'.$appname.'/example/app/';
         $app_dest = $appname.'/app/repository/';
@@ -62,21 +61,19 @@ class InitCommand extends Command
         } catch (IOExceptionInterface $e) {
             echo "An error occurred while creating your directory at ".$e->getPath();
         }
-        if(!$fs->exists($app_dest)) {
-            $fs->mkdir($app_dest);
-            $fs->mirror($app_src, $app_dest);
-        }
 
-//        // copy example app
-//        $fs->copy($app_src.'index.html', $app_dest.'index.html');
-//        $fs->copy($app_src.'images/favicon.ico', $app_dest.'images/favicon.ico');
-//        $fs->copy($app_src.'images/logo.png', $app_dest.'images/logo.png');
-//        $fs->copy($app_src.'vids/vid1.mp4', $app_dest.'vids/vid1.mp4');
-//        $fs->copy($app_src.'vids/vid1.ogv', $app_dest.'vids/vid1.ogv');
-//        $fs->copy($app_src.'vids/vid1.webm', $app_dest.'vids/vid1.webm');
+        $io->note($appname.'www');
+        $fs->symlink('repository', $appname.'/app/www', true);
 
-        $fs->symlink($app_dest,$appname.'/app/www');
-        $fs->makePathRelative('/tmp/videos', '/tmp');
+        // docker-compose -f myapp21/docker_myapp21/docker-compose.yml up -d
+        $message = 'Stopping and running containers';
+        $io->note($message);
+        system('docker stop $(docker ps -q)');
+
+        $message = 'Creating app network, volumes and containers.';
+        $io->note($message);
+        system('docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml up -d');
 
     }
+
 }
