@@ -53,7 +53,7 @@ class DockerDrupalStyle extends SymfonyStyle
     {
         $this->block(
             $message, null,
-            'bg=green;options=bold',
+            'bg=cyan;options=bold',
             ' ',
             true
         );
