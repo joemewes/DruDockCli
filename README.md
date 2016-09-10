@@ -1,7 +1,7 @@
 # DockerDrupalCli
 CLI utility for DockerDrupal 
 
-```composer require dockerdrupal/cli```
+```composer global require dockerdrupal/cli```
 
 ## for notes
 
