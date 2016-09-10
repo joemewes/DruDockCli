@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Symfony\Component\Console\Question\Question;
 
 /**
  * Class DemoCommand
@@ -29,7 +30,7 @@ class InitCommand extends Command
             ->setAliases(['init'])
             ->setDescription('Fetch and build DockerDrupal containers')
             ->setHelp("This command will fetch the specified DockerDrupal config, download and build all necessary images.")
-            ->addArgument('app', InputArgument::REQUIRED, 'Specify application(s) to build')
+            ->addArgument('app', InputArgument::OPTIONAL, 'Specify application(s) to build')
             ->addOption('type', 't', InputOption::VALUE_REQUIRED, '', getcwd())
         ;
     }
@@ -38,6 +39,11 @@ class InitCommand extends Command
     {
         $io = new DockerDrupalStyle($input, $output);
         $appname = $input->getArgument('app');
+        if(!$appname){
+            $helper = $this->getHelper('question');
+            $question = new Question('What is the name of your app [eg. my-great-website] ?');
+            $appname = $helper->ask($input, $output, $question);
+        }
         $fs = new Filesystem();
 
         if(!$fs->exists($appname)){
@@ -45,7 +51,7 @@ class InitCommand extends Command
             $fs->mkdir($appname.'/docker_'.$appname , 0755);
         }
 
-        $message = 'Downloading DockerDrupal v.1.0';
+        $message = 'Cloning DockerDrupal v.1.0';
         $io->note($message);
         exec('git clone https://github.com/4alldigital/DockerDrupal-lite.git --quiet '.$appname.'/docker_'.$appname);
 
@@ -65,14 +71,24 @@ class InitCommand extends Command
         $io->note($appname.'www');
         $fs->symlink('repository', $appname.'/app/www', true);
 
-        // docker-compose -f myapp21/docker_myapp21/docker-compose.yml up -d
-        $message = 'Stopping and running containers';
+        $message = 'Stopping any running containers';
         $io->note($message);
         system('docker stop $(docker ps -q)');
 
         $message = 'Creating app network, volumes and containers.';
         $io->note($message);
-        system('docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml up -d');
+        $message = 'This may take a while.... downloading DockerDrupal container images from DockerHub and then syncing your app will vary greatly depending on internet download speeds.';
+        $io->comment($message);
+
+        // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
+        // When "Synchronization complete" kill this temp run container and start DockerDrupal.
+        system('until docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml run app 2>&1 | grep -m 1 "Synchronization complete"; do : ; done && docker kill $(docker ps -q) && docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml up -d');
+        $message = 'Open example app in browser at http://docker.dev';
+
+        $io->note($message);
+        // Necessary to wait for container services to startup
+        sleep(1);
+        shell_exec('python -mwebbrowser http://docker.dev');
 
     }
 

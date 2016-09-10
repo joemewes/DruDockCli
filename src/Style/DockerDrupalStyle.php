@@ -41,12 +41,12 @@ class DockerDrupalStyle extends SymfonyStyle
      */
     public function comment($message, $newLine = true)
     {
-        $message = sprintf('<comment> %s</comment>', $message);
-        if ($newLine) {
-            $this->writeln($message);
-        } else {
-            $this->write($message);
-        }
+        $this->block(
+            $message, null,
+            'bg=yellow;fg=black',
+            ' ',
+            true
+        );
     }
 
     public function note($message)

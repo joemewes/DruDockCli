@@ -13,7 +13,7 @@
     - git clone https://github.com/4alldigital/DockerDrupal.git docker_<appname>
   -> lite
     - git clone https://github.com/4alldigital/DockerDrupal-lite.git docker_<appname>
-    
+
     ```
           .        
           ├── app
@@ -83,12 +83,29 @@
 
     - be able to import local DB / .sql dump
     - build multisite? add site?
+    - get container name
+    - STOP ALL running containers
+    - \<CONTAINER\> bash
+    - Monitor APP sync
+    - drush ULI
+    - drush clear cache
+    - multisite drush -> args :multi
+    - redis clearcache
+    - open mailcatcher
+    - launch ??
+    - mysql log
+    - Nginx log :error
+    - Nginx RELOAD
+    - backup/export Database -> integration with AWS cli ??
+    - restore/import database : local or remote source ??
+
 
 - Other @TODO CLI -≥ commands
    python -mwebbrowser http://localhost:8983/solr/#/SITE
    python -mwebbrowser http://localhost:4444/grid/console
    python -mwebbrowser http://localhost:1080
    python -mwebbrowser http://localhost:8088
+
 
 # get container name
 docker ps --format {{.Names}} | grep php
@@ -97,13 +114,14 @@ docker ps --format {{.Names}} | grep php
 docker stop $(docker ps -q)
 
 # \<CONTAINER\> bash
-docker exec -i $(docker ps --format {{.Names}} | grep php) bash
+docker exec -it $(docker ps --format {{.Names}} | grep php) bash
 
 # Monitor APP sync
 docker exec -i $(docker ps --format {{.Names}} | grep app) tail -f /var/log/unison.log   
 
 # drush ULI
-docker exec -i $(docker ps --format {{.Names}} | grep php) drush uli 1
+docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docker.dev uli 1
+#docker exec -i $(docker ps --format {{.Names}} | grep php) drush uli 1
 # drush clear cache
 docker exec -i $(docker ps --format {{.Names}} | grep php) drush cc all
 # multisite drush -> args :multi
