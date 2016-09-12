@@ -17,6 +17,7 @@
     "symfony/class-loader": "~2.8",
     "symfony/config": "~2.8",
     "symfony/var-dumper": "~2.8",
+    "symfony/framework-bundle": "~2.8",
     "stecman/symfony-console-completion": "^0.5.1",
     "php": "^5.5",
     "doctrine/cache": "^1.6",

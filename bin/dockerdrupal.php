@@ -11,6 +11,8 @@ use Docker\Drupal\Application;
 //umask(0000);
 
 set_time_limit(0);
+$dockerDrupalRoot = realpath(__DIR__.'/../') . '/';
+$root = getcwd() . '/';
 
 ini_set('display_errors', 1);
 ini_set('log_errors', 0);
@@ -38,9 +40,10 @@ $input = new ArgvInput();
 $env = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'dev');
 $debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(['--no-debug', '']) && $env !== 'prod';
 
-if ($debug) {
-    Debug::enable();
-}
+//if ($debug) {
+//   Debug::enable();
+//}
 
 $application = new Application('DockerDrupal Console Application', '1.0');
+$application->setDefaultCommand('about');
 $application->run($input);

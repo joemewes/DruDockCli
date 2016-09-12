@@ -24,6 +24,11 @@ class Application extends ParentApplication
      */
     const VERSION = '1.0.0';
 
+    /**
+     * @var string
+     */
+    protected $directoryRoot;
+
     public function __construct()
     {
         parent::__construct( $this::NAME, $this::VERSION);
@@ -40,6 +45,32 @@ class Application extends ParentApplication
     {
         $this->registerCommands();
         parent::doRun($input, $output);
+    }
+
+    /**
+     * @return string
+     */
+    public function getUtilRoot()
+    {
+        $utilRoot = realpath(__DIR__.'/../') . '/';
+        return $utilRoot;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this::VERSION;
+    }
+
+
+    /**
+     * @return ContainerBuilder
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**

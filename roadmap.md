@@ -111,13 +111,21 @@
 docker ps --format {{.Names}} | grep php
 
 # STOP ALL running containers
-docker stop $(docker ps -q)
-
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Console\Command\Command;
+use Drupal\Console\Command\Shared\CommandTrait;
+use Drupal\Console\Style\DrupalStyle;
+use Drupal\Console\Command\Shared\ProjectDownloadTrait;
 # \<CONTAINER\> bash
 docker exec -it $(docker ps --format {{.Names}} | grep php) bash
 
 # Monitor APP sync
-docker exec -i $(docker ps --format {{.Names}} | grep app) tail -f /var/log/unison.log   
+docker exec -i $(docker ps --format {{.Names}} | grep app_1) tail -f /var/log/unison.log
 
 # drush ULI
 docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docker.dev uli 1
@@ -144,3 +152,6 @@ docker exec -i $(docker ps --format {{.Names}} | grep nginx) tail -f /var/log/ng
 
 # Nginx RELOAD
 docker exec -i $(docker ps --format {{.Names}} | grep nginx) nginx -s reload
+
+# SCREEN into HYVE
+screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
