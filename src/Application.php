@@ -7,6 +7,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Application as ParentApplication;
 
 
@@ -37,7 +38,6 @@ class Application extends ParentApplication
 
         $this->setDefaultTimezone();
         $this->addCommands($this->registerCommands());
-       // $this->addOptions();
     }
 
     /**
@@ -110,6 +110,33 @@ class Application extends ParentApplication
     }
 
     /**
+     * @output status table
+     */
+    public function dockerHealthCheck($io){
+        $names = shell_exec("echo $(docker ps --format '{{.Names}}|{{.Status}}:')");
+        $n_array = explode(':',$names);
+        $rows = [];
+        foreach($n_array as $i => $n){
+            $c = explode('|', $n);
+            if($c[0] && $c[1]) {
+                $rows[$i]['Name'] = str_replace(' ', '', $c[0]);
+                $rows[$i]['Status'] = $c[1];
+            }
+        }
+        $headers = ['Container Name', 'Status'];
+        $io->table($headers, $rows);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRunningContainerNames(){
+        $names = shell_exec("echo $(docker ps --format '{{.Names}}')");
+        $n_array = explode(' ',$names);
+        return $n_array;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getDefaultInputDefinition()
@@ -139,12 +166,47 @@ class Application extends ParentApplication
         }
 
         $commands[] = new Command\InitCommand();
-        $commands[] = new Command\DemoCommand();
         $commands[] = new Command\StopCommand();
         $commands[] = new Command\StartCommand();
         $commands[] = new Command\RestartCommand();
         $commands[] = new Command\DestroyCommand();
+        $commands[] = new Command\StatusCommand();
+        $commands[] = new Command\ExecCommand();
+        $commands[] = new Command\AboutCommand();
 
         return $commands;
+    }
+
+    /**
+     * @return string
+     */
+    public function checkDocker($io, $showoutput)
+    {
+        $command = 'docker info';
+        $process = new Process($command);
+        $process->setTimeout(2);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            if($showoutput) {
+                $out = 'Can\'t connect to Docker. Is it running?';
+                $io->warning($out);
+            }
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDockerVersion(){
+        $command = 'docker --version';
+        $process = new Process($command);
+        $process->setTimeout(2);
+        $process->run();
+        $version = $process->getOutput();
+        return $version;
     }
 }

@@ -33,6 +33,7 @@ class StartCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $application = $this->getApplication();
         $io = new DockerDrupalStyle($input, $output);
         $io->section("STARTING CONTAINERS");
 
@@ -42,7 +43,7 @@ class StartCommand extends Command
             return;
         }
 
-        $command = 'docker-compose start';
+        $command = 'docker-compose start 2>&1';
         $process = new Process($command);
         $process->setTimeout(3600);
         $process->run();
@@ -50,6 +51,9 @@ class StartCommand extends Command
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        echo $process->getOutput();
+        $out = $process->getOutput();
+        $io->info($out);
     }
+
+
 }

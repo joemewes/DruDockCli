@@ -57,6 +57,7 @@ class DestroyCommand extends Command
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        echo $process->getOutput();
+        $out = $process->getOutput();
+        $io->info($out);
     }
 }

@@ -42,7 +42,7 @@ class RestartCommand extends Command
             return;
         }
 
-        $command = 'docker-compose restart';
+        $command = 'docker-compose restart 2>&1';
         $process = new Process($command);
         $process->setTimeout(3600);
         $process->run();
@@ -50,6 +50,7 @@ class RestartCommand extends Command
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        echo $process->getOutput();
+        $out = $process->getOutput();
+        $io->info($out);
     }
 }

@@ -32,3 +32,17 @@ $settings['trusted_host_patterns'] = array('^docker\.dev');
 
 $config['system.performance']['css']['preprocess'] = FALSE;
 $config['system.performance']['js']['preprocess'] = FALSE;
+
+/**
+ * Uncomment after enabling REDIS
+ */
+//$settings['container_yamls'][] = 'modules/redis/example.services.yml';
+//$settings['redis.connection']['interface'] = 'PhpRedis';
+//$settings['redis.connection']['host'] = 'redis';
+//$settings['cache']['default'] = 'cache.backend.redis';
+//$settings['cache']['bins']['bootstrap'] = 'cache.backend.chainedfast';
+//$settings['cache']['bins']['discovery'] = 'cache.backend.chainedfast';
+//$settings['cache']['bins']['config'] = 'cache.backend.chainedfast';
+
+
+

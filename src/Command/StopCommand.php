@@ -35,7 +35,7 @@ class StopCommand extends Command
         $io = new DockerDrupalStyle($input, $output);
         $io->section("STOPPING CONTAINERS");
 
-        $command = 'docker stop $(docker ps -q)';
+        $command = 'docker stop $(docker ps -q) 2>&1';
         $process = new Process($command);
         $process->setTimeout(3600);
         $process->run();
@@ -46,6 +46,7 @@ class StopCommand extends Command
              $io->warning("No running containers");
           }
         }
-        echo $process->getOutput();
+        $out = $process->getOutput();
+        $io->info($out);
     }
 }

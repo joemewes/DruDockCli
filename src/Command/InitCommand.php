@@ -28,15 +28,13 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  */
 class InitCommand extends ContainerAwareCommand
 {
-
-
     protected function configure()
     {
         $this
             ->setName('build:init')
             ->setAliases(['build'])
             ->setDescription('Fetch and build DockerDrupal containers')
-            ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.')
+            ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
             ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
             ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
         ;
@@ -46,8 +44,15 @@ class InitCommand extends ContainerAwareCommand
     {
         $application = $this->getApplication();
         $io = new DockerDrupalStyle($input, $output);
+
+        // check Docker is running
+        $application->checkDocker($io);
+
         $fs = new Filesystem();
         $date =  date('Y-m-d--H-i-s');
+
+        $io->section("ADD HOSTS");
+        $this->addHost();
 
         $appname = $input->getArgument('appname');
 
@@ -121,7 +126,8 @@ class InitCommand extends ContainerAwareCommand
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        echo $process->getOutput();
+        $out = $process->getOutput();
+        $io->info($out);
     }
 
     private function initDocker($io, $appname){
@@ -148,6 +154,21 @@ class InitCommand extends ContainerAwareCommand
         $dockercmd = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml up -d';
         $this->runcommand($dockercmd);
 
+    }
+
+    private function addHost(){
+        // add initial entry to hosts file -> OSX @TODO update as command for all systems and OS's
+        $ip = '127.0.0.1';
+        $hostname = 'docker.dev';
+        $hosts_file = '/etc/hosts';
+        if(!exec("cat ".$hosts_file." | grep '".$ip." ".$hostname."'")) {
+            $process = new Process(sprintf('echo "%s %s" | sudo tee -a %s >/dev/null', $ip, $hostname, $hosts_file));
+            $process->run(
+                function ($type, $buffer) use ($output) {
+                    $output->writeln($buffer);
+                }
+            );
+        }
     }
 
     private function setupD7($fs, $io, $appname){
@@ -195,6 +216,7 @@ class InitCommand extends ContainerAwareCommand
             $fs->copy($d8files.'/settings.php', $app_dest.'/repository/settings.php');
             //local shared files
             $fs->copy($d8files.'/settings.local.php', $app_dest.'/shared/settings.local.php');
+
         }
 
         // download D8 - ask for version ?? [8.1.8]
@@ -221,9 +243,24 @@ class InitCommand extends ContainerAwareCommand
         $fs->remove(array($app_dest.'/'.$buildpath.'/sites/default/files'));
         $fs->symlink('../../../../../shared/files', $app_dest.'/'.$buildpath.'/sites/default/files', true);
 
+        $fs->symlink($rel.'/modules/custom', $app_dest.'/'.$buildpath.'/modules/custom', true);
+        $fs->symlink($rel.'/profiles/custom', $app_dest.'/'.$buildpath.'/profiles/custom', true);
+        $fs->symlink($rel.'/themes/custom', $app_dest.'/'.$buildpath.'/themes/custom', true);
+
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/files', 0777, 0000, true);
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.php', 0777, 0000, true);
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.local.php', 0777, 0000, true);
+
+        // setup $VAR for redis cache_prefix in settings.loca.php template
+        $cache_prefix = "\$settings['cache_prefix'] = '".$appname."_';";
+        $local_settings = $app_dest.'/'.$buildpath.'/sites/default/settings.local.php';
+
+        $process = new Process(sprintf('echo "%s" | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
+        $process->run(
+            function ($type, $buffer) use ($output) {
+                $output->writeln($buffer);
+            }
+        );
 
     }
 
@@ -263,6 +300,13 @@ class InitCommand extends ContainerAwareCommand
         $io->comment($message);
         $installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
         $this->runcommand($installcmd);
+
+        $composercmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) composer update';
+        $this->runcommand($composercmd);
+
+        $drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush en admin_toolbar ctools metatag redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
+        $this->runcommand($drushcmd);
+
     }
 
 

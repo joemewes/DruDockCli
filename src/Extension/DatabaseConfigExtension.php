@@ -27,8 +27,5 @@ class DatabaseConfigExtension extends Extension
     $loader = new YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ) );
     $loader->load( '../config/database.yml' );
 
-    // Once the services definition are read, get your service and add a method call to setConfig()
-    $sillyServiceDefintion = $container->getDefinition( 'my.niceproject.sillymanager' );
-    $sillyServiceDefintion->addMethodCall( 'setConfig', array( $processedConfig[ 'contact_email' ] ) );
     }
 }

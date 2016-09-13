@@ -29,6 +29,7 @@
     - GIT installed?
     - PHP version on HOST 5.5+
     - Drush installed and minimum version etc....
+    - ADD `127.0.0.1 docker.dev` to /etc/hosts
 
 
 For more information see [roadmap](https://github.com/4AllDigital/DockerDrupalCli/blob/master/roadmap.md)

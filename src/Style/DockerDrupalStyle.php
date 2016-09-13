@@ -5,6 +5,8 @@ namespace Docker\Drupal\Style;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+
 
 class DockerDrupalStyle extends SymfonyStyle
 {
@@ -28,7 +30,7 @@ class DockerDrupalStyle extends SymfonyStyle
      */
     public function info($message, $newLine = true)
     {
-        $message = sprintf('<info> %s</info>', $message);
+        $message = sprintf('<fg=yellow>%s</>', $message);
         if ($newLine) {
             $this->writeln($message);
         } else {

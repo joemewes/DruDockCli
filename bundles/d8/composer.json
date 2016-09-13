@@ -52,5 +52,15 @@
         "post-autoload-dump": "Drupal\\Core\\Composer\\Composer::ensureHtaccess",
         "post-package-install": "Drupal\\Core\\Composer\\Composer::vendorTestCodeCleanup",
         "post-package-update": "Drupal\\Core\\Composer\\Composer::vendorTestCodeCleanup"
+    },
+    "extra": {
+        "installer-paths": {
+            "www/core": ["type:drupal-core"],
+            "www/modules/contrib/{$name}": ["type:drupal-module"],
+            "www/profiles/contrib/{$name}": ["type:drupal-profile"],
+            "www/themes/contrib/{$name}": ["type:drupal-theme"],
+            "www/libraries/{$name}": ["type:drupal-library"],
+            "drush/contrib/{$name}": ["type:drupal-drush"]
+        },
     }
 }
