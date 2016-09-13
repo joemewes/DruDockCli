@@ -5,6 +5,8 @@ namespace Docker\Drupal;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Application as ParentApplication;
 
 
@@ -108,6 +110,25 @@ class Application extends ParentApplication
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getDefaultInputDefinition()
+    {
+        return new InputDefinition(
+            [
+                new InputArgument('command', InputArgument::REQUIRED),
+                new InputOption('--help', '-h', InputOption::VALUE_NONE),
+                new InputOption('--quiet', '-q', InputOption::VALUE_NONE),
+                new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE),
+                new InputOption('--version', '-V', InputOption::VALUE_NONE),
+                new InputOption('--ansi', '', InputOption::VALUE_NONE),
+                new InputOption('--no-ansi', '', InputOption::VALUE_NONE),
+                new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE),
+            ]
+        );
+    }
+
+    /**
      * @return \Symfony\Component\Console\Command\Command[]
      */
     protected function registerCommands()
@@ -120,6 +141,9 @@ class Application extends ParentApplication
         $commands[] = new Command\InitCommand();
         $commands[] = new Command\DemoCommand();
         $commands[] = new Command\StopCommand();
+        $commands[] = new Command\StartCommand();
+        $commands[] = new Command\RestartCommand();
+        $commands[] = new Command\DestroyCommand();
 
         return $commands;
     }

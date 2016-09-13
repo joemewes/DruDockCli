@@ -105,16 +105,6 @@ class InitCommand extends ContainerAwareCommand
 
         $this->initDocker($io, $appname);
 
-
-        // Questions set to build install query
-        /*
-         * 1. account name [docker]
-         * 2. account pass [drupal]
-         * 3. Site name [DockerDrupal]
-         * 4. Site mail [drupalD8@docker.dev]
-         * 5.
-         */
-
         $this->installDrupal8($io);
 
         $message = 'Opening Drupal 8 base Installation at http://docker.dev';

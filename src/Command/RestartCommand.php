@@ -12,39 +12,43 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Filesystem\Filesystem;
 use Docker\Drupal\Style\DockerDrupalStyle;
 
 /**
  * Class DemoCommand
  * @package Docker\Drupal\Command
  */
-class StopCommand extends Command
+class RestartCommand extends Command
 {
     protected function configure()
     {
         $this
-            ->setName('docker:stop')
-            ->setAliases(['stop'])
-            ->setDescription('Stop all containers')
-            ->setHelp("This command will stop all running containers even if you're in another app/project folder...")
+            ->setName('docker:restart')
+            ->setAliases(['restart'])
+            ->setDescription('Restart APP containers')
+            ->setHelp("This command will restart all containers for the current APP via the docker-compose.yml file.")
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new DockerDrupalStyle($input, $output);
-        $io->section("STOPPING CONTAINERS");
+        $io->section("RESTARTING CONTAINERS");
 
-        $command = 'docker stop $(docker ps -q)';
+        $fs = new Filesystem();
+        if(!$fs->exists('docker-compose.yml')){
+            $io->warning("docker-compose.yml : Not Found");
+            return;
+        }
+
+        $command = 'docker-compose restart';
         $process = new Process($command);
         $process->setTimeout(3600);
         $process->run();
 
         if (!$process->isSuccessful()) {
-           // throw new ProcessFailedException($process);
-          if(!exec("echo $(docker ps -q)")){
-             $io->warning("No running containers");
-          }
+            throw new ProcessFailedException($process);
         }
         echo $process->getOutput();
     }
