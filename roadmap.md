@@ -111,16 +111,8 @@
 docker ps --format {{.Names}} | grep php
 
 # STOP ALL running containers
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\Console\Command\Command;
-use Drupal\Console\Command\Shared\CommandTrait;
-use Drupal\Console\Style\DrupalStyle;
-use Drupal\Console\Command\Shared\ProjectDownloadTrait;
+docker stop $(docker ps -q)
+
 # \<CONTAINER\> bash
 docker exec -it $(docker ps --format {{.Names}} | grep php) bash
 
