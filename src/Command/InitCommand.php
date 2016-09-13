@@ -131,7 +131,7 @@ class InitCommand extends ContainerAwareCommand
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        //echo $process->getOutput();
+        echo $process->getOutput();
     }
 
     private function initDocker($io, $appname){
@@ -149,7 +149,13 @@ class InitCommand extends ContainerAwareCommand
         $dockerlogs = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml logs -f';
         $this->runcommand($dockerlogs);
 
-        $dockercmd = 'until docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml run app 2>&1 | grep -m 1 "Synchronization complete"; do : ; done && docker kill $(docker ps -q) && docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml up -d';
+        $dockercmd = 'until docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "Nothing to do"; do : ; done';
+        $this->runcommand($dockercmd);
+
+        $dockercmd = 'docker kill $(docker ps -q)';
+        $this->runcommand($dockercmd);
+
+        $dockercmd = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml up -d';
         $this->runcommand($dockercmd);
 
     }
