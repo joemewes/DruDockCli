@@ -1,13 +1,20 @@
 # DockerDrupalCli
 
 ## Things it must do
-- check requirements    
-    - Docker for Mac/Windows/Linux
-        - docker Daemon running
-    - PHP version
-    - Drush version ` shell_exec('which drush') `
-    - GIT installed ` shell_exec('which git') `
-    - WRITE .yaml file with APP .config INFO to reading later. eg. type: [D8]
+```
+######################################################################################
+#                                                                                    #
+# - check requirements                                                               #
+#    - Docker for Mac/Windows/Linux                                                  #
+#        - docker Daemon running                                                     #
+#    - PHP version                                                                   #
+#    - Drush version ` shell_exec('which drush') `                                   #
+#    - GIT installed ` shell_exec('which git') `                                     #
+#    - WRITE .yaml file with APP .config INFO to reading later. eg. type: [D8]       #
+#                                                                                    #
+######################################################################################
+    
+```
 
 - GET DockerDrupal and setup basic index.php/html welcome page
   -> full

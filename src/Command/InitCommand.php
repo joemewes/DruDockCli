@@ -20,6 +20,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Symfony\Component\Yaml\Yaml;
 
 
 /**
@@ -46,12 +47,12 @@ class InitCommand extends ContainerAwareCommand
         $io = new DockerDrupalStyle($input, $output);
 
         // check Docker is running
-        $application->checkDocker($io);
+        $application->checkDocker($io, FALSE);
 
         $fs = new Filesystem();
         $date =  date('Y-m-d--H-i-s');
 
-        $io->section("ADD HOSTS");
+        //$io->section("ADD HOSTS");
         $this->addHost();
 
         $appname = $input->getArgument('appname');
@@ -72,6 +73,7 @@ class InitCommand extends ContainerAwareCommand
         }
 
         if(!$type){
+            $io->info(' ');
             $io->title("SET APP TYPE");
             $helper = $this->getHelper('question');
             $question = new ChoiceQuestion(
@@ -82,77 +84,95 @@ class InitCommand extends ContainerAwareCommand
             $type = $helper->ask($input, $output, $question);
         }
 
-        if(!$fs->exists($appname)){
-            $fs->mkdir($appname , 0755);
-            $fs->mkdir($appname.'/docker_'.$appname , 0755);
+        $system_appname = strtolower(str_replace(' ', '', $appname));
+
+        // check if this folder is has APP config
+        if(file_exists('.config.yml')){
+            $io->error('You\'re currently in an APP directory');
+            return;
+        }
+
+        if(!$fs->exists($system_appname)){
+            $fs->mkdir($system_appname , 0755);
+            $fs->mkdir($system_appname.'/docker_'.$system_appname, 0755);
         }else{
             $io->error('This app already exists');
             return;
         }
 
+        // SETUP APP CONFIG FILE
+        $config= array(
+            'Appname' => $appname,
+            'DockerDrupal' => array('version' => $application->getVersion(), 'date' => $date),
+        );
+        $yaml = Yaml::dump($config);
+        file_put_contents($system_appname.'/.config.yml', $yaml);
+
         $message = 'Fetching DockerDrupal v'.$application->getVersion();
+        $io->info(' ');
         $io->note($message);
-        $command = 'git clone https://github.com/4alldigital/DockerDrupal-lite.git '.$appname.'/docker_'.$appname;
-        $this->runcommand($command);
+        $command = 'git clone https://github.com/4alldigital/DockerDrupal-lite.git '.$system_appname.'/docker_'.$system_appname;
+        $this->runcommand($command, $io, FALSE);
 
         /**
          * Install specific APP type
          */
         if(isset($type) && $type == 'DEFAULT'){
-            $this->setUpExampleApp($fs, $io, $appname);
+            $this->setUpExampleApp($fs, $io, $system_appname);
         }
         if(isset($type) && $type == 'D7'){
-            $this->setupD7($fs, $io, $appname);
+            $this->setupD7($fs, $io, $system_appname);
         }
         if(isset($type) && $type == 'D8'){
-            $this->setupD8($fs, $io, $appname);
+            $this->setupD8($fs, $io, $system_appname);
         }
 
-        $this->initDocker($io, $appname);
+        $this->initDocker($io, $system_appname);
 
         $this->installDrupal8($io);
 
         $message = 'Opening Drupal 8 base Installation at http://docker.dev';
-        $io->comment($message);
+        $io->note($message);
         shell_exec('python -mwebbrowser http://docker.dev');
 
     }
 
-    protected function runcommand($command){
+    protected function runcommand($command, $io, $showoutput){
         $process = new Process($command);
         $process->setTimeout(3600);
         $process->run();
-
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        $out = $process->getOutput();
-        $io->info($out);
+        if($showoutput) {
+            $out = $process->getOutput();
+            $io->info($out);
+        }
     }
 
     private function initDocker($io, $appname){
 
         if(exec('docker ps -q 2>&1', $exec_output)) {
             $dockerstopcmd = 'docker stop $(docker ps -q)';
-            $this->runcommand($dockerstopcmd);
+            $this->runcommand($dockerstopcmd, $io, FALSE);
         }
 
         $message = 'Download and configure DockerDrupal.... This may take a few minutes....';
-        $io->comment($message);
+        $io->note($message);
 
         // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
         // When 'Synchronization complete' kill this temp run container and start DockerDrupal.
         $dockerlogs = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml logs -f';
-        $this->runcommand($dockerlogs);
+        $this->runcommand($dockerlogs, $io, FALSE);
 
         $dockercmd = 'until docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "Nothing to do"; do : ; done';
-        $this->runcommand($dockercmd);
+        $this->runcommand($dockercmd, $io, FALSE);
 
         $dockercmd = 'docker kill $(docker ps -q)';
-        $this->runcommand($dockercmd);
+        $this->runcommand($dockercmd, $io, FALSE);
 
         $dockercmd = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml up -d';
-        $this->runcommand($dockercmd);
+        $this->runcommand($dockercmd, $io, FALSE);
 
     }
 
@@ -221,8 +241,8 @@ class InitCommand extends ContainerAwareCommand
 
         // download D8 - ask for version ?? [8.1.8]
         $command = sprintf('composer create-project drupal/drupal:8.2.x-dev '.$app_dest.'/builds/'.$date.'/public --stability dev --no-interaction');
-        $io->comment('Download and configure Drupal 8.... This may take a few minutes....');
-        $this->runcommand($command);
+        $io->note('Download and configure Drupal 8.... This may take a few minutes....');
+        $this->runcommand($command, $io, FALSE);
 
         $buildpath = 'builds/'.$date.'/public';
         $fs->symlink($buildpath, $app_dest.'/www', true);
@@ -251,16 +271,12 @@ class InitCommand extends ContainerAwareCommand
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.php', 0777, 0000, true);
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.local.php', 0777, 0000, true);
 
-        // setup $VAR for redis cache_prefix in settings.loca.php template
-        $cache_prefix = "\$settings['cache_prefix'] = '".$appname."_';";
-        $local_settings = $app_dest.'/'.$buildpath.'/sites/default/settings.local.php';
-
-        $process = new Process(sprintf('echo "%s" | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
-        $process->run(
-            function ($type, $buffer) use ($output) {
-                $output->writeln($buffer);
-            }
-        );
+        // setup $VAR for redis cache_prefix in settings.local.php template
+//        $cache_prefix = "\$settings['cache_prefix'] = '".$appname."_';";
+//        $local_settings = $app_dest.'/'.$buildpath.'/sites/default/settings.local.php';
+//
+//        $process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
+//        $process->run();
 
     }
 
@@ -297,15 +313,21 @@ class InitCommand extends ContainerAwareCommand
         $io->success($message);
 
         $message = 'Run Drupal Installation.... This may take a few minutes....';
-        $io->comment($message);
+        $io->note($message);
         $installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
-        $this->runcommand($installcmd);
+        $this->runcommand($installcmd, $io, FALSE);
 
+        $message = 'Run APP composer update';
+        $io->text(' ');
+        $io->note($message);
         $composercmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) composer update';
-        $this->runcommand($composercmd);
+        $this->runcommand($composercmd, $io, TRUE);
 
+        $message = 'Enable useful starter contrib modules';
+        $io->text(' ');
+        $io->note($message);
         $drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush en admin_toolbar ctools metatag redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
-        $this->runcommand($drushcmd);
+        $this->runcommand($drushcmd, $io, TRUE);
 
     }
 
