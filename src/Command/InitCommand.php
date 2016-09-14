@@ -267,6 +267,7 @@ class InitCommand extends ContainerAwareCommand
         $fs->symlink($rel.'/profiles/custom', $app_dest.'/'.$buildpath.'/profiles/custom', true);
         $fs->symlink($rel.'/themes/custom', $app_dest.'/'.$buildpath.'/themes/custom', true);
 
+        $fs->chmod($app_dest.'/repository/config/sync', 0777, 0000, true);
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/files', 0777, 0000, true);
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.php', 0777, 0000, true);
         $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.local.php', 0777, 0000, true);
@@ -300,7 +301,7 @@ class InitCommand extends ContainerAwareCommand
 
     }
 
-    private function installDrupal8($io){
+    private function installDrupal8($io, $install_helpers = FALSE){
         // Check for running mySQL container before launching Drupal Installation
         $message = 'Waiting for mySQL service.';
         $io->warning($message);
@@ -317,17 +318,18 @@ class InitCommand extends ContainerAwareCommand
         $installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
         $this->runcommand($installcmd, $io, FALSE);
 
-        $message = 'Run APP composer update';
-        $io->text(' ');
-        $io->note($message);
-        $composercmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) composer update';
-        $this->runcommand($composercmd, $io, TRUE);
-
-        $message = 'Enable useful starter contrib modules';
-        $io->text(' ');
-        $io->note($message);
-        $drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush en admin_toolbar ctools metatag redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
-        $this->runcommand($drushcmd, $io, TRUE);
+        if($install_helpers) {
+          $message = 'Run APP composer update';
+          $io->note($message);
+          $composercmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) composer update';
+          $this->runcommand($composercmd, $io, TRUE);
+          $message = 'Enable useful starter contrib modules';
+          $io->note($message);
+          $drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush en admin_toolbar ctools redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
+          $this->runcommand($drushcmd, $io, TRUE);
+          $drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush entity-updates -y';
+          $this->runcommand($drushcmd, $io, TRUE);
+        }
 
     }
 

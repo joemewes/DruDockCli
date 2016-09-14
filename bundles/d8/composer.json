@@ -23,13 +23,14 @@
         "drupal/token": "8.*",
         "drupal/pathauto": "8.*",
         "drupal/adminimal_admin_toolbar": "8.x",
-        //"drupal/metatag": "8.x",
         "drupal/ctools": "8.x"
     },
     "require-dev": {
         "mikey179/vfsStream": "~1.2",
         "phpunit/phpunit": "~4.8",
-        "symfony/css-selector": "~2.8"
+        "symfony/css-selector": "~2.8",
+        "mbostock/d3": "~3.5",
+        "components/highlightjs": "~9.6"
     },
     "replace": {
         "drupal/core": "~8.3"
@@ -59,12 +60,7 @@
             "profiles/contrib/{$name}": ["type:drupal-profile"],
             "themes/contrib/{$name}": ["type:drupal-theme"],
             "libraries/{$name}": ["type:drupal-library"]
-        },
-//        "patches": {
-//            "drupal/metatag": {
-//                "DrupalConsole integration breaks Drush": "https://www.drupal.org/files/issues/metatag-n2786795-23.patch"
-//            }
-//        }
+        }
     },
     "autoload": {
         "psr-4": {
