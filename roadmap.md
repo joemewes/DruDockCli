@@ -13,7 +13,7 @@
 #    - WRITE .yaml file with APP .config INFO to reading later. eg. type: [D8]       #
 #                                                                                    #
 ######################################################################################
-    
+
 ```
 
 - GET DockerDrupal and setup basic index.php/html welcome page
@@ -129,7 +129,7 @@ docker exec -i $(docker ps --format {{.Names}} | grep app_1) tail -f /var/log/un
 
 # drush ULI
 docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docker.dev uli 1
-#docker exec -i $(docker ps --format {{.Names}} | grep php) drush uli 1
+# docker exec -i $(docker ps --format {{.Names}} | grep php) drush uli 1
 # drush clear cache
 docker exec -i $(docker ps --format {{.Names}} | grep php) drush cc all
 # multisite drush -> args :multi

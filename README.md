@@ -6,24 +6,24 @@
 ### CLI utility for DockerDrupal
 
 ### Questions?
-  Ping me on [Twitter](http://twitter.com/@4alldigital) 
+  Ping me on [Twitter](http://twitter.com/@4alldigital)
 
 ```composer global require dockerdrupal/cli```
 
 # Status
-## Initial Commands structure 
+## Initial Commands structure
 ```
      --------------
-     build:destroy   Disable and delete APP and containers
-     build:init      Fetch and build DockerDrupal containers docker
+     $ dockerdrupal build:destroy   [destroy] Disable and delete APP and containers
+     $ dockerdrupal build:init      [init] Fetch and build DockerDrupal containers docker
      --------------
-     docker:restart  Restart APP containers
-     docker:start    Start APP containers
-     docker:stop     Stop all containers
+     $ dockerdrupal docker:restart  [restart] Restart APP containers
+     $ dockerdrupal docker:start    [start] Start APP containers
+     $ dockerdrupal docker:stop     [stop] Stop all containers
      --------------
 ```
 
-# Next step : 
+# Next step :
 
  - D7 app build
 
