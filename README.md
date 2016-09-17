@@ -21,7 +21,7 @@
      $ dockerdrupal docker:start    [start] Start APP containers
      $ dockerdrupal docker:stop     [stop] Stop all containers
      --------------
-     $ dockerdrupal exec [exec] Execute command against a container service
+     $ dockerdrupal exec [-s] [-c]  [exec --flags] Execute command against a container service
      --------------
 ```
 
