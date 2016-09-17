@@ -23,6 +23,21 @@
      --------------
 ```
 
+## Example Commands
+```
+      --------------
+      dockerdrupal exec -s [service/container name] -c "[command to execute against container service]"
+
+      dockerdrupal exec -s php -c "drush cc all"
+
+      dockerdrupal exec -s nginx -c "nginx -s reload"
+
+      OR
+
+      dockerdrupal exec [follow prompts]
+
+```
+
 # Next step :
 
  - D7 app build
