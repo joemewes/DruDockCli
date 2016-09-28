@@ -25,7 +25,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class DemoCommand
- * @package Docker\Drupal\Command
+ * @package Docker\Drupal\ContainerAwareCommand
  */
 class InitCommand extends ContainerAwareCommand
 {
