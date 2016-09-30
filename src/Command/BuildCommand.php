@@ -58,37 +58,22 @@ class BuildCommand extends ContainerAwareCommand
       $fs = new Filesystem();
       $date =  date('Y-m-d--H-i-s');
 
-//      $type = $input->getOption('type');
-//      $available_types = array('DEFAULT', 'D7', 'D8');
-//
-//      if($type && !in_array($type, $available_types)){
-//          $io->warning('TYPE : '.$type.' not allowed.');
-//          $type = null;
+//      if(file_exists('.config.yml')){
+//        $config = Yaml::parse(file_get_contents('.config.yml'));
+//        $appname = $config['appname'];
+//        $type = $config['apptype'];
+//        $dockerdrupal_version = $config['dockerdrupal']['version'];
+//        if($dockerdrupal_version != $application->getVersion()){
+//          $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
+//        }
+//      }else{
+//        $io->error('You\'re not currently in an APP directory.');
+//        return;
 //      }
-//
-//      if(!$type){
-//          $io->info(' ');
-//          $io->title("SET APP TYPE");
-//          $helper = $this->getHelper('question');
-//          $question = new ChoiceQuestion(
-//              'Select your APP type : ',
-//              $available_types,
-//              '0,1'
-//          );
-//          $type = $helper->ask($input, $output, $question);
-//      }
-
-      if(file_exists('.config.yml')){
-        $config = Yaml::parse(file_get_contents('.config.yml'));
+      $config = $application->getAppConfig();
+      if($config) {
         $appname = $config['appname'];
         $type = $config['apptype'];
-        $dockerdrupal_version = $config['dockerdrupal']['version'];
-        if($dockerdrupal_version != $application->getVersion()){
-          $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
-        }
-      }else{
-        $io->error('You\'re not currently in an APP directory.');
-        return;
       }
 
       $system_appname = strtolower(str_replace(' ', '', $appname));

@@ -44,5 +44,4 @@ $config['system.performance']['js']['preprocess'] = FALSE;
 //$settings['cache']['bins']['discovery'] = 'cache.backend.chainedfast';
 //$settings['cache']['bins']['config'] = 'cache.backend.chainedfast';
 
-
-
+$base_url = "http://docker.dev";

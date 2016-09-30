@@ -59,11 +59,14 @@
     - linux -> write 127.0.0.1 docker.dev to /etc/hosts file
     - Windows -> ??        
     - ~~Open http://docker.dev in browser~~
-- DRUSH:commands 
-    - drush cc <cache> [all]
-    - drush uli <uid> [1]
+
+------
+## Active APP commands
+- ~~DRUSH:commands~~
+    - ~~drush cc \<cache> \[all]~~
+    - ~~drush uli \<uid> \[1]~~
 - UTIL:commands
-    - be able to import local DB / .sql dump
+    - ~~be able to import local DB / .sql dump~~
     - ~~build multisite? add site?~~
     - ~~get container name~~
     - ~~STOP ALL running containers~~

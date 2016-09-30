@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Console\Application as ParentApplication;
 
 
@@ -174,6 +175,9 @@ class Application extends ParentApplication
     $commands[] = new Command\StatusCommand();
     $commands[] = new Command\ExecCommand();
     $commands[] = new Command\AboutCommand();
+    $commands[] = new Command\DrushCommand();
+    $commands[] = new Command\util\UtilMysqlImportCommand();
+    $commands[] = new Command\util\UtilMysqlExportCommand();
 
     return $commands;
   }
@@ -209,5 +213,22 @@ class Application extends ParentApplication
       $process->run();
       $version = $process->getOutput();
       return $version;
+  }
+
+  /**
+   * @return array
+   */
+  public function getAppConfig($io){
+    if(file_exists('.config.yml')){
+      $config = Yaml::parse(file_get_contents('.config.yml'));
+      $dockerdrupal_version = $config['dockerdrupal']['version'];
+      if($dockerdrupal_version != $this->getVersion()){
+          $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
+      }
+      return $config;
+    }else{
+      $io->error('You\'re not currently in an APP directory.');
+      exit;
+    }
   }
 }

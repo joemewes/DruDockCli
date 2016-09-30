@@ -37,13 +37,23 @@ class StartCommand extends Command
         $io = new DockerDrupalStyle($input, $output);
         $io->section("STARTING CONTAINERS");
 
+        $config = $application->getAppConfig($io);
+        if($config) {
+            $appname = $config['appname'];
+            //$type = $config['apptype'];
+        }
+
         $fs = new Filesystem();
-        if(!$fs->exists('docker-compose.yml')){
+        if($fs->exists('docker-compose.yml')) {
+            $command = 'docker-compose start 2>&1';
+        }elseif($fs->exists('./docker_'.$appname.'/docker-compose.yml')){
+            $command = 'docker-compose -f ./docker_'.$appname.'/docker-compose.yml start 2>&1';
+        }else{
             $io->warning("docker-compose.yml : Not Found");
             return;
         }
 
-        $command = 'docker-compose start 2>&1';
+
         $process = new Process($command);
         $process->setTimeout(3600);
         $process->run();

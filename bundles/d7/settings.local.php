@@ -93,3 +93,4 @@ $conf['search_api_override_servers'] = array(
 //$conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
 //$conf['cache_prefix'] = '';
 
+$base_url = "http://docker.dev";
