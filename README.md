@@ -13,6 +13,9 @@
 # Status
 ## Initial Commands structure
 ```
+env:init
+    --------------
+     $ dockerdrupal env:init   [env] Initial Docker container and app directory setup. 
      --------------
      $ dockerdrupal build:destroy   [destroy] Disable and delete APP and containers
      $ dockerdrupal build:init      [init] Fetch and build DockerDrupal containers docker

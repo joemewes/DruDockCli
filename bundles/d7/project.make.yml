@@ -1,0 +1,407 @@
+core: 7.x
+api: '2'
+projects:
+  drupal:
+    version: '7.43'
+  admin_menu:
+    subdir: contrib
+    version: '3.x-dev'
+  adminimal_admin_menu:
+    subdir: contrib
+    version: '1.7'
+  admin_views:
+    subdir: contrib
+    version: '1.5'
+  advanced_link:
+    subdir: contrib
+    version: '1.3'
+  advanced_text_formatter:
+    subdir: contrib
+    version: '1.4'
+  apc:
+    subdir: contrib
+    version: '1.0-beta6'
+  bakery:
+    subdir: contrib
+    version: '2.x-dev'
+  better_exposed_filters:
+    subdir: contrib
+    version: '3.2'
+  botcha:
+    subdir: contrib
+    version: '3.3'
+  block_views:
+    subdir: contrib
+    version: 1.0-beta2
+  chosen:
+    subdir: contrib
+    version: 2.0-beta4
+    patch:
+      - 'https://www.drupal.org/files/issues/chosen-toggle-admin-pages-option-2089987-32.patch'
+  ctools:
+    subdir: contrib
+    version: '1.9'
+  cck:
+    subdir: contrib
+    version: 3.0-alpha3
+  ckeditor:
+    subdir: contrib
+    version: '1.17'
+  ckeditor_link:
+    subdir: contrib
+    version: '2.4'
+  date:
+    subdir: contrib
+    version: '2.9'
+  diff:
+    subdir: contrib
+    version: '3.2'
+  environment_indicator:
+    subdir: contrib
+    version: '2.8'
+  expire:
+    subdir: contrib
+    version: '2.0-rc4'
+  eck:
+    subdir: contrib
+    version: 2.0-rc8
+  entity:
+    subdir: contrib
+    version: '1.7'
+  entity_view_mode:
+    subdir: contrib
+    version: 1.0-rc1
+  entityqueue:
+    subdir: contrib
+    version: '1.1'
+  entityreference:
+    subdir: contrib
+    version: '1.1'
+  emptyparagraphkiller:
+    subdir: contrib
+    version: '1.0-beta2'
+  exclude_node_title:
+    subdir: contrib
+    version: '1.9'
+  features:
+    subdir: contrib
+    version: '2.8'
+  fences:
+    subdir: contrib
+    version: '1.2'
+  file_entity:
+    subdir: contrib
+    version: 2.0-beta2
+    patch:
+     - "https://www.drupal.org/files/issues/file_entity_update-2375595-4.patch"
+  emogrifier:
+    subdir: contrib
+    version: '2.0-beta1'
+  entity:
+    subdir: contrib
+    version: '1.6'
+  features:
+    subdir: contrib
+    version: '2.7'
+  field_group:
+    subdir: contrib
+    version: '1.5'
+  file_lock:
+    subdir: contrib
+    version: 2.0
+  globalredirect:
+    subdir: contrib
+    version: '1.5'
+  google_analytics:
+    subdir: contrib
+    version: '2.1'
+  htmlmail:
+    subdir: contrib
+    version: '2.65'
+  imagecache_token:
+    subdir: contrib
+    version: 1.0-rc2
+  imce:
+    subdir: contrib
+    version: '1.10'
+  inline_entity_form:
+    subdir: contrib
+    version: '1.6'
+  job_scheduler:
+    subdir: contrib
+    version: 2.0-alpha3
+  jquery_update:
+    subdir: contrib
+    version: '2.7'
+  jquery_localscroll:
+    subdir: contrib
+    version: '1.x-dev'
+  libraries:
+    subdir: contrib
+    version: '2.2'
+  link:
+    subdir: contrib
+    version: '1.4'
+  mailsystem:
+    subdir: contrib
+    version: '2.34'
+    patch:
+     - "https://www.drupal.org/files/issues/mailsystem-theme_registry-2051135-13.patch"
+  mandrill:
+    subdir: contrib
+    version: '2.2'
+  media:
+    subdir: contrib
+    version: '2.x-dev'
+  media_ckeditor:
+    subdir: contrib
+    version: '2.0-alpha1'
+  menu_attributes:
+    subdir: contrib
+    version: 1.0
+  metatag:
+    subdir: contrib
+    version: '1.13'
+  mobile_detect:
+    subdir: contrib
+    version: '1.0-alpha1'
+  module_filter:
+    subdir: contrib
+    version: '2.0'
+  moopapi:
+    subdir: contrib
+    version: '2.x-dev'
+  multiform:
+    subdir: contrib
+    version: '2.x-dev'
+  references:
+    subdir: contrib
+    version: '2.1'
+  oauth:
+    subdir: contrib
+    version: '3.2'
+  panels:
+    subdir: contrib
+    version: '3.5'
+  panelizer:
+    subdir: contrib
+    version: '3.1'
+  panels_everywhere:
+    subdir: contrib
+    version: 1.0-rc2
+  pathauto:
+    subdir: contrib
+    version: '1.3'
+  rabbit_hole:
+    subdir: contrib
+    version: '2.23'
+  redirect:
+    subdir: contrib
+    version: 1.0-rc3
+  redis:
+    subdir: contrib
+    version: 3.11
+  retina_images:
+    subdir: contrib
+    version: 1.0-beta5
+  save_draft:
+    subdir: contrib
+    version: '1.4'
+  scheduler:
+    subdir: contrib
+    version: '1.4'
+  semantic_panels:
+    subdir: contrib
+    version: '1.x-dev'
+  site_verify:
+    subdir: contrib
+    version: '1.1'
+  slack:
+    subdir: contrib
+    version: '1.5'
+  slick:
+    subdir: contrib
+    version: 2.0
+  slick_extras:
+    subdir: contrib
+    version: 2.0-beta4
+  slick_views:
+    subdir: contrib
+    version: 2.0
+  static_404:
+    subdir: contrib
+    version: 1.0-beta4
+  strongarm:
+    subdir: contrib
+    version: '2.0'
+  styleguide:
+    subdir: contrib
+    version: '1.x-dev'
+  styles:
+    subdir: contrib
+    version: 2.0-alpha8
+  title:
+    subdir: contrib
+    version: 1.0-alpha8
+  token:
+    subdir: contrib
+    version: '1.6'
+  transliteration:
+    subdir: contrib
+    version: '3.2'
+  ultimate_cron:
+    subdir: contrib
+    version: '2.0-rc1'
+  user_pages:
+    subdir: contrib
+    version: '1.0'
+  uuid:
+    subdir: contrib
+    version: 1.0-beta1
+  views:
+    subdir: contrib
+    version: '3.13'
+  views_bulk_operations:
+    subdir: contrib
+    version: '3.3'
+  views_slideshow:
+    subdir: contrib
+    version: '3.1'
+  waypoints:
+    subdir: contrib
+    version: '1.0'
+  webform:
+    subdir: contrib
+    version: '3.24'
+  xmlsitemap:
+    subdir: contrib
+    version: '2.2'
+  adminimal_theme:
+    type: theme
+    subdir: contrib
+    version: '1.24'
+  omega:
+    type: theme
+    subdir: contrib
+    version: '4.4'
+libraries:
+  backbone:
+    download:
+      type: 'file'
+      url: 'https://github.com/jashkenas/backbone/archive/master.zip'
+    directory_name: backbone
+    type: library
+    destination: libraries
+  chosen:
+    download:
+      type: file
+      url: 'http://github.com/harvesthq/chosen/releases/download/v1.2.0/chosen_v1.2.0.zip'
+    directory_name: chosen
+    type: library
+    destination: libraries
+  ckeditor:
+    download:
+      type: file
+      url: 'http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.4.3/ckeditor_4.4.3_standard.zip'
+    directory_name: ckeditor
+    type: library
+    destination: libraries
+  facebook-php-sdk:
+    download:
+      type: 'file'
+      url: 'https://github.com/facebookarchive/facebook-php-sdk/archive/master.zip'
+    directory_name: facebook-php-sdk
+    type: library
+    destination: libraries
+  freetile:
+    download:
+      type: 'file'
+      url: 'https://github.com/yconst/Freetile/archive/master.zip'
+    directory_name: freetile
+    type: library
+    destination: libraries
+  jquery.cycle:
+    download:
+      type: 'file'
+      url: 'https://github.com/malsup/cycle/archive/master.zip'
+    directory_name: jquery.cycle
+    type: library
+    destination: libraries
+  json2:
+    download:
+      type: 'file'
+      url: 'https://github.com/douglascrockford/JSON-js/archive/master.zip'
+    directory_name: json2
+    type: library
+    destination: libraries
+  jsonpath:
+    download:
+      type: 'file'
+      url: 'http://jsonpath.googlecode.com/svn/trunk/src/php/jsonpath.php'
+    directory_name: jsonpath
+    type: library
+    destination: libraries
+  mailchimp:
+    download:
+      type: 'file'
+      url: 'https://github.com/jbrooksuk/MCAPI-PHP/archive/master.zip'
+    directory_name: mailchimp
+    type: library
+    destination: libraries
+  Mobile_Detect:
+    download:
+      type: file
+      url: 'https://github.com/serbanghita/Mobile-Detect/archive/master.zip'
+    directory_name: Mobile_Detect
+    type: library
+    destination: libraries
+  modernizr:
+    download:
+      type: 'file'
+      url: 'https://github.com/Modernizr/Modernizr/archive/v2.7.0.tar.gz'
+    directory_name: modernizr
+    type: library
+    destination: libraries
+  predis:
+    download:
+      type: 'file'
+      url: 'http://github.com/nrk/predis/archive/v0.8.5.tar.gz'
+    directory_name: predis
+    type: library
+    destination: libraries
+  slick:
+    download:
+      type: 'file'
+      url: 'https://github.com/kenwheeler/slick/archive/master.zip'
+    directory_name: slick
+    type: library
+    destination: libraries
+  simplepie:
+    download:
+      type: 'file'
+      url: 'http://simplepie.org/downloads/simplepie_1.3.1.mini.php'
+    directory_name: simplepie
+    type: library
+    destination: libraries
+  underscore:
+    download:
+      type: file
+      url: 'https://github.com/jashkenas/underscore/archive/master.zip'
+    directory_name: underscore
+    type: library
+    destination: libraries
+  emogrifier:
+    download:
+      type: 'file'
+      url: 'https://github.com/jjriv/emogrifier/archive/master.zip'
+    directory_name: emogrifier
+    type: library
+    destination: libraries
+  mandrill:
+    download:
+      type: 'file'
+      url: 'https://bitbucket.org/mailchimp/mandrill-api-php/get/1.0.52.zip'
+    directory_name: mandrill
+    type: library
+    destination: libraries
+
