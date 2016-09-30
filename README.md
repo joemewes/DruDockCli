@@ -13,19 +13,30 @@
 # Status
 ## Initial Commands structure
 ```
-env:init
-    --------------
-     $ dockerdrupal env:init   [env] Initial Docker container and app directory setup. 
      --------------
-     $ dockerdrupal build:destroy   [destroy] Disable and delete APP and containers
-     $ dockerdrupal build:init      [init] Fetch and build DockerDrupal containers docker
+      build
+       build:destroy      Disable and delete APP and containers
+       build:init         Fetch and build Drupal apps
      --------------
-     $ dockerdrupal docker:restart  [restart] Restart APP containers
-     $ dockerdrupal docker:start    [start] Start APP containers
-     $ dockerdrupal docker:stop     [stop] Stop all containers
+      docker
+       docker:exec        Execute bespoke commands at :container
+       docker:restart     Restart APP containers
+       docker:start       Start APP containers
+       docker:status      Get current status of all containers
+       docker:stop        Stop all containers
      --------------
-     $ dockerdrupal exec [-s] [-c]  [exec --flags] Execute command against a container service
+      drush
+       drush:cmd          Run drush commands 
      --------------
+      env
+       env:init           Fetch and build DockerDrupal containers
+     --------------
+      self
+       self:about         About DockerDrupal
+     --------------
+      util
+       util:mysql:export  Export .sql files [utilme]
+       util:mysql:import  Import .sql files [utilmi]
 ```
 
 ## Example Commands
