@@ -35,6 +35,8 @@ class AboutCommand extends Command
     {
         $application = $this->getApplication();
         $io = new DockerDrupalStyle($input, $output);
+
+
         if($dockerversion = $application->getDockerVersion()){
             $dv = $dockerversion;
         }else{
@@ -42,10 +44,12 @@ class AboutCommand extends Command
         }
 
         $io->info(' ');
-        $io->title('DockerDrupal [cli] ::: Create and manage Drupal projects with Docker ::: '.$dv);
+        $io->title('DockerDrupal [cli] - '.$application->getVersion().' ::: Create and manage Drupal projects with Docker ::: '.$dv);
 
         $io->info(' ');
         $io->section(' Docker status ');
+
+        // docker status
         if($application->checkDocker($io, false)){
             $io->success(' Docker Running');
         }else{
@@ -63,9 +67,9 @@ class AboutCommand extends Command
         $io->info(' ');
         $io->section('Get started');
 
-        $io->simple('GET COMMAND DETAILS');
+        $io->simple('SETUP DOCKER ENVIRONMENT');
         $io->info(' ');
-        $io->info('     dockerdrupal build:init --help');
+        $io->info('     dockerdrupal env:init');
         $io->info(' ');
 
         $io->simple('BUILD DRUPAL 8 APP');

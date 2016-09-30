@@ -58,35 +58,36 @@ class BuildCommand extends ContainerAwareCommand
       $fs = new Filesystem();
       $date =  date('Y-m-d--H-i-s');
 
-      $type = $input->getOption('type');
-      $available_types = array('DEFAULT', 'D7', 'D8');
-
-      if($type && !in_array($type, $available_types)){
-          $io->warning('TYPE : '.$type.' not allowed.');
-          $type = null;
-      }
-
-      if(!$type){
-          $io->info(' ');
-          $io->title("SET APP TYPE");
-          $helper = $this->getHelper('question');
-          $question = new ChoiceQuestion(
-              'Select your APP type : ',
-              $available_types,
-              '0,1'
-          );
-          $type = $helper->ask($input, $output, $question);
-      }
+//      $type = $input->getOption('type');
+//      $available_types = array('DEFAULT', 'D7', 'D8');
+//
+//      if($type && !in_array($type, $available_types)){
+//          $io->warning('TYPE : '.$type.' not allowed.');
+//          $type = null;
+//      }
+//
+//      if(!$type){
+//          $io->info(' ');
+//          $io->title("SET APP TYPE");
+//          $helper = $this->getHelper('question');
+//          $question = new ChoiceQuestion(
+//              'Select your APP type : ',
+//              $available_types,
+//              '0,1'
+//          );
+//          $type = $helper->ask($input, $output, $question);
+//      }
 
       if(file_exists('.config.yml')){
         $config = Yaml::parse(file_get_contents('.config.yml'));
-        $appname = $config['Appname'];
-        $dockerdrupal_version = $config['DockerDrupal']['version'];
+        $appname = $config['appname'];
+        $type = $config['apptype'];
+        $dockerdrupal_version = $config['dockerdrupal']['version'];
         if($dockerdrupal_version != $application->getVersion()){
           $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
         }
       }else{
-        $io->error('You\'re not currently in an APP directory');
+        $io->error('You\'re not currently in an APP directory.');
         return;
       }
 
@@ -144,7 +145,7 @@ class BuildCommand extends ContainerAwareCommand
           $this->runcommand($dockerstopcmd, $io, TRUE);
       }
 
-      $message = 'Creating and configure DockerDrupal containers.... This may a moment....';
+      $message = 'Creating and configure DockerDrupal containers.... This may take a moment....';
       $io->note($message);
 
       // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
@@ -161,10 +162,21 @@ class BuildCommand extends ContainerAwareCommand
       $dockercmd = 'docker-compose -f ./docker_'.$appname.'/docker-compose.yml up -d';
       $this->runcommand($dockercmd, $io, TRUE);
 
+      // Check for running mySQL container before launching Drupal Installation
+      $message = 'Waiting for mySQL service.';
+      $io->warning($message);
+      while (!@mysqli_connect('127.0.0.1', 'dev', 'DEVPASSWORD', 'dev_db')) {
+          sleep(1);
+          echo '.';
+      }
+      $io->text(' ');
+      $message = 'mySQL CONNECTED';
+      $io->success($message);
+
   }
 
   private function setupD7($fs, $io, $appname){
-    $app_dest = $appname.'/app';
+    $app_dest = './app';
     $date =  date('Y-m-d--H-i-s');
 
     $application = $this->getApplication();
@@ -179,6 +191,7 @@ class BuildCommand extends ContainerAwareCommand
       $fs->mkdir($app_dest.'/repository/themes/custom');
 
       $fs->mkdir($app_dest.'/shared/files');
+      $fs->mkdir($app_dest.'/builds');
 
     } catch (IOExceptionInterface $e) {
       //echo 'An error occurred while creating your directory at '.$e->getPath();
@@ -191,16 +204,48 @@ class BuildCommand extends ContainerAwareCommand
       // potential repo files
       $fs->copy($d7files.'/robots.txt', $app_dest.'/repository/robots.txt');
       $fs->copy($d7files.'/settings.php', $app_dest.'/repository/settings.php');
+      $fs->copy($d7files.'/project.make.yml', $app_dest.'/repository/project.make.yml');
+      $fs->copy($d7files.'/.gitignore', $app_dest.'/repository/.gitignore');
       //local shared files
       $fs->copy($d7files.'/settings.local.php', $app_dest.'/shared/settings.local.php');
-
     }
+
+    // deploy an initial build
+
+    //replace this with make.yml script
+    $command = 'drush make '.$app_dest.'/repository/project.make.yml '.$app_dest.'/builds/'.$date.'/public';
+
+    $io->note('Download and configure Drupal 7.... This may take a few minutes....');
+    $this->runcommand($command, $io, TRUE);
+
+    $buildpath = 'builds/'.$date.'/public';
+    $fs->symlink($buildpath, $app_dest.'/www', true);
+
+    $rel = $fs->makePathRelative($app_dest.'/repository/', $app_dest.'/'.$buildpath);
+
+    $fs->remove(array($app_dest.'/'.$buildpath.'/robots.txt'));
+    $fs->symlink($rel.'robots.txt', $app_dest.'/'.$buildpath.'/robots.txt', true);
+
+    $fs->remove(array($app_dest.'/'.$buildpath.'/sites/default/settings.php'));
+    $fs->symlink('../../'.$rel.'settings.php', $app_dest.'/'.$buildpath.'/sites/default/settings.php', true);
+    $fs->remove(array($app_dest.'/'.$buildpath.'/sites/default/files'));
+    $fs->symlink('../../../../../shared/settings.local.php', $app_dest.'/'.$buildpath.'/sites/default/settings.local.php', true);
+    $fs->remove(array($app_dest.'/'.$buildpath.'/sites/default/files'));
+    $fs->symlink('../../../../../shared/files', $app_dest.'/'.$buildpath.'/sites/default/files', true);
+
+    $fs->symlink($rel.'/sites/default/modules/custom', $app_dest.'/'.$buildpath.'/modules/custom', true);
+    $fs->symlink($rel.'/profiles/custom', $app_dest.'/'.$buildpath.'/profiles/custom', true);
+    $fs->symlink($rel.'/sites/default/themes/custom', $app_dest.'/'.$buildpath.'/themes/custom', true);
+
+    $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/files', 0777, 0000, true);
+    $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.php', 0777, 0000, true);
+    $fs->chmod($app_dest.'/'.$buildpath.'/sites/default/settings.local.php', 0777, 0000, true);
 
   }
 
   private function setupD8($fs, $io, $appname){
 
-      $app_dest = $appname.'/app';
+      $app_dest = './app';
       $date =  date('Y-m-d--H-i-s');
 
       $application = $this->getApplication();
@@ -298,16 +343,6 @@ class BuildCommand extends ContainerAwareCommand
   }
 
   private function installDrupal8($io, $install_helpers = FALSE){
-      // Check for running mySQL container before launching Drupal Installation
-      $message = 'Waiting for mySQL service.';
-      $io->warning($message);
-      while (!@mysqli_connect('127.0.0.1', 'dev', 'DEVPASSWORD', 'dev_db')) {
-          sleep(1);
-          echo '.';
-      }
-      $io->text(' ');
-      $message = 'mySQL CONNECTED';
-      $io->success($message);
 
       $message = 'Run Drupal Installation.... This may take a few minutes....';
       $io->note($message);
@@ -330,16 +365,6 @@ class BuildCommand extends ContainerAwareCommand
   }
 
   private function installDrupal7($io, $install_helpers = FALSE){
-    // Check for running mySQL container before launching Drupal Installation
-    $message = 'Waiting for mySQL service.';
-    $io->warning($message);
-    while (!@mysqli_connect('127.0.0.1', 'dev', 'DEVPASSWORD', 'dev_db')) {
-      sleep(1);
-      echo '.';
-    }
-    $io->text(' ');
-    $message = 'mySQL CONNECTED';
-    $io->success($message);
 
     $message = 'Run Drupal Installation.... This may take a few minutes....';
     $io->note($message);

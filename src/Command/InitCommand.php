@@ -37,6 +37,7 @@ class InitCommand extends ContainerAwareCommand
         ->setDescription('Fetch and build DockerDrupal containers')
         ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
         ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
+        ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
     ;
   }
 
@@ -51,27 +52,47 @@ class InitCommand extends ContainerAwareCommand
     $fs = new Filesystem();
     $date =  date('Y-m-d--H-i-s');
 
-    //$io->section("ADD HOSTS");
-    $message = 'If required, please type admin password to add \'127.0.0.1 docker.dev\' to \/etc\/hosts';
+    // check if this folder is has APP config
+    if(file_exists('.config.yml')){
+      $io->error('You\'re currently in an APP directory');
+      return;
+    }
+
+    $message = 'If required, please type admin password to add \'127.0.0.1 docker.dev\' to /etc/hosts';
     $io->note($message);
     $this->addHost();
 
+    // GET AND SET APPNAME
     $appname = $input->getArgument('appname');
-
     if(!$appname){
         $io->title("SET APP NAME");
         $helper = $this->getHelper('question');
-        $question = new Question('Enter App name [dd_app_'.$date.'] : ', 'my-app-'.$date);
+        $question = new Question('Enter App name [dockerdrupal_app_'.$date.'] : ', 'my-app-'.$date);
         $appname = $helper->ask($input, $output, $question);
     }
 
-    $system_appname = strtolower(str_replace(' ', '', $appname));
+    // GET AND SET APP TYPE
+    $type = $input->getOption('type');
+    $available_types = array('DEFAULT', 'D7', 'D8');
 
-    // check if this folder is has APP config
-    if(file_exists('.config.yml')){
-        $io->error('You\'re currently in an APP directory');
-        return;
+    if($type && !in_array($type, $available_types)){
+      $io->warning('TYPE : '.$type.' not allowed.');
+      $type = null;
     }
+
+    if(!$type){
+      $io->info(' ');
+      $io->title("SET APP TYPE");
+      $helper = $this->getHelper('question');
+      $question = new ChoiceQuestion(
+          'Select your APP type [0] : ',
+          $available_types,
+          '0'
+      );
+      $type = $helper->ask($input, $output, $question);
+    }
+
+    $system_appname = strtolower(str_replace(' ', '', $appname));
 
     if(!$fs->exists($system_appname)){
         $fs->mkdir($system_appname , 0755);
@@ -83,8 +104,9 @@ class InitCommand extends ContainerAwareCommand
 
     // SETUP APP CONFIG FILE
     $config= array(
-        'Appname' => $appname,
-        'DockerDrupal' => array('version' => $application->getVersion(), 'date' => $date),
+        'appname' => $appname,
+        'apptype' => $type,
+        'dockerdrupal' => array('version' => $application->getVersion(), 'date' => $date),
     );
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname.'/.config.yml', $yaml);
@@ -97,7 +119,7 @@ class InitCommand extends ContainerAwareCommand
 
     $this->initDocker($io, $system_appname);
 
-    $message = 'DockerDrupal containers ready. Navigate to your app folder and build your app via ::: build:init';
+    $message = 'DockerDrupal containers ready. Navigate to your app folder [cd '.$system_appname.'] and build your app via ::: build:init';
     $io->info(' ');
     $io->note($message);
 
