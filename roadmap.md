@@ -38,12 +38,12 @@
     ```
 
 - Init DockerDrupal
-    - scaffold app/docker directory structure
-      - http://symfony.com/doc/current/bundles/best_practices.html
-      - http://symfony.com/doc/current/bundles.html
-    - ASK
-        : Drupal [default] [version]
-        : simple [/app/www/index.php] -> hello world
+    ~~- scaffold app/docker directory structure~~
+      ~~- http://symfony.com/doc/current/bundles/best_practices.html~~
+      ~~- http://symfony.com/doc/current/bundles.html~~
+    ~~- ASK
+        ~~: Drupal [default] [version]~~
+        ~~: simple [/app/www/index.php] -> hello world~~
                 
         - :build DockerDrupal lite? full?        
         ~~- setup repo/app files eg~~
@@ -73,21 +73,24 @@
                   ├── scripts
                   └── sites-enabled
         ```
-    - run app build
-            - Download Drupal and symlink custom folders
-    - cd docker_<yourappname>
+    ~~- run app build~~
+            ~~- Download Drupal and symlink custom folders~~
+    ~~- cd docker_<yourappname>~~
     - check for currently running dockerdrupal apps/containers
         - the use of Port :80 will prevent multiple apps/services running concurrently
-    - docker-compose up -d
-            - this will create networks, volumes and containers
-            - @todo - fix PHP7 working directory compile vs sync issue
-    - with services running
-        - Install Drupal site
+    ~~- docker-compose up -d~~
+            ~~- this will create networks, volumes and containers~~
+            ~~- @todo - fix PHP7 working directory compile vs sync issue~~
+   ~~ - with services running~~
+        ~~- Install Drupal site~~
         - OSX -> write 127.0.0.1 docker.dev to /etc/hosts file
         - linux -> write 127.0.0.1 docker.dev to /etc/hosts file
         - Windows -> ??        
-        - Open http://docker.dev in browser
+        ~~- Open http://docker.dev in browser~~
 
+    - drush commands 
+        - drush cc <cache> [all]
+        - drush uli <uid> [1]
     - be able to import local DB / .sql dump
     - build multisite? add site?
     - get container name
