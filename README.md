@@ -42,23 +42,20 @@
 ## Example Commands
 ```
       --------------
-      dockerdrupal exec -s [service/container name] -c "[command to execute against container service]"
+      $ dockerdrupal env my-great-app -t DEFAULT
+      $ dockerdrupal env my-drupal8-site -t D8
+      $ dockerdrupal env my-drupal7-site -t D7
+      --------------
 
-      dockerdrupal exec -s php -c "drush cc all"
+      $ dockerdrupal build:init
 
-      dockerdrupal exec -s nginx -c "nginx -s reload"
-
-      OR
-
-      dockerdrupal exec [follow prompts]
       --------------
 
 ```
 
 # Next step :
 
- - D7 app build
-
+ - More utility commands and USER feedback
 
 For more information see [roadmap](https://github.com/4AllDigital/DockerDrupalCli/blob/master/roadmap.md)
 
