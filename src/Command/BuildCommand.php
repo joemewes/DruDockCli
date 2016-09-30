@@ -70,7 +70,7 @@ class BuildCommand extends ContainerAwareCommand
 //        $io->error('You\'re not currently in an APP directory.');
 //        return;
 //      }
-      $config = $application->getAppConfig();
+      $config = $application->getAppConfig($io);
       if($config) {
         $appname = $config['appname'];
         $type = $config['apptype'];
