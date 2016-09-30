@@ -73,8 +73,8 @@
                   ├── scripts
                   └── sites-enabled
         ```
-    ~~- run app build~~
-            ~~- Download Drupal and symlink custom folders~~
+    ~~- run app build
+            - Download Drupal and symlink custom folders~~
     ~~- cd docker_<yourappname>~~
     - check for currently running dockerdrupal apps/containers
         - the use of Port :80 will prevent multiple apps/services running concurrently
