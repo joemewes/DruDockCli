@@ -1,52 +1,30 @@
 # DockerDrupalCli
 
-## Things it must do
-```
-######################################################################################
-#                                                                                    #
-# - check requirements                                                               #
-#    - Docker for Mac/Windows/Linux                                                  #
-#        - docker Daemon running                                                     #
-#    - PHP version                                                                   #
-#    - Drush version ` shell_exec('which drush') `                                   #
-#    - GIT installed ` shell_exec('which git') `                                     #
-#    - WRITE .yaml file with APP .config INFO to reading later. eg. type: [D8]       #
-#                                                                                    #
-######################################################################################
+## Things it must do                                                                            
+    - ~~- check requirements~~                                                             
+    - ~~- Docker for Mac/Windows/Linux~~                                               
+        - ~~- docker Daemon running~~                                                 
+    - ~~- PHP version~~                                                               
+    - ~~- Drush version \` shell_exec('which drush') \`~~                              
+    - ~~- GIT installed \` shell_exec('which git') \`~~
+    - ~~- WRITE .yaml file with APP .config INFO to reading later. eg. type: \[D8]~~                                                                                     
 
-```
+    * - GET DockerDrupal and setup basic index.php/html welcome page~~
+      * -> full - git clone https://github.com/4alldigital/DockerDrupal.git docker_\<appname>~~
+      * -> lite - git clone https://github.com/4alldigital/DockerDrupal-lite.git docker_\<appname>~~
 
-- GET DockerDrupal and setup basic index.php/html welcome page
-  -> full
-    - git clone https://github.com/4alldigital/DockerDrupal.git docker_<appname>
-  -> lite
-    - git clone https://github.com/4alldigital/DockerDrupal-lite.git docker_<appname>
-
-    ```
-          .        
-          ├── app
-          |   ├── index.html
-          └── docker_<yourappname>  
-              ├── config
-              │   ├── mysql
-              │   └── solr
-              ├── docs
-              │   └── images
-              ├── scripts
-              └── sites-enabled
-                  └── docker.dev
-    ```
-
-- Init DockerDrupal
-    ~~- scaffold app/docker directory structure~~
-      ~~- http://symfony.com/doc/current/bundles/best_practices.html~~
-      ~~- http://symfony.com/doc/current/bundles.html~~
-    ~~- ASK
+    * ~~- Init DockerDrupal~~
+    * ~~- scaffold app/docker directory structure~~
+    * ~~- http://symfony.com/doc/current/bundles/best_practices.html~~
+    * ~~- http://symfony.com/doc/current/bundles.html~~
+    * ~~- ASK
         ~~: Drupal [default] [version]~~
         ~~: simple [/app/www/index.php] -> hello world~~
-                
-        - :build DockerDrupal lite? full?        
-        ~~- setup repo/app files eg~~
+            
+    - :build DockerDrupal lite? full?    
+        
+    ~~- setup repo/app files eg~~
+        
         ```
               .        
               ├── app
