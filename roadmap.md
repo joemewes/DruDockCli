@@ -44,10 +44,9 @@
     - ASK
         : Drupal [default] [version]
         : simple [/app/www/index.php] -> hello world
-
+                
         - :build DockerDrupal lite? full?        
-        - setup repo/app files eg
-
+        ~- setup repo/app files eg~
         ```
               .        
               ├── app
