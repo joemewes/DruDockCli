@@ -13,27 +13,27 @@
 # Status
 ## Initial Commands structure
 ```
-     --------------
-      build
+     build
        build:destroy      Disable and delete APP and containers
        build:init         Fetch and build Drupal apps
-     --------------
       docker
        docker:exec        Execute bespoke commands at :container
+       docker:logs        Montitor logs output of container
        docker:restart     Restart APP containers
        docker:start       Start APP containers
        docker:status      Get current status of all containers
        docker:stop        Stop all containers
-     --------------
       drush
        drush:cmd          Run drush commands 
-     --------------
       env
        env:init           Fetch and build DockerDrupal containers
-     --------------
+      redis
+       redis:flush        FLush Redis cache
+       redis:info         Get Redis running config information
+       redis:monitor      Montitor redis activity
+       redis:ping         Ping Redis
       self
        self:about         About DockerDrupal
-     --------------
       util
        util:mysql:export  Export .sql files [utilme]
        util:mysql:import  Import .sql files [utilmi]
