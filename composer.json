@@ -26,7 +26,7 @@
     "padraic/phar-updater": "^1.0"
   },
   "require-dev": {
-    "drush/drush": "^8.0",
+    "drush/drush": "^8.0"
   },
   "authors": [
     {
