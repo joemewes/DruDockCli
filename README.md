@@ -8,7 +8,7 @@
 ### Questions?
   Ping me on [Twitter](http://twitter.com/@4alldigital)
 
-```composer global require dockerdrupal/cli```
+```composer global require dockerdrupal/cli:1.0.3```
 
 # Status
 ## Initial Commands structure
