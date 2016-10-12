@@ -37,7 +37,7 @@ class StopCommand extends Command
 
         $command = 'docker stop $(docker ps -q) 2>&1';
         $process = new Process($command);
-        $process->setTimeout(3600);
+        $process->setTimeout(60);
         $process->run();
 
         if (!$process->isSuccessful()) {

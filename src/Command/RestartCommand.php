@@ -47,7 +47,7 @@ class RestartCommand extends Command
     }
 
     $process = new Process($command);
-    $process->setTimeout(2);
+    $process->setTimeout(60);
     $process->run();
 
     if (!$process->isSuccessful()) {
