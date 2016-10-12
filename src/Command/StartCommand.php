@@ -53,7 +53,6 @@ class StartCommand extends Command
             return;
         }
 
-
         $process = new Process($command);
         $process->setTimeout(3600);
         $process->run();

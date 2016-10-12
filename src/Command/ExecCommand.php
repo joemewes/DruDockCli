@@ -61,7 +61,13 @@ class ExecCommand extends Command
             $service = $helper->ask($input, $output, $question);
         }
 
-        if(!$cmd){
+      $config = $application->getAppConfig($io);
+      if($config) {
+        $appname = $config['appname'];
+        $type = $config['apptype'];
+      }
+
+      if(!$cmd){
             $helper = $this->getHelper('question');
             $question = new Question('Enter command : ', 'bash');
             $cmd = $helper->ask($input, $output, $question);

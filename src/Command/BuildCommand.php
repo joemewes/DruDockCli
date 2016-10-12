@@ -33,7 +33,7 @@ class BuildCommand extends ContainerAwareCommand
   {
     $this
       ->setName('build:init')
-      ->setAliases(['build'])
+      ->setAliases(['init'])
       ->setDescription('Fetch and build Drupal apps')
       ->setHelp('This command will fetch and build Drupal apps')
       //->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
@@ -58,18 +58,6 @@ class BuildCommand extends ContainerAwareCommand
       $fs = new Filesystem();
       $date =  date('Y-m-d--H-i-s');
 
-//      if(file_exists('.config.yml')){
-//        $config = Yaml::parse(file_get_contents('.config.yml'));
-//        $appname = $config['appname'];
-//        $type = $config['apptype'];
-//        $dockerdrupal_version = $config['dockerdrupal']['version'];
-//        if($dockerdrupal_version != $application->getVersion()){
-//          $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
-//        }
-//      }else{
-//        $io->error('You\'re not currently in an APP directory.');
-//        return;
-//      }
       $config = $application->getAppConfig($io);
       if($config) {
         $appname = $config['appname'];

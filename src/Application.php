@@ -2,6 +2,7 @@
 
 namespace Docker\Drupal;
 
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -9,6 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Application as ParentApplication;
 
 
@@ -227,7 +229,37 @@ class Application extends ParentApplication
       }
       return $config;
     }else{
-      $io->error('You\'re not currently in an APP directory.');
+      $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');
+      exit;
+    }
+  }
+
+  /**
+   * @return string
+   */
+  public function getComposePath($appname){
+
+    $fs = new Filesystem();
+    if($fs->exists('docker-compose.yml')) {
+      $dc = 'docker-compose ';
+      return $dc;
+    }elseif($fs->exists('./docker_'.$appname.'/docker-compose.yml')){
+      $dc = 'docker-compose -f ./docker_'.$appname.'/docker-compose.yml ';
+      return $dc;
+    }else{
+      $io->error("docker-compose.yml : Not Found");
+      exit;
+    }
+  }
+
+  /**
+   * @return Boolean
+   */
+  public function checkForAppContainers($appname, $io){
+    if(exec($this->getComposePath($appname).'ps | grep '.$appname)) {
+      return TRUE;
+    }else{
+      $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
       exit;
     }
   }
