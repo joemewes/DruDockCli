@@ -6,16 +6,18 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "symfony/finder": "~2.8",
-    "symfony/console": "~2.8",
-    "symfony/yaml": "~2.8",
-    "symfony/filesystem": "~2.8",
-    "symfony/process": "~2.8",
-    "symfony/event-dispatcher": "~2.8",
-    "symfony/dependency-injection": "~2.8",
-    "symfony/class-loader": "~2.8",
-    "symfony/config": "~2.8",
-    "symfony/framework-bundle": "~2.8",
+    "symfony/finder": "~3.0",
+    "symfony/console": "~3.0",
+    "symfony/yaml": "~3.0",
+    "symfony/filesystem": "~3.0",
+    "symfony/process": "~3.0",
+    "symfony/event-dispatcher": "~3.0",
+    "symfony/dependency-injection": "~3.0",
+    "symfony/http-kernel": "~3.0",
+    "symfony/class-loader": "~3.0",
+    "symfony/config": "~3.0",
+    "symfony/var-dumper": "~3.0",
+    "symfony/framework-bundle": "~3.0",
     "stecman/symfony-console-completion": "^0.5.1",
     "php": "^5.5",
     "doctrine/cache": "^1.6",
@@ -25,7 +27,10 @@
     "padraic/phar-updater": "^1.0"
   },
   "require-dev": {
-    "drush/drush": "^8.0"
+    "phpunit/phpunit": "^4.3 <4.8",
+    "drush/drush": "^8.0",
+    "sensiolabs/security-checker": "^3.0",
+    "symfony/debug": "~3.0"
   },
   "authors": [
     {
