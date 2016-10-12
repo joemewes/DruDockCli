@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\util;
+namespace Docker\Drupal\Command\Util;
 
 use Symfony\Component\Console\Command\Command;
 //use Symfony\Component\Console\Input\InputArgument;
