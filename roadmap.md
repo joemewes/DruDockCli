@@ -62,9 +62,14 @@
 
 ------
 ## Active APP commands
-- ~~DRUSH:commands~~
-    - ~~drush cc \<cache> \[all]~~
-    - ~~drush uli \<uid> \[1]~~
+- DRUSH:commands
+    - drush cc \<cache> \[all]
+    - drush uli \<uid> \[1]
+  @todo CONvert drush:cmd  into several preconfigured useful drush utility commands, like
+    - :login (optional arg for uid)
+    - :cc (optional arg to specify cache)
+    - :sql-dump
+    - ~~:cmd (generic - ie. already done)~~
 - UTIL:commands
     - ~~be able to import local DB / .sql dump~~
     - ~~build multisite? add site?~~
