@@ -70,7 +70,7 @@
     - drush:cc -option \[all] (which cache)
     - drush:features:revert \[all] (drush:fr)
     - drush:features:update \[all] (drush:fu)
-    -
+-----
   @todo CONvert drush:cmd  into several preconfigured useful drush utility commands, like
     - :login (optional arg for uid)
     - :cc (optional arg to specify cache)
