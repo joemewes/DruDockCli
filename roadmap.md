@@ -62,6 +62,7 @@
 
 ------
 ## Active APP commands
+- ADD GENERAL SYNCME COMMAND - to start/update PHP apps
 - DRUSH:commands
     - drush cc \<cache> \[all]
     - drush uli \<uid> \[1]
@@ -77,6 +78,7 @@
     - :sql-dump
     - ~~:cmd (generic - ie. already done)~~
 - UTIL:commands
+    - SUPRESS VERSION WARNING COMMAND - ADD TO CONFIG AND READ PRE-WARNING FROM CONFIG
     - ~~be able to import local DB / .sql dump~~
     - ~~build multisite? add site?~~
     - ~~get container name~~
