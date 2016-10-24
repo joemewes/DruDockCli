@@ -18,10 +18,10 @@
     "symfony/config": "~2.8",
     "symfony/var-dumper": "~2.8",
     "symfony/framework-bundle": "~2.8",
+    "symfony/debug": "~2.6|~2.8",
     "stecman/symfony-console-completion": "^0.5.1",
-    "php": "^5.5",
     "doctrine/cache": "^1.6",
-    "guzzlehttp/guzzle": "^6.2",
+    "guzzlehttp/guzzle": "^6.1",
     "guzzlehttp/ringphp": "^1.1",
     "psr/log": "^1.0.0",
     "padraic/phar-updater": "^1.0"
