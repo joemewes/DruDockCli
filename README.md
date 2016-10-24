@@ -8,7 +8,7 @@
 ### Questions?
   Ping me on [Twitter](http://twitter.com/@4alldigital)
 
-```composer global require dockerdrupal/cli:1.0.4```
+```composer global require dockerdrupal/cli:1.0.5```
 
 # Status
 ## Initial Commands structure
@@ -24,7 +24,7 @@
        docker:status      Get current status of all containers
        docker:stop        Stop all containers
       drush
-       drush:cmd          Run drush commands 
+       drush:cmd          Run drush commands
       env
        env:init           Fetch and build DockerDrupal containers
       redis
