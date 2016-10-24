@@ -24,7 +24,8 @@
     "guzzlehttp/guzzle": "^6.1",
     "guzzlehttp/ringphp": "^1.1",
     "psr/log": "^1.0.0",
-    "padraic/phar-updater": "^1.0"
+    "padraic/phar-updater": "^1.0",
+    "drupal/console": "^0.11.3"
   },
   "authors": [
     {
