@@ -175,7 +175,9 @@ class InitCommand extends ContainerAwareCommand
       $process = new Process(sprintf('echo "%s %s" | sudo tee -a %s >/dev/null', $ip, $hostname, $hosts_file));
       $process->run(
         function ($type, $buffer) use ($output) {
+          if(isset($output)){
             $output->writeln($buffer);
+          }
         }
       );
     }
