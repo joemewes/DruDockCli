@@ -2,12 +2,10 @@ core: 7.x
 api: '2'
 projects:
   drupal:
-    version: '7.50'
+    version: '7.51'
   chosen:
     subdir: contrib
-    version: 2.0-beta4
-    patch:
-      - 'https://www.drupal.org/files/issues/chosen-toggle-admin-pages-option-2089987-32.patch'
+    version: 2.0
   redis:
     subdir: contrib
     version: 3.11
@@ -31,12 +29,5 @@ libraries:
       type: 'file'
       url: 'https://github.com/Modernizr/Modernizr/archive/v2.7.0.tar.gz'
     directory_name: modernizr
-    type: library
-    destination: libraries
-  predis:
-    download:
-      type: 'file'
-      url: 'http://github.com/nrk/predis/archive/v0.8.5.tar.gz'
-    directory_name: predis
     type: library
     destination: libraries
