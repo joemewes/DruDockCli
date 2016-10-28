@@ -64,3 +64,7 @@ screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux
 
 # CLEAR nginx pagespeed cache
 dockerdrupal exec -s nginx -c "rm -rf /var/ngx_pagespeed_cache/*"
+
+# backup before restore
+
+cd project_folder && dockerdrupal start && docker exec -i $(docker ps --format {{.Names}} | grep db) mysqldump -u root -ppassword dev_db > dev_db.sql && dockerdrupal stop && cd ../
