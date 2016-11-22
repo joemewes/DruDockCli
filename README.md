@@ -7,6 +7,10 @@
 
 ### Questions?
   Ping me on [Twitter](http://twitter.com/@4alldigital)
+  
+### Example experience
+   - video 1 (Installation and setup) - https://www.youtube.com/watch?v=XfmN47xdrgY
+   - video 2 (Initialise Drupal7 Env && App) - https://www.youtube.com/watch?v=FoDeyEPEhiY
 
 ```composer global require dockerdrupal/cli:1.0.7```
 
