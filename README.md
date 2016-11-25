@@ -5,6 +5,9 @@
 # DockerDrupal-Cli - BETA
 ### CLI utility for DockerDrupal
 
+  START by installing & launching the Docker for Mac Application 
+   - https://download.docker.com/mac/stable/Docker.dmg
+
 ### Questions?
   Ping me on [Twitter](http://twitter.com/@4alldigital)
   
