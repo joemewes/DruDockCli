@@ -18,7 +18,7 @@
     "symfony/event-dispatcher": "~2.7",
     "symfony/class-loader": "~2.7",
     "symfony/var-dumper": "~2.7",
-    "symfony/framework-bundle": "~2.7",
+    "symfony/http-kernel": "~2.7",
     "stecman/symfony-console-completion": "^0.5.1",
     "guzzlehttp/guzzle": "^6.2"
   },
