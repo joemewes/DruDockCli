@@ -24,7 +24,8 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^4.3 <4.8",
-    "drush/drush": "^8.1"
+    "drush/drush": "^8.1",
+    "symfony/debug": "^3.0"
   },
   "authors": [
     {
