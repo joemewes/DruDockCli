@@ -255,7 +255,8 @@ class BuildCommand extends ContainerAwareCommand
       }
 
       // download D8 - ask for version ?? [8.1.8]
-      $command = sprintf('composer create-project drupal/drupal:8.2.x-dev '.$app_dest.'/builds/'.$date.'/public --stability dev --no-interaction');
+      //$command = sprintf('composer create-project drupal/drupal:8.2.x-dev '.$app_dest.'/builds/'.$date.'/public --stability dev --no-interaction');
+      $command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev my_site_name-dir --stability dev --no-interaction');
       $io->note('Download and configure Drupal 8.... This may take a few minutes....');
       $this->runcommand($command, $io, TRUE);
 

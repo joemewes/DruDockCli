@@ -16,6 +16,9 @@ docker exec -i $(docker ps --format {{.Names}} | grep php) drush uli 1
 # redis clearcache
 docker exec -i $(docker ps --format {{.Names}} | grep redis) redis-cli flushall
 
+# monitor redis
+docker exec -i $(docker ps --format {{.Names}} | grep redis) redis-cli monitor
+
 # open mailcatcher
 python -mwebbrowser http://localhost:1080
 
@@ -68,3 +71,8 @@ dockerdrupal exec -s nginx -c "rm -rf /var/ngx_pagespeed_cache/*"
 # backup before restore
 
 cd project_folder && dockerdrupal start && docker exec -i $(docker ps --format {{.Names}} | grep db) mysqldump -u root -ppassword dev_db > dev_db.sql && dockerdrupal stop && cd ../
+
+
+## DRUPAL 8
+dockerdrupal drush -c "config-export sync --skip-modules=devel,devel_generate,webprofiler,kint -y"
+
