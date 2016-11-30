@@ -17,6 +17,8 @@
    
 ### Install via Composer
   - Install Composer [Globally](https://getcomposer.org/doc/00-intro.md#globally) 
+  - Make sure you add composers vendor directory to your $PATH:
+    - add `export PATH="~/.composer/vendor/bin:$PATH"` to your ~/.bash_profile
   - Install DockerDrupal globally.
 
 ```
