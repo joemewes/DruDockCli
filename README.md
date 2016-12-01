@@ -22,7 +22,7 @@
   - Install DockerDrupal globally.
 
 ```
-composer global require dockerdrupal/cli:1.0.9
+composer global require dockerdrupal/cli
 ```
 
 - Note : drupal/console and drush/drush have complex dependencies and may cause conflicts with this utility. You can resolve this by adding the following to your global/project composer.json file:
