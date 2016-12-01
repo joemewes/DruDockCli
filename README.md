@@ -30,7 +30,7 @@ composer global require dockerdrupal/cli
 ```
 {
     "require": {
-        "dockerdrupal/cli": "1.0.9"
+        "dockerdrupal/cli": "1.0.10"
     }
 }
 ```
