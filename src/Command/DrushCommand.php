@@ -8,11 +8,9 @@
 namespace Docker\Drupal\Command;
 
 use Symfony\Component\Console\Command\Command;
-//use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -59,7 +57,6 @@ class DrushCommand extends Command
         $command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush '.$cmd;
 
         global $output;
-        $output = $io;
 
         $process = new Process($command);
         $process->setTimeout(3600);
@@ -73,16 +70,5 @@ class DrushCommand extends Command
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-
-
-//        $process = new Process($command);
-//        $process->setTimeout(360);
-//        $process->run();
-//
-//        if (!$process->isSuccessful()) {
-//            throw new ProcessFailedException($process);
-//        }
-//        $out = $process->getOutput();
-//        $io->info($out);
     }
 }

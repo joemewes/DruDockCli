@@ -20,44 +20,54 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  * Class DemoCommand
  * @package Docker\Drupal\Command
  */
-class DestroyCommand extends Command
-{
-    protected function configure()
-    {
-        $this
-            ->setName('build:destroy')
-            ->setAliases(['destroy'])
-            ->setDescription('Disable and delete APP and containers')
-            ->setHelp("This command will completely remove all containers and volumes for the current APP via the docker-compose.yml file.")
-        ;
-    }
+class DestroyCommand extends Command {
+	protected function configure() {
+		$this
+			->setName('build:destroy')
+			->setAliases(['destroy'])
+			->setDescription('Disable and delete APP and containers')
+			->setHelp("This command will completely remove all containers and volumes for the current APP via the docker-compose.yml file.");
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $io = new DockerDrupalStyle($input, $output);
-        $io->section("REMOVING APP");
+	protected function execute(InputInterface $input, OutputInterface $output) {
 
-        $fs = new Filesystem();
-        if(!$fs->exists('docker-compose.yml')){
-            $io->warning("docker-compose.yml : Not Found");
-            return;
-        }
+		$application = $this->getApplication();
 
-        $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion('Are you sure you want to delete this app? [y/n] : ', false);
-        if (!$helper->ask($input, $output, $question)) {
-            return;
-        }
+		$io = new DockerDrupalStyle($input, $output);
+		$io->section("REMOVING APP");
 
-        $command = 'docker-compose down -v';
-        $process = new Process($command);
-        $process->setTimeout(360);
-        $process->run();
+		$helper = $this->getHelper('question');
+		$question = new ConfirmationQuestion('Are you sure you want to delete this app? [y/n] : ', FALSE);
+		if (!$helper->ask($input, $output, $question)) {
+			return;
+		}
 
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
-        $out = $process->getOutput();
-        $io->info($out);
-    }
+		$config = $application->getAppConfig($io);
+		if ($config) {
+			$appname = $config['appname'];
+			$type = $config['apptype'];
+		}
+
+		$fs = new Filesystem();
+		if ($fs->exists('docker-compose.yml')) {
+			$command = 'docker-compose down -v';
+		}
+		elseif ($fs->exists('./docker_' . $appname . '/docker-compose.yml')) {
+			$command = 'docker-compose -f ./docker_' . $appname . '/docker-compose.yml down -v';
+		}
+		else {
+			$io->warning("docker-compose.yml : Not Found");
+			return;
+		}
+
+		$process = new Process($command);
+		$process->setTimeout(360);
+		$process->run();
+
+		if (!$process->isSuccessful()) {
+			throw new ProcessFailedException($process);
+		}
+		$out = $process->getOutput();
+		$io->info($out);
+	}
 }

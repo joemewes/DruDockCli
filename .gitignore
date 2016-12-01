@@ -2,3 +2,6 @@
 vendor/*
 
 .idea/*
+
+.phpintel
+.phpintel/*

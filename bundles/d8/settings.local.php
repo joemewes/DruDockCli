@@ -6,7 +6,7 @@ assert_options(ASSERT_ACTIVE, TRUE);
 ini_set('memory_limit','1024M');
 
 // General sync folder.
-$config_directories[CONFIG_SYNC_DIRECTORY] = '/app/repository/config/sync';
+$config_directories[CONFIG_SYNC_DIRECTORY] = '/app/config/sync';
 
 // Local settings.
 $databases['default']['default'] = array(
