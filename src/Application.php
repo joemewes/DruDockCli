@@ -177,11 +177,14 @@ class Application extends ParentApplication
     $commands[] = new Command\StatusCommand();
     $commands[] = new Command\ExecCommand();
     $commands[] = new Command\AboutCommand();
-    $commands[] = new Command\DrushCommand();
     $commands[] = new Command\WatchCommand();
 
-    $commands[] = new Command\Util\UtilMysqlImportCommand();
-    $commands[] = new Command\Util\UtilMysqlExportCommand();
+		$commands[] = new Command\Util\UtilMysqlImportCommand();
+		$commands[] = new Command\Util\UtilMysqlExportCommand();
+
+		$commands[] = new Command\Drush\DrushCommand();
+		$commands[] = new Command\Drush\DrushClearCacheCommand();
+		$commands[] = new Command\Drush\DrushLoginCommand();
 
     $commands[] = new Command\Redis\RedisMonitorCommand();
     $commands[] = new Command\Redis\RedisPingCommand();

@@ -215,7 +215,6 @@ class BuildCommand extends ContainerAwareCommand {
 	private function setupD8($fs, $io, $appname) {
 
 		$app_dest = './app';
-		$date = date('Y-m-d--H-i-s');
 
 		$application = $this->getApplication();
 		$utilRoot = $application->getUtilRoot();
@@ -242,6 +241,7 @@ class BuildCommand extends ContainerAwareCommand {
 			$fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', true);
 			$fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', true);
 			$fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', true);
+			$fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', true);
 			$fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', true);
 			$fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', true);
 		}
@@ -289,7 +289,7 @@ class BuildCommand extends ContainerAwareCommand {
 
 		$message = 'Run Drupal Installation.... This may take a few minutes....';
 		$io->note($message);
-		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
+		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) chmod -R 777 ../vendor/ && docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
 		$this->runcommand($installcmd, $io, TRUE);
 
 		if ($install_helpers) {
