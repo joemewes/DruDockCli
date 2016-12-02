@@ -251,7 +251,7 @@ class Application extends ParentApplication
   /**
    * @return string
    */
-  public function getComposePath($appname){
+  public function getComposePath($appname, $io){
 
     $fs = new Filesystem();
     if($fs->exists('docker-compose.yml')) {
@@ -270,7 +270,8 @@ class Application extends ParentApplication
    * @return Boolean
    */
   public function checkForAppContainers($appname, $io){
-    if(exec($this->getComposePath($appname).'ps | grep '.$appname)) {
+
+    if(exec($this->getComposePath($appname, $io).'ps | grep '.str_replace('_', '', $appname))) {
       return TRUE;
     }else{
       $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");

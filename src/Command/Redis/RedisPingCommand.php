@@ -41,7 +41,7 @@ class RedisPingCommand extends Command
     }
 
     if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname).'exec -T redis redis-cli ping';
+      $command = $application->getComposePath($appname, $io).'exec -T redis redis-cli ping';
     }
 
     $process = new Process($command);

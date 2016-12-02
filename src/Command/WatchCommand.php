@@ -79,18 +79,18 @@ class WatchCommand extends Command
 //    if($application->checkForAppContainers($appname, $io)){
 //      switch ($service) {
 //        case 'redis':
-//          $command = $application->getComposePath($appname).'exec '.$service.' redis-cli monitor';
+//          $command = $application->getComposePath($appname, $io).'exec '.$service.' redis-cli monitor';
 //          break;
 //        case 'nginx':
-//          $command = $application->getComposePath($appname).'exec '.$service.' tail -f /var/log/nginx/app-error.log';
+//          $command = $application->getComposePath($appname, $io).'exec '.$service.' tail -f /var/log/nginx/app-error.log';
 //          break;
 //        default :
-//          $command = $application->getComposePath($appname).'logs -f '.$service;
+//          $command = $application->getComposePath($appname, $io).'logs -f '.$service;
 //      }
 //    }
 
     if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname).'logs '.$service;
+      $command = $application->getComposePath($appname, $io).'logs '.$service;
     }
 
     $process = new Process($command);

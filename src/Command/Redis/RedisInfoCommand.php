@@ -41,7 +41,7 @@ class RedisInfoCommand extends Command
     }
 
     if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname).'exec -T redis redis-cli info';
+      $command = $application->getComposePath($appname, $io).'exec -T redis redis-cli info';
     }
 
     $process = new Process($command);

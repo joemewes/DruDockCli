@@ -41,7 +41,7 @@ class RedisFlushCommand extends Command
     }
 
     if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname).'exec -T redis redis-cli flushall';
+      $command = $application->getComposePath($appname, $io).' exec -T redis redis-cli flushall';
     }
 
     $process = new Process($command);

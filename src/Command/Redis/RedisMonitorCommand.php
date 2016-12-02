@@ -41,7 +41,7 @@ class RedisMonitorCommand extends Command
     }
 
     if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname).'exec -T redis redis-cli monitor  2>&1';
+      $command = $application->getComposePath($appname, $io).'exec -T redis redis-cli monitor  2>&1';
     }
 
     $process = new Process($command);

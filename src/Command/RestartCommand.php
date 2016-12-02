@@ -43,7 +43,7 @@ class RestartCommand extends Command
     }
 
     if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname).'restart 2>&1';
+      $command = $application->getComposePath($appname, $io).'restart 2>&1';
     }
 
     $process = new Process($command);

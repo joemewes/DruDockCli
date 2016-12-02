@@ -53,7 +53,7 @@ class DrushCommand extends Command {
 		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush ' . $cmd;
 
 		$process = new Process($command);
-		$process->setTimeout(2);
+		$process->setTimeout(60);
 		$process->run();
 
 		if (!$process->isSuccessful()) {
