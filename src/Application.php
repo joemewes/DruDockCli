@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Console\Application as ParentApplication;
 
 
@@ -190,7 +191,9 @@ class Application extends ParentApplication
     $commands[] = new Command\Redis\RedisMonitorCommand();
     $commands[] = new Command\Redis\RedisPingCommand();
     $commands[] = new Command\Redis\RedisFlushCommand();
-    $commands[] = new Command\Redis\RedisInfoCommand();
+		$commands[] = new Command\Redis\RedisInfoCommand();
+
+		$commands[] = new Command\Sync\AppSyncMonitorCommand();
 
     return $commands;
   }
