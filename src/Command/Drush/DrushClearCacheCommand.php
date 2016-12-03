@@ -9,11 +9,7 @@ namespace Docker\Drupal\Command\Drush;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
 
 /**
@@ -36,7 +32,6 @@ class DrushClearCacheCommand extends Command {
 		$config = $application->getAppConfig($io);
 
 		if ($config) {
-			$appname = $config['appname'];
 			$type = $config['apptype'];
 		}
 
@@ -55,16 +50,7 @@ class DrushClearCacheCommand extends Command {
 
 		$io->section('EXEC drush ' . $cmd);
 		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush ' . $cmd;
-
-		$process = new Process($command);
-		$process->setTimeout(60);
-		$process->run();
-
-		if (!$process->isSuccessful()) {
-			throw new ProcessFailedException($process);
-		}
-		$out = $process->getOutput();
-		$io->info($out);
+		$application->runcommand($command, $io);
 
 	}
 }

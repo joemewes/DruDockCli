@@ -24,7 +24,6 @@ class DrushCommand extends Command {
 	protected function configure() {
 		$this
 			->setName('drush:cmd')
-			->setAliases(['drush'])
 			->setDescription('Run drush commands ')
 			->setHelp("This command will execute Drush commands directly against your Drupal APP.")
 			->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');
@@ -44,22 +43,8 @@ class DrushCommand extends Command {
 			$cmd = $helper->ask($input, $output, $question);
 		}
 
-		$config = $application->getAppConfig($io);
-		if ($config) {
-			$appname = $config['appname'];
-			$type = $config['apptype'];
-		}
-
 		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush ' . $cmd;
+		$application->runcommand($command, $io);
 
-		$process = new Process($command);
-		$process->setTimeout(60);
-		$process->run();
-
-		if (!$process->isSuccessful()) {
-			throw new ProcessFailedException($process);
-		}
-		$out = $process->getOutput();
-		$io->info($out);
 	}
 }
