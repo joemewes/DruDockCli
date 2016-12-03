@@ -184,6 +184,10 @@ class Application extends ParentApplication
 		$commands[] = new Command\Mysql\MysqlExportCommand();
 		$commands[] = new Command\Mysql\MysqlMonitorCommand();
 
+		$commands[] = new Command\Nginx\NginxMonitorCommand();
+		$commands[] = new Command\Nginx\NginxReloadCommand();
+		$commands[] = new Command\Nginx\NginxFlushPagespeedCommand();
+
 		$commands[] = new Command\Drush\DrushCommand();
 		$commands[] = new Command\Drush\DrushClearCacheCommand();
 		$commands[] = new Command\Drush\DrushLoginCommand();
