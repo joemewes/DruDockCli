@@ -15,68 +15,63 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Class MysqlImportExportCommand
  * @package Docker\Drupal\Command\Mysql
  */
-class MysqlImportCommand extends Command
-{
-    protected function configure()
-    {
-        $this
-            ->setName('mysql:import')
-            ->setDescription('Import .sql files')
-            ->setHelp("Use this to import .sql files to the current running APPs dev_db. eg. [dockerdrupal mysql:import -p ./latest.sql]")
-            ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify import file path including filename')
-        ;
-    }
+class MysqlImportCommand extends Command {
+	protected function configure() {
+		$this
+			->setName('mysql:import')
+			->setDescription('Import .sql files')
+			->setHelp("Use this to import .sql files to the current running APPs dev_db. eg. [dockerdrupal mysql:import -p ./latest.sql]")
+			->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify import file path including filename');
+	}
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $application = $this->getApplication();
+	protected function execute(InputInterface $input, OutputInterface $output) {
+		$application = $this->getApplication();
 
-        $io = new DockerDrupalStyle($input, $output);
+		$io = new DockerDrupalStyle($input, $output);
 
-        $config = $application->getAppConfig($io);
-        if($config) {
-            $appname = $config['appname'];
-            $type = $config['apptype'];
-        }
+		$helper = $this->getHelper('question');
 
-        // GET AND SET APP TYPE
-        $path = $input->getOption('path');
-        if(!$path){
-            // specify import path
-            $helper = $this->getHelper('question');
-            $question = new Question('Specify import path, including filename : ');
-            $importpath = $helper->ask($input, $output, $question);
-            if(file_exists($importpath)){
-                $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD dev_db < '.$importpath;
-            }else{
-                $io->error('Import .sql file not found at path '.$importpath);
-                exit;
-            }
-        }
+		$io->warning("Dropping the database is potentially a very bad thing to do.\nAny data stored in the database will be destroyed.");
 
-        global $output;
-        $output = $io;
+		$question = new ConfirmationQuestion('Do you really want to drop the \'dev_db\' database [y/N] : ', FALSE);
+		if (!$helper->ask($input, $output, $question)) {
+			return;
+		}
 
-        $process = new Process($command);
-        $process->setTimeout(3600);
-        $process->run(function ($type, $buffer) {
-            global $output;
-            if($output) {
-                $output->info($buffer);
-            }
-        });
+		// GET AND SET APP TYPE
+		$path = $input->getOption('path');
+		if (!$path) {
+			// specify import path
+			$helper = $this->getHelper('question');
+			$question = new Question('Specify import path, including filename : ');
+			$importpath = $helper->ask($input, $output, $question);
 
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
-        if ($process->isSuccessful()) {
-            $io->success('MySQL '.$type.' complete.');
-        }
+			if (file_exists($importpath)) {
 
-    }
+				//drop database;
+				$command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
+				$application->runcommand($command, $io);
+
+				// recreate dev_db
+				$command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
+				$application->runcommand($command, $io);
+
+				// import new .sql file
+				$command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
+				$application->runcommand($command, $io);
+
+			} else {
+
+				$io->error('Import .sql file not found at path ' . $importpath);
+				exit;
+
+			}
+		}
+	}
 }

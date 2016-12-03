@@ -39,17 +39,8 @@ class StartCommand extends Command {
 
 		if($application->checkForAppContainers($appname, $io)){
 			$command = $application->getComposePath($appname, $io).' start 2>&1';
+			$application->runcommand($command, $io);
 		}
-
-		$process = new Process($command);
-		$process->setTimeout(60);
-		$process->run();
-
-		if (!$process->isSuccessful()) {
-			throw new ProcessFailedException($process);
-		}
-		$out = $process->getOutput();
-		$io->info($out);
 	}
 
 
