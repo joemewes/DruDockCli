@@ -25,7 +25,7 @@
 composer global require dockerdrupal/cli
 ```
 
-- Note : drupal/console and drush/drush have complex dependencies and may cause conflicts with this utility. You can resolve this by adding the following to your global/project composer.json file:
+- Note : drupal/console and drush/drush have complex dependencies and may cause conflicts with this utility. You should be able to resolve this by adding the following to your global/project composer.json file, and then running 'composer global update' :
 
 ```
 {
@@ -97,7 +97,9 @@ composer global require dockerdrupal/cli
       $ dockerdrupal env my-drupal7-site -t D7
       --------------
 
-      $ dockerdrupal build:init
+      $ cd my-great-app && dockerdrupal build:init
+      $ cd my-drupal8-site && dockerdrupal build:init
+      $ cd my-drupal7-site && dockerdrupal build:init
 
       --------------
 
