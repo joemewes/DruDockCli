@@ -19,38 +19,35 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class DemoCommand
  * @package Docker\Drupal\Command
  */
-class StartCommand extends Command {
+class UpdateCommand extends Command {
 	protected function configure() {
 		$this
-			->setName('docker:start')
-			->setAliases(['start'])
-			->setDescription('Start APP containers')
-			->setHelp("This command will start all containers for the current APP via the docker-compose.yml file.");
+			->setName('docker:update')
+			->setAliases(['update'])
+			->setDescription('Update APP containers')
+			->setHelp("This command will update all containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$application = $this->getApplication();
 		$io = new DockerDrupalStyle($input, $output);
-		$io->section("STARTING CONTAINERS");
+		$io->section("UPDATING CONTAINERS");
 
 		if($config = $application->getAppConfig($io)) {
 			$appname = $config['appname'];
 		}
 
 		if($application->checkForAppContainers($appname, $io)){
-			$command = $application->getComposePath($appname, $io).' start 2>&1';
-		}
 
-		$process = new Process($command);
-		$process->setTimeout(60);
-		$process->run();
+			// update images from docker hub
+			$command = $application->getComposePath($appname, $io).' pull 2>&1';
+			$application->runcommand($command, $io);
 
-		if (!$process->isSuccessful()) {
-			throw new ProcessFailedException($process);
+			// recreate containers
+			$command = $application->getComposePath($appname, $io).' up -d --force-recreate 2>&1';
+			$application->runcommand($command, $io);
+
 		}
-		$out = $process->getOutput();
-		$io->info($out);
 	}
-
 
 }

@@ -178,9 +178,10 @@ class Application extends ParentApplication
     $commands[] = new Command\ExecCommand();
     $commands[] = new Command\AboutCommand();
     $commands[] = new Command\WatchCommand();
+		$commands[] = new Command\UpdateCommand();
 
-		$commands[] = new Command\Util\UtilMysqlImportCommand();
-		$commands[] = new Command\Util\UtilMysqlExportCommand();
+		$commands[] = new Command\Mysql\MysqlImportCommand();
+		$commands[] = new Command\Mysql\MysqlExportCommand();
 
 		$commands[] = new Command\Drush\DrushCommand();
 		$commands[] = new Command\Drush\DrushClearCacheCommand();
@@ -190,10 +191,6 @@ class Application extends ParentApplication
     $commands[] = new Command\Redis\RedisPingCommand();
     $commands[] = new Command\Redis\RedisFlushCommand();
     $commands[] = new Command\Redis\RedisInfoCommand();
-
-
-
-
 
     return $commands;
   }
@@ -278,4 +275,26 @@ class Application extends ParentApplication
       exit;
     }
   }
+
+	/**
+	 * @return string
+	 */
+	public function runcommand($command, $io) {
+
+		global $output;
+		$output = $io;
+
+		$process = new Process($command);
+		$process->setTimeout(3600);
+		$process->run(function ($type, $buffer) {
+			global $output;
+			if ($output) {
+				$output->info($buffer);
+			}
+		});
+
+		if (!$process->isSuccessful()) {
+			throw new ProcessFailedException($process);
+		}
+	}
 }

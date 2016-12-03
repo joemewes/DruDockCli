@@ -7,20 +7,15 @@
 
 namespace Docker\Drupal\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
-use Symfony\Component\Yaml\Yaml;
 
 
 /**
@@ -119,8 +114,8 @@ class BuildCommand extends ContainerAwareCommand {
 
 		// Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
 		// When 'Synchronization complete' kill this temp run container and start DockerDrupal.
-//        $dockerlogs = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml logs -f';
-//        $this->runcommand($dockerlogs, $io, TRUE);
+		// $dockerlogs = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml logs -f';
+		// $this->runcommand($dockerlogs, $io, TRUE);
 
 		$dockercmd = 'until docker-compose -f ./docker_' . $appname . '/docker-compose.yml run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "Nothing to do"; do : ; done';
 		$this->runcommand($dockercmd, $io, TRUE);
@@ -151,64 +146,67 @@ class BuildCommand extends ContainerAwareCommand {
 		$application = $this->getApplication();
 		$utilRoot = $application->getUtilRoot();
 
-		try {
-			$fs->mkdir($app_dest);
+		if(!$fs->exists($app_dest)) {
 
-			$fs->mkdir($app_dest . '/repository/libraries/custom');
-			$fs->mkdir($app_dest . '/repository/modules/custom');
-			$fs->mkdir($app_dest . '/repository/scripts');
-			$fs->mkdir($app_dest . '/repository/themes/custom');
+			try {
+				$fs->mkdir($app_dest);
 
-			$fs->mkdir($app_dest . '/shared/files');
-			$fs->mkdir($app_dest . '/builds');
+				$fs->mkdir($app_dest . '/repository/libraries/custom');
+				$fs->mkdir($app_dest . '/repository/modules/custom');
+				$fs->mkdir($app_dest . '/repository/scripts');
+				$fs->mkdir($app_dest . '/repository/themes/custom');
 
-		} catch (IOExceptionInterface $e) {
-			//echo 'An error occurred while creating your directory at '.$e->getPath();
-			$io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
+				$fs->mkdir($app_dest . '/shared/files');
+				$fs->mkdir($app_dest . '/builds');
+
+			} catch (IOExceptionInterface $e) {
+				//echo 'An error occurred while creating your directory at '.$e->getPath();
+				$io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
+			}
+
+			// build repo content
+			if (is_dir($utilRoot . '/bundles/d7') && is_dir($app_dest . '/repository')) {
+				$d7files = $utilRoot . '/bundles/d7';
+				// potential repo files
+				$fs->copy($d7files . '/robots.txt', $app_dest . '/repository/robots.txt');
+				$fs->copy($d7files . '/settings.php', $app_dest . '/repository/settings.php');
+				$fs->copy($d7files . '/project.make.yml', $app_dest . '/repository/project.make.yml');
+				$fs->copy($d7files . '/.gitignore', $app_dest . '/repository/.gitignore');
+				//local shared files
+				$fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
+			}
+
+			// deploy an initial build
+
+			//replace this with make.yml script
+			$command = 'drush make ' . $app_dest . '/repository/project.make.yml ' . $app_dest . '/builds/' . $date . '/public';
+
+			$io->note('Download and configure Drupal 7.... This may take a few minutes....');
+			$this->runcommand($command, $io, TRUE);
+
+			$buildpath = 'builds/' . $date . '/public';
+			$fs->symlink($buildpath, $app_dest . '/www', TRUE);
+
+			$rel = $fs->makePathRelative($app_dest . '/repository/', $app_dest . '/' . $buildpath);
+
+			$fs->remove(array($app_dest . '/' . $buildpath . '/robots.txt'));
+			$fs->symlink($rel . 'robots.txt', $app_dest . '/' . $buildpath . '/robots.txt', TRUE);
+
+			$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/settings.php'));
+			$fs->symlink('../../' . $rel . 'settings.php', $app_dest . '/' . $buildpath . '/sites/default/settings.php', TRUE);
+			$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/files'));
+			$fs->symlink('../../../../../shared/settings.local.php', $app_dest . '/' . $buildpath . '/sites/default/settings.local.php', TRUE);
+			$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/files'));
+			$fs->symlink('../../../../../shared/files', $app_dest . '/' . $buildpath . '/sites/default/files', TRUE);
+
+			$fs->symlink($rel . '/sites/default/modules/custom', $app_dest . '/' . $buildpath . '/modules/custom', TRUE);
+			$fs->symlink($rel . '/profiles/custom', $app_dest . '/' . $buildpath . '/profiles/custom', TRUE);
+			$fs->symlink($rel . '/sites/default/themes/custom', $app_dest . '/' . $buildpath . '/themes/custom', TRUE);
+
+			$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/files', 0777, 0000, TRUE);
+			$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.php', 0777, 0000, TRUE);
+			$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.local.php', 0777, 0000, TRUE);
 		}
-
-		// build repo content
-		if (is_dir($utilRoot . '/bundles/d7') && is_dir($app_dest . '/repository')) {
-			$d7files = $utilRoot . '/bundles/d7';
-			// potential repo files
-			$fs->copy($d7files . '/robots.txt', $app_dest . '/repository/robots.txt');
-			$fs->copy($d7files . '/settings.php', $app_dest . '/repository/settings.php');
-			$fs->copy($d7files . '/project.make.yml', $app_dest . '/repository/project.make.yml');
-			$fs->copy($d7files . '/.gitignore', $app_dest . '/repository/.gitignore');
-			//local shared files
-			$fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
-		}
-
-		// deploy an initial build
-
-		//replace this with make.yml script
-		$command = 'drush make ' . $app_dest . '/repository/project.make.yml ' . $app_dest . '/builds/' . $date . '/public';
-
-		$io->note('Download and configure Drupal 7.... This may take a few minutes....');
-		$this->runcommand($command, $io, TRUE);
-
-		$buildpath = 'builds/' . $date . '/public';
-		$fs->symlink($buildpath, $app_dest . '/www', TRUE);
-
-		$rel = $fs->makePathRelative($app_dest . '/repository/', $app_dest . '/' . $buildpath);
-
-		$fs->remove(array($app_dest . '/' . $buildpath . '/robots.txt'));
-		$fs->symlink($rel . 'robots.txt', $app_dest . '/' . $buildpath . '/robots.txt', TRUE);
-
-		$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/settings.php'));
-		$fs->symlink('../../' . $rel . 'settings.php', $app_dest . '/' . $buildpath . '/sites/default/settings.php', TRUE);
-		$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/files'));
-		$fs->symlink('../../../../../shared/settings.local.php', $app_dest . '/' . $buildpath . '/sites/default/settings.local.php', TRUE);
-		$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/files'));
-		$fs->symlink('../../../../../shared/files', $app_dest . '/' . $buildpath . '/sites/default/files', TRUE);
-
-		$fs->symlink($rel . '/sites/default/modules/custom', $app_dest . '/' . $buildpath . '/modules/custom', TRUE);
-		$fs->symlink($rel . '/profiles/custom', $app_dest . '/' . $buildpath . '/profiles/custom', TRUE);
-		$fs->symlink($rel . '/sites/default/themes/custom', $app_dest . '/' . $buildpath . '/themes/custom', TRUE);
-
-		$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/files', 0777, 0000, TRUE);
-		$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.php', 0777, 0000, TRUE);
-		$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.local.php', 0777, 0000, TRUE);
 
 	}
 
@@ -219,51 +217,53 @@ class BuildCommand extends ContainerAwareCommand {
 		$application = $this->getApplication();
 		$utilRoot = $application->getUtilRoot();
 
-		$command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
-		$io->note('Download and configure Drupal 8.... This may take a few minutes....');
-		$this->runcommand($command, $io, TRUE);
+		if(!$fs->exists($app_dest)) {
 
-		try {
-			$fs->mkdir($app_dest . '/config/sync');
-			$fs->mkdir($app_dest . '/web/sites/default/files');
-			$fs->mkdir($app_dest . '/web/themes/custom');
-			$fs->mkdir($app_dest . '/web/modules/custom');
+			$command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
+			$io->note('Download and configure Drupal 8.... This may take a few minutes....');
+			$this->runcommand($command, $io, TRUE);
 
-		} catch (IOExceptionInterface $e) {
-			//echo 'An error occurred while creating your directory at '.$e->getPath();
-			$io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
+			try {
+				$fs->mkdir($app_dest . '/config/sync');
+				$fs->mkdir($app_dest . '/web/sites/default/files');
+				$fs->mkdir($app_dest . '/web/themes/custom');
+				$fs->mkdir($app_dest . '/web/modules/custom');
+
+			} catch (IOExceptionInterface $e) {
+				//echo 'An error occurred while creating your directory at '.$e->getPath();
+				$io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
+			}
+
+			// Move DockerDrupal Drupal 8 config files into install
+			if (is_dir($utilRoot . '/bundles/d8') && is_dir($app_dest)) {
+				$d8files = $utilRoot . '/bundles/d8';
+				$fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
+				$fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
+				$fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
+				$fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
+				$fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
+				$fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
+				$fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
+			}
+
+			// Set perms
+			$fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
+			$fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
+			$fs->chmod($app_dest . '/web/sites/default/settings.php', 0666, 0000, TRUE);
+			$fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0666, 0000, TRUE);
+
+			// Set perms for executables
+			$fs->chmod($app_dest . '/vendor', 0777, 0000, TRUE);
+
+			// setup $VAR for redis cache_prefix in settings.local.php template
+			$cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
+			$local_settings = $app_dest . '/web/sites/default/settings.local.php';
+			$process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
+			$process->run();
+
+			// Symlink PHP7 container working directory ie. /app/www
+			$fs->symlink('./web', $app_dest . '/www', TRUE);
 		}
-
-		// Move DockerDrupal Drupal 8 config files into install
-		if (is_dir($utilRoot . '/bundles/d8') && is_dir($app_dest)) {
-			$d8files = $utilRoot . '/bundles/d8';
-			$fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', true);
-			$fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', true);
-			$fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', true);
-			$fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', true);
-			$fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', true);
-			$fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', true);
-			$fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', true);
-		}
-
-		// Set perms
-		$fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
-		$fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
-		$fs->chmod($app_dest . '/web/sites/default/settings.php', 0666, 0000, TRUE);
-		$fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0666, 0000, TRUE);
-
-		// Set perms for executables
-		$fs->chmod($app_dest . '/vendor', 0777, 0000, TRUE);
-
-		// setup $VAR for redis cache_prefix in settings.local.php template
-		$cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
-		$local_settings = $app_dest . '/web/sites/default/settings.local.php';
-		$process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
-		$process->run();
-
-		// Symlink PHP7 container working directory ie. /app/www
-		$fs->symlink('./web', $app_dest . '/www', TRUE);
-
 	}
 
 	private function setupExampleApp($fs, $io, $appname) {
@@ -329,6 +329,5 @@ class BuildCommand extends ContainerAwareCommand {
 //      }
 
 	}
-
 
 }
