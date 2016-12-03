@@ -18,7 +18,7 @@
   - ~~simple \[/app/www/index.php] \-> hello world~~            
   - build DockerDrupal lite? full?            
   - ~~setup repo/app files eg~~  
-  - dir structure
+  - ~~dir structure~~
 ```
       .        
       ├── app
@@ -52,7 +52,7 @@
 - the use of Port :80 will prevent multiple apps/services running concurrently
 - ~~docker-compose up -d~~
 - ~~this will create networks, volumes and containers~~
-- @todo - fix PHP7 working directory compile vs sync issue
+- ~~@todo - fix PHP7 working directory compile vs sync issue~~
 - with services running
     - ~~Install Drupal site~~
     - ~~OSX -> write 127.0.0.1 docker.dev to /etc/hosts file~~
@@ -62,20 +62,20 @@
 
 ------
 ## Active APP commands
-- ADD GENERAL SYNCME COMMAND - to start/update PHP apps
+- ~~ADD GENERAL SYNCME COMMAND - to start/update PHP apps~~
 - DRUSH:commands
-    - drush cc \<cache> \[all]
-    - drush uli \<uid> \[1]
+    - ~~drush cc \<cache> \[all]~~
+    - ~~drush uli \<uid> \[1]~~
 -----
-    - drush:uli -options \[1] (uid/username)
-    - drush:cc -option \[all] (which cache)
+    - ~~drush:uli -options \[1] (uid/username)~~
+    - ~~drush:cc -option \[all] (which cache)~~
     - drush:features:revert \[all] (drush:fr)
     - drush:features:update \[all] (drush:fu)
 -----
   @todo CONvert drush:cmd  into several preconfigured useful drush utility commands, like
-    - :login (optional arg for uid)
-    - :cc (optional arg to specify cache)
-    - :sql-dump
+    - ~~:login (optional arg for uid)~~
+    - ~~:cc (optional arg to specify cache)~~
+    - ~~:sql-dump~~
     - ~~:cmd (generic - ie. already done)~~
 - UTIL:commands
     - SUPRESS VERSION WARNING COMMAND - ADD TO CONFIG AND READ PRE-WARNING FROM CONFIG
@@ -84,18 +84,18 @@
     - ~~get container name~~
     - ~~STOP ALL running containers~~
     - \<CONTAINER\> bash
-    - Monitor APP sync
+    - ~~Monitor APP sync~~
     - multisite drush -> args :multi
-    - redis clearcache
+    - ~~redis clearcache~~
     - open mailcatcher
 - LOG:commands
-    - watch <service>
+    - ~~watch <service>~~
 - launch ??
-- mysql log
-- Nginx log :error
-- Nginx RELOAD
-- backup/export Database -> integration with AWS cli ??
-- restore/import database : local or remote source ??
+- ~~mysql log~~
+- ~~Nginx log :error~~
+- ~~Nginx RELOAD~~
+- ~~backup/export Database~~ -> integration with AWS cli ??
+- ~~restore/import database : local~~ or remote source ??
 
 - Other @TODO CLI
 - commands
