@@ -42,16 +42,7 @@ class RedisInfoCommand extends Command
 
     if($application->checkForAppContainers($appname, $io)){
       $command = $application->getComposePath($appname, $io).'exec -T redis redis-cli info';
+			$application->runcommand($command, $io);
     }
-
-    $process = new Process($command);
-    $process->setTimeout(2);
-    $process->run();
-
-    if (!$process->isSuccessful()) {
-      throw new ProcessFailedException($process);
-    }
-    $out = $process->getOutput();
-    $io->info($out);
   }
 }

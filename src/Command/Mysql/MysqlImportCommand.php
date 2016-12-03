@@ -12,8 +12,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
@@ -26,7 +24,7 @@ class MysqlImportCommand extends Command {
 		$this
 			->setName('mysql:import')
 			->setDescription('Import .sql files')
-			->setHelp("Use this to import .sql files to the current running APPs dev_db. eg. [dockerdrupal mysql:import -p ./latest.sql]")
+			->setHelp("Use this to import .sql files to the current running APPs dev_db. [dockerdrupal mysql:import -p ./latest.sql]")
 			->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify import file path including filename');
 	}
 

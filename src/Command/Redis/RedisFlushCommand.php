@@ -24,7 +24,7 @@ class RedisFlushCommand extends Command
   {
       $this
           ->setName('redis:flush')
-          ->setDescription('FLush Redis cache')
+          ->setDescription('Flush Redis cache')
           ->setHelp("This command will flush all data REDIS key/value store (cache).")
       ;
   }
@@ -42,16 +42,7 @@ class RedisFlushCommand extends Command
 
     if($application->checkForAppContainers($appname, $io)){
       $command = $application->getComposePath($appname, $io).' exec -T redis redis-cli flushall';
+			$application->runcommand($command, $io);
     }
-
-    $process = new Process($command);
-    $process->setTimeout(2);
-    $process->run();
-
-    if (!$process->isSuccessful()) {
-      throw new ProcessFailedException($process);
-    }
-    $out = $process->getOutput();
-    $io->info($out);
   }
 }

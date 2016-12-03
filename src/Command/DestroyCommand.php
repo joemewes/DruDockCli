@@ -60,14 +60,6 @@ class DestroyCommand extends Command {
 			return;
 		}
 
-		$process = new Process($command);
-		$process->setTimeout(360);
-		$process->run();
-
-		if (!$process->isSuccessful()) {
-			throw new ProcessFailedException($process);
-		}
-		$out = $process->getOutput();
-		$io->info($out);
+		$application->runcommand($command, $io);
 	}
 }

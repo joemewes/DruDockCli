@@ -54,26 +54,7 @@ class MysqlExportCommand extends Command
             $question = new Question('Specify save path, including filename [latest.sql] : ', 'latest-'.$appname.'.sql');
             $savepath = $helper->ask($input, $output, $question);
             $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysqldump -u dev -pDEVPASSWORD dev_db > '.$savepath;
+						$application->runcommand($command, $io);
         }
-
-        global $output;
-        $output = $io;
-
-        $process = new Process($command);
-        $process->setTimeout(3600);
-        $process->run(function ($type, $buffer) {
-            global $output;
-            if($output) {
-                $output->info($buffer);
-            }
-        });
-
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
-        if ($process->isSuccessful()) {
-            $io->success('MySQL '.$type.' complete.');
-        }
-
     }
 }

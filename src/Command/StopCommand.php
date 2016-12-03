@@ -36,17 +36,6 @@ class StopCommand extends Command
         $io->section("STOPPING CONTAINERS");
 
         $command = 'docker stop $(docker ps -q) 2>&1';
-        $process = new Process($command);
-        $process->setTimeout(60);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-           // throw new ProcessFailedException($process);
-          if(!exec("echo $(docker ps -q)")){
-             $io->warning("No running containers");
-          }
-        }
-        $out = $process->getOutput();
-        $io->info($out);
+				$application->runcommand($command, $io);
     }
 }

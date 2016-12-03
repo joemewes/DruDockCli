@@ -1,12 +1,12 @@
 {
-    "name": "drupal/drupal",
-    "description": "Drupal is an open source content management platform powering millions of websites and applications.",
+    "name": "drupal-composer/drupal-project",
+    "description": "Project template for Drupal 8 projects with composer",
     "type": "project",
     "license": "GPL-2.0+",
     "repositories": [
         {
             "type": "composer",
-            "url": "https://packagist.drupal-composer.org"
+            "url": "https://packages.drupal.org/8"
         }
     ],
     "require": {
@@ -14,63 +14,59 @@
         "wikimedia/composer-merge-plugin": "~1.3",
         "drupal-composer/drupal-scaffold": "^2.0.1",
         "cweagans/composer-patches": "~1.0",
-        "drupal/core": "~8.0",
-        "drupal/devel": "8.*",
-        "drupal/devel_generate": "8.*",
-        "drupal/webprofiler": "8.*",
-        "drupal/redis": "8.*",
-        "drupal/search_api": "8.*",
-        "drupal/token": "8.*",
-        "drupal/pathauto": "8.*",
-        "drupal/adminimal_admin_toolbar": "8.x",
-        "drupal/ctools": "8.x"
+        "drupal/core": "^8.2",
+        "drush/drush": "~8.0",
+        "drupal/console": "~1.0",
+        "drupal/adminimal_admin_toolbar": "^1.3",
+        "drupal/adminimal_theme": "^1.2",
+        "drupal/devel": "1.x-dev",
+        "drupal/redis": "1.x-dev",
+        "drupal/search_api": "1.x-dev",
+        "drupal/token": "1.x-dev",
+        "drupal/pathauto": "1.x-dev"
     },
     "require-dev": {
+        "behat/mink": "~1.7",
+        "behat/mink-goutte-driver": "~1.2",
+        "jcalderonzumba/gastonjs": "~1.0.2",
+        "jcalderonzumba/mink-phantomjs-driver": "~0.3.1",
         "mikey179/vfsStream": "~1.2",
         "phpunit/phpunit": "~4.8",
-        "symfony/css-selector": "~2.8",
-        "mbostock/d3": "~3.5",
-        "components/highlightjs": "~9.6"
+        "symfony/css-selector": "~2.8"
     },
-    "replace": {
-        "drupal/core": "~8.3"
+    "conflict": {
+        "drupal/drupal": "*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "config": {
-        "preferred-install": "dist",
-        "autoloader-suffix": "Drupal8"
-    },
-    "extra": {
-        "_readme": [
-            "By default Drupal loads the autoloader from ./vendor/autoload.php.",
-            "To change the autoloader you can edit ./autoload.php."
-        ],
-        "merge-plugin": {
-            "include": [
-                "core/composer.json"
-            ],
-            "recurse": false,
-            "replace": false,
-            "merge-extra": false
-        },
-        "installer-paths": {
-            "core": ["type:drupal-core"],
-            "modules/contrib/{$name}": ["type:drupal-module"],
-            "profiles/contrib/{$name}": ["type:drupal-profile"],
-            "themes/contrib/{$name}": ["type:drupal-theme"],
-            "libraries/{$name}": ["type:drupal-library"]
-        }
-    },
     "autoload": {
-        "psr-4": {
-            "Drupal\\Core\\Composer\\": "core/lib/Drupal/Core/Composer"
-        }
+        "classmap": [
+            "scripts/composer/ScriptHandler.php"
+        ]
     },
     "scripts": {
-        "pre-autoload-dump": "Drupal\\Core\\Composer\\Composer::preAutoloadDump",
-        "post-autoload-dump": "Drupal\\Core\\Composer\\Composer::ensureHtaccess",
-        "post-package-install": "Drupal\\Core\\Composer\\Composer::vendorTestCodeCleanup",
-        "post-package-update": "Drupal\\Core\\Composer\\Composer::vendorTestCodeCleanup"
+        "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
+        "pre-install-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+        ],
+        "pre-update-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+        ],
+        "post-install-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+        ],
+        "post-update-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+        ]
+    },
+    "extra": {
+        "installer-paths": {
+            "web/core": ["type:drupal-core"],
+            "web/libraries/{$name}": ["type:drupal-library"],
+            "web/modules/contrib/{$name}": ["type:drupal-module"],
+            "web/profiles/contrib/{$name}": ["type:drupal-profile"],
+            "web/themes/contrib/{$name}": ["type:drupal-theme"],
+            "drush/contrib/{$name}": ["type:drupal-drush"]
+        }
     }
 }
