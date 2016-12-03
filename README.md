@@ -39,30 +39,54 @@ composer global require dockerdrupal/cli
 # Status
 ## Initial Commands structure
 ```
-     build
-       build:destroy      Disable and delete APP and containers
-       build:init         Fetch and build Drupal apps
+     Available commands:
+       about           About DockerDrupal
+       destroy         Disable and delete APP and containers
+       env             Fetch and build DockerDrupal containers
+       exec            Execute bespoke commands at :container
+       help            Displays help for a command
+       init            Fetch and build Drupal apps
+       list            Lists commands
+       restart         Restart APP containers
+       start           Start APP containers
+       status          Get current status of all containers
+       stop            Stop all containers
+       update          Update APP containers
+      build
+       build:destroy   Disable and delete APP and containers
+       build:init      Fetch and build Drupal apps
       docker
-       docker:exec        Execute bespoke commands at :container
-       docker:logs        Montitor logs output of container
-       docker:restart     Restart APP containers
-       docker:start       Start APP containers
-       docker:status      Get current status of all containers
-       docker:stop        Stop all containers
+       docker:exec     Execute bespoke commands at :container
+       docker:restart  Restart APP containers
+       docker:start    Start APP containers
+       docker:status   Get current status of all containers
+       docker:stop     Stop all containers
+       docker:update   Update APP containers
       drush
-       drush:cmd          Run drush commands
+       drush:cc        Run drush cache clear 
+       drush:cmd       Run drush commands 
+       drush:en        Enable Drupal module
+       drush:uli       Run Drush ULI
       env
-       env:init           Fetch and build DockerDrupal containers
+       env:init        Fetch and build DockerDrupal containers
+      mysql
+       mysql:export    Export .sql files
+       mysql:import    Import .sql files
+       mysql:log       Monitor mysql activity
+      nginx
+       nginx:flush     Flush nginx cache
+       nginx:log       Monitor nginx activity
+       nginx:reload    Reload nginx activity
       redis
-       redis:flush        FLush Redis cache
-       redis:info         Get Redis running config information
-       redis:monitor      Montitor redis activity
-       redis:ping         Ping Redis
+       redis:flush     Flush Redis cache
+       redis:info      Get Redis running config information
+       redis:monitor   Montitor redis activity
+       redis:ping      Ping Redis
       self
-       self:about         About DockerDrupal
-      util
-       util:mysql:export  Export .sql files [utilme]
-       util:mysql:import  Import .sql files [utilmi]
+       self:about      About DockerDrupal
+      sync
+       sync:monitor    Montitor App sync activity
+       
 ```
 
 ## Example Commands
