@@ -276,7 +276,7 @@ class Application extends ParentApplication
    */
   public function checkForAppContainers($appname, $io){
 
-    if(exec($this->getComposePath($appname, $io).'ps | grep '.str_replace('_', '', $appname))) {
+    if(exec($this->getComposePath($appname, $io).'ps | grep '.preg_replace("/[^A-Za-z0-9 ]/", '', $appname))) {
       return TRUE;
     }else{
       $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
