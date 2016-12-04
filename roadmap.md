@@ -1,105 +1,52 @@
 # DockerDrupalCli
 
-## Things it must do                                                                            
-- ~~- check requirements~~                                                             
-- ~~- Docker for Mac/Windows/Linux~~                                               
-    - ~~- docker Daemon running~~                                                 
-- ~~PHP version~~                                                               
-- ~~Drush version \` shell_exec('which drush') \`~~                              
-- ~~GIT installed \` shell_exec('which git') \`~~
-- ~~WRITE .yaml file with APP .config INFO to reading later. eg. type: \[D8]~~                                                                                     
-- ~~GET DockerDrupal and setup basic index.php/html welcome page~~
-  - ~~\-> full - git clone https://github.com/4alldigital/DockerDrupal.git docker_\<appname>~~
-  - ~~\-> lite - git clone https://github.com/4alldigital/DockerDrupal-lite.git docker_\<appname>~~
-- ~~Init DockerDrupal~~
-- ~~scaffold app/docker directory structure~~
-- ~~ASK~~
-  - ~~Drupal \[default] \[version]~~
-  - ~~simple \[/app/www/index.php] \-> hello world~~            
-  - build DockerDrupal lite? full?            
-  - ~~setup repo/app files eg~~  
-  - ~~dir structure~~
-```
-      .        
-      ├── app
-      |   ├── builds
-          │   ├── build-2016-08-08--09-30-00
-          │   │   └── public/index.php
-          ├── repository
-          │   ├── libraries/
-          │   ├── modules
-          │   │   ├── custom/
-          │   │   └── features/
-          │   ├── scripts
-          │   └── themes
-          │       └── custom/
-          ├── shared
-          │   └── files/
-          └── www -> builds/build-2016-08-08--09-30-00/public
-      └── docker_<yourappname>  
-          ├── config
-          │   ├── mysql
-          │   └── solr
-          ├── docs
-          │   └── images
-          ├── scripts
-          └── sites-enabled
-```
+## build ENV- docker-compose.yml
+- Build docker-compose.yml via Q&A rather than from alternative GIT repo
+
+1. -> DEFAULT - DockerDrupal-lite
+2. -> WITH TESTING SUITE - DockerDrupal
+3. -> CUSTOM - Q and A
+    - Mysql [y/n]
+    - PHP5.6 [y/n]
+    - PHP7 [y/n]
+    - NGINX [y/n]
+    - APACHE [y/n]
+    - mySQL DB [y/n]
+    - Postgres DB [y/n]
+    - Mongo DB [y/n]
+    - Redis [y/n]
+    - Memcached [y/n]
+        
+- Each option will need to: 
+1. Print out required config in .yml file including  /Volumes for DBs
+2. Copy/create relevant .env files
+3. Copy/create relevant /config files
+
+## General continued things it must do :                                                                                    
+- build DockerDrupal lite? full?            
 - init app/dockerdrupal ./config.yaml on manually created app/old version
-- ~~run app build~~
-- ~~Download Drupal and symlink custom folders~~
-- ~~check for currently running dockerdrupal apps/containers~~
 - the use of Port :80 will prevent multiple apps/services running concurrently
-- ~~docker-compose up -d~~
-- ~~this will create networks, volumes and containers~~
-- ~~@todo - fix PHP7 working directory compile vs sync issue~~
 - with services running
-    - ~~Install Drupal site~~
-    - ~~OSX -> write 127.0.0.1 docker.dev to /etc/hosts file~~
     - linux -> write 127.0.0.1 docker.dev to /etc/hosts file
-    - Windows -> ??        
-    - ~~Open http://docker.dev in browser~~
+    - Windows -> ??     
+       
+## Active APP commands @TODO :
+DRUSH
 
-------
-## Active APP commands
-- ~~ADD GENERAL SYNCME COMMAND - to start/update PHP apps~~
-- DRUSH:commands
-    - ~~drush cc \<cache> \[all]~~
-    - ~~drush uli \<uid> \[1]~~
------
-    - ~~drush:uli -options \[1] (uid/username)~~
-    - ~~drush:cc -option \[all] (which cache)~~
-    - drush:features:revert \[all] (drush:fr)
-    - drush:features:update \[all] (drush:fu)
------
-  @todo CONvert drush:cmd  into several preconfigured useful drush utility commands, like
-    - ~~:login (optional arg for uid)~~
-    - ~~:cc (optional arg to specify cache)~~
-    - ~~:sql-dump~~
-    - ~~:cmd (generic - ie. already done)~~
-- UTIL:commands
-    - SUPRESS VERSION WARNING COMMAND - ADD TO CONFIG AND READ PRE-WARNING FROM CONFIG
-    - ~~be able to import local DB / .sql dump~~
-    - ~~build multisite? add site?~~
-    - ~~get container name~~
-    - ~~STOP ALL running containers~~
-    - \<CONTAINER\> bash
-    - ~~Monitor APP sync~~
-    - multisite drush -> args :multi
-    - ~~redis clearcache~~
-    - open mailcatcher
-- LOG:commands
-    - ~~watch <service>~~
-- launch ??
-- ~~mysql log~~
-- ~~Nginx log :error~~
-- ~~Nginx RELOAD~~
-- ~~backup/export Database~~ -> integration with AWS cli ??
-- ~~restore/import database : local~~ or remote source ??
+- drush:features:revert \[all] (drush:fr)
+- drush:features:update \[all] (drush:fu)
 
-- Other @TODO CLI
-- commands
-   - python -mwebbrowser http://docker.dev:8983/solr/#/SITE
-   - python -mwebbrowser http://docker.dev:4444/grid/console
-   - python -mwebbrowser http://docker.dev:1080
-   - python -mwebbrowser http://docker.dev:8088
+UTIL
+
+- SUPRESS VERSION WARNING COMMAND - ADD TO CONFIG AND READ PRE-WARNING FROM CONFIG
+- \<CONTAINER\> bash
+- multisite drush -> args :multi
+- open mailcatcher
+
+GENERAL
+
+- python -mwebbrowser http://docker.dev:8983/solr/#/SITE
+- python -mwebbrowser http://docker.dev:4444/grid/console
+- python -mwebbrowser http://docker.dev:1080
+- python -mwebbrowser http://docker.dev:8088
+
