@@ -34,6 +34,7 @@ class ExecCommand extends Command {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
+
 		$application = $this->getApplication();
 
 		$cmd = $input->getOption('cmd');
