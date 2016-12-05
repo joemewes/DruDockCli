@@ -3,8 +3,8 @@
 ## build ENV- docker-compose.yml
 - Dynamic build of docker-compose.yml via Q & A rather than from alternative GIT repo
 
-1. -> DEFAULT - DockerDrupal-lite
-2. -> WITH TESTING SUITE - DockerDrupal
+1. -> DEFAULT - [DockerDrupal-lite](https://github.com/4AllDigital/DockerDrupal-lite)
+2. -> WITH TESTING SUITE - [DockerDrupal](https://github.com/4AllDigital/DockerDrupal)
 3. -> CUSTOM - Q & A
 
     - Mysql [y/n]
