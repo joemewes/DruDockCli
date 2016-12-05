@@ -6,6 +6,7 @@
 1. -> DEFAULT - DockerDrupal-lite
 2. -> WITH TESTING SUITE - DockerDrupal
 3. -> CUSTOM - Q & A
+
     - Mysql [y/n]
     - PHP5.6 [y/n]
     - PHP7 [y/n]
