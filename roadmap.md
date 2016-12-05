@@ -1,11 +1,11 @@
 # DockerDrupalCli
 
 ## build ENV- docker-compose.yml
-- Build docker-compose.yml via Q&A rather than from alternative GIT repo
+- Dynamic build of docker-compose.yml via Q & A rather than from alternative GIT repo
 
 1. -> DEFAULT - DockerDrupal-lite
 2. -> WITH TESTING SUITE - DockerDrupal
-3. -> CUSTOM - Q and A
+3. -> CUSTOM - Q & A
     - Mysql [y/n]
     - PHP5.6 [y/n]
     - PHP7 [y/n]
