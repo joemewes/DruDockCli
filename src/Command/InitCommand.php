@@ -1,9 +1,9 @@
 <?php
 
 /**
-* @file
-* Contains \Docker\Drupal\Command\DemoCommand.
-*/
+ * @file
+ * Contains \Docker\Drupal\Command\DemoCommand.
+ */
 
 namespace Docker\Drupal\Command;
 
@@ -24,21 +24,21 @@ use Symfony\Component\Yaml\Yaml;
 
 
 /**
-* Class DemoCommand
-* @package Docker\Drupal\ContainerAwareCommand
-*/
+ * Class DemoCommand
+ * @package Docker\Drupal\ContainerAwareCommand
+ */
 class InitCommand extends ContainerAwareCommand
 {
   protected function configure()
   {
     $this
-        ->setName('env:init')
-        ->setAliases(['env'])
-        ->setDescription('Fetch and build DockerDrupal containers')
-        ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
-        ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
-        ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
-    ;
+      ->setName('env:init')
+      ->setAliases(['env'])
+      ->setDescription('Fetch and build DockerDrupal containers')
+      ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
+      ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
+      ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
+      ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full]');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -60,126 +60,146 @@ class InitCommand extends ContainerAwareCommand
 
     $message = 'If required, please type admin password to add \'127.0.0.1 docker.dev\' to /etc/hosts';
     $io->note($message);
-    $this->addHost();
+    $this->addHost($application, $io);
 
-    // GET AND SET APPNAME
+    // GET AND SET APPNAME.
     $appname = $input->getArgument('appname');
-    if(!$appname){
-        $io->title("SET APP NAME");
-        $helper = $this->getHelper('question');
-        $question = new Question('Enter App name [dockerdrupal_app_'.$date.'] : ', 'my-app-'.$date);
-        $appname = $helper->ask($input, $output, $question);
+    if (!$appname) {
+      $io->title("SET APP NAME");
+      $helper = $this->getHelper('question');
+      $question = new Question('Enter App name [dockerdrupal_app_' . $date . '] : ', 'my-app-' . $date);
+      $appname = $helper->ask($input, $output, $question);
     }
 
-    // GET AND SET APP TYPE
+    // GET AND SET APP REQUIREMENTS.
+    $reqs = $input->getOption('reqs');
+    $available_reqs = array('Basic', 'Full');
+
+    if ($reqs && !in_array($reqs, $available_reqs)) {
+      $io->warning('REQS : ' . $reqs . ' not allowed.');
+      $reqs = NULL;
+    }
+
+    if (!$reqs) {
+      $io->info(' ');
+      $io->title("SET APP REQS");
+      $helper = $this->getHelper('question');
+      $question = new ChoiceQuestion(
+        'Select your APP reqs [basic] : ',
+        $available_reqs,
+        'basic'
+      );
+      $reqs = $helper->ask($input, $output, $question);
+    }
+
+    // GET AND SET APP TYPE.
     $type = $input->getOption('type');
     $available_types = array('DEFAULT', 'D7', 'D8');
 
-    if($type && !in_array($type, $available_types)){
-      $io->warning('TYPE : '.$type.' not allowed.');
-      $type = null;
+    if ($type && !in_array($type, $available_types)) {
+      $io->warning('TYPE : ' . $type . ' not allowed.');
+      $type = NULL;
     }
 
-    if(!$type){
+    if (!$type) {
       $io->info(' ');
       $io->title("SET APP TYPE");
       $helper = $this->getHelper('question');
       $question = new ChoiceQuestion(
-          'Select your APP type [0] : ',
-          $available_types,
-          '0'
+        'Select your APP type [0] : ',
+        $available_types,
+        '0'
       );
       $type = $helper->ask($input, $output, $question);
     }
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
-    if(!$fs->exists($system_appname)){
-        $fs->mkdir($system_appname , 0755);
-        $fs->mkdir($system_appname.'/docker_'.$system_appname, 0755);
-    }else{
-        $io->error('This app already exists');
-        return;
+    if (!$fs->exists($system_appname)) {
+      $fs->mkdir($system_appname, 0755);
+      $fs->mkdir($system_appname . '/docker_' . $system_appname, 0755);
+    }
+    else {
+      $io->error('This app already exists');
+      return;
     }
 
-    // SETUP APP CONFIG FILE
-    $config= array(
-        'appname' => $appname,
-        'apptype' => $type,
-        'dockerdrupal' => array('version' => $application->getVersion(), 'date' => $date),
+    // SETUP APP CONFIG FILE.
+    $config = array(
+      'appname' => $appname,
+      'apptype' => $type,
+      'reqs' => $reqs,
+      'dockerdrupal' => array('version' => $application->getVersion(), 'date' => $date),
     );
     $yaml = Yaml::dump($config);
-    file_put_contents($system_appname.'/.config.yml', $yaml);
+    file_put_contents($system_appname . '/.config.yml', $yaml);
 
-    $message = 'Fetching DockerDrupal v'.$application->getVersion();
-    $io->info(' ');
-    $io->note($message);
-    $command = 'git clone https://github.com/4alldigital/DockerDrupal-lite.git '.$system_appname.'/docker_'.$system_appname;
-    $this->runcommand($command, $io, TRUE);
-
-    $this->initDocker($io, $system_appname);
-
-    $message = 'DockerDrupal containers ready. Navigate to your app folder [cd '.$system_appname.'] and build your app via ::: build:init';
+    $message = 'Fetching DockerDrupal v' . $application->getVersion();
     $io->info(' ');
     $io->note($message);
 
-  }
+    var_dump($reqs);
 
-  protected function runcommand($command, $io, $showoutput = TRUE){
-
-    global $output;
-    $output = $io;
-
-    $process = new Process($command);
-    $process->setTimeout(3600);
-    $process->run(function ($type, $buffer) {
-      global $output;
-      if($output) {
-        $output->info($buffer);
-      }
-    });
-
-    if (!$process->isSuccessful()) {
-        throw new ProcessFailedException($process);
+    if ($reqs == 'Basic') {
+      $io->note('APP basic');
+      $command = 'git clone https://github.com/4alldigital/DockerDrupal-lite.git ' . $system_appname . '/docker_' . $system_appname;
     }
+
+    if ($reqs == 'Full') {
+      $io->note('APP basic');
+      $command = 'git clone https://github.com/4AllDigital/DockerDrupal.git ' . $system_appname . '/docker_' . $system_appname;
+    }
+
+    $application->runcommand($command, $io, TRUE);
+
+    $this->initDocker($application, $io, $system_appname);
+
+    $message = 'DockerDrupal containers ready. Navigate to your app folder [cd ' . $system_appname . '] and build your app via ::: build:init';
+    $io->info(' ');
+    $io->note($message);
+
   }
 
-  private function initDocker($io, $appname){
+  /**
+   * @param $application
+   * @param $io
+   * @param $appname
+   */
+  private function initDocker($application, $io, $appname) {
 
-    if(exec('docker ps -q 2>&1', $exec_output)) {
-        $dockerstopcmd = 'docker stop $(docker ps -q)';
-        $this->runcommand($dockerstopcmd, $io, TRUE);
+    if (exec('docker ps -q 2>&1', $exec_output)) {
+      $dockerstopcmd = 'docker stop $(docker ps -q)';
+      $application->runcommand($dockerstopcmd, $io, TRUE);
     }
 
     $message = 'Download and configure DockerDrupal.... This may take a few minutes....';
     $io->note($message);
 
-    $dockerlogs = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml logs -f';
-    $this->runcommand($dockerlogs, $io, TRUE);
+    $dockerlogs = 'docker-compose -f ' . $appname . '/docker_' . $appname . '/docker-compose.yml logs -f';
+    $application->runcommand($dockerlogs, $io, TRUE);
 
-    if(exec('docker ps -q 2>&1', $exec_output)) {
+    if (exec('docker ps -q 2>&1', $exec_output)) {
       $dockercmd = 'docker kill $(docker ps -q)';
-      $this->runcommand($dockercmd, $io, TRUE);
+      $application->runcommand($dockercmd, $io, TRUE);
     }
 
-    $dockercmd = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml pull';
-    $this->runcommand($dockercmd, $io, TRUE);
+    $dockercmd = 'docker-compose -f ' . $appname . '/docker_' . $appname . '/docker-compose.yml pull';
+    $application->runcommand($dockercmd, $io, TRUE);
   }
 
-  private function addHost(){
-    // add initial entry to hosts file -> OSX @TODO update as command for all systems and OS's
+  /**
+   * @param $application
+   * @param $io
+   */
+  private function addHost($application, $io) {
+    // Add initial entry to hosts file.
+    // OSX @TODO update as command for all systems and OS's.
     $ip = '127.0.0.1';
     $hostname = 'docker.dev';
     $hosts_file = '/etc/hosts';
-    if(!exec("cat ".$hosts_file." | grep '".$ip." ".$hostname."'")) {
-      $process = new Process(sprintf('echo "%s %s" | sudo tee -a %s >/dev/null', $ip, $hostname, $hosts_file));
-      $process->run(
-        function ($type, $buffer) use ($output) {
-          if(isset($output)){
-            $output->writeln($buffer);
-          }
-        }
-      );
+    if (!exec("cat " . $hosts_file . " | grep '" . $ip . " " . $hostname . "'")) {
+      $command = new Process(sprintf('echo "%s %s" | sudo tee -a %s >/dev/null', $ip, $hostname, $hosts_file));
+      $application->runcommand($command, $io, TRUE);
     }
   }
 

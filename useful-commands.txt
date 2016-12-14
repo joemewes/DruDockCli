@@ -26,6 +26,14 @@ python -mwebbrowser http://localhost:1080
 # launch ??
 python -mwebbrowser http://docker.dev
 
+# behat commands
+## get PORT
+docker inspect --format '{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).HostPort }}' $(docker ps --format {{.Names}} | grep firefox)
+
+## open debug VNC server viewer
+open vnc://:secret@localhost:$(docker inspect --format '{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).HostPort }}' $(docker ps --format {{.Names}} | grep firefox))
+
+
 
 # SCREEN into HYVE
 screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty

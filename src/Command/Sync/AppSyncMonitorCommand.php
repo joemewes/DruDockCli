@@ -20,29 +20,31 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  */
 class AppSyncMonitorCommand extends Command
 {
-  protected function configure()
-  {
-      $this
-          ->setName('sync:monitor')
-          ->setDescription('Montitor App sync activity')
-          ->setHelp("This command will output App Sync activity.")
-      ;
+
+  protected function configure() {
+    $this
+      ->setName('sync:monitor')
+      ->setDescription('Montitor App sync activity')
+      ->setHelp("This command will output App Sync activity.");
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
+  /**
+   * @param \Symfony\Component\Console\Input\InputInterface $input
+   * @param \Symfony\Component\Console\Output\OutputInterface $output
+   */
+  protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("SYNC ::: Monitor");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).'logs -f app  2>&1';
-			$application->runcommand($command, $io);
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'logs -f app  2>&1';
+      $application->runcommand($command, $io);
     }
   }
 }

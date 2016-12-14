@@ -117,7 +117,7 @@ class BuildCommand extends ContainerAwareCommand {
 		// $dockerlogs = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml logs -f';
 		// $this->runcommand($dockerlogs, $io, TRUE);
 
-		$dockercmd = 'until docker-compose -f ./docker_' . $appname . '/docker-compose.yml run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "Nothing to do"; do : ; done';
+		$dockercmd = 'until docker-compose -f ./docker_' . $appname . '/docker-compose.yml run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "Nothing to do:" ; do : ; done';
 		$this->runcommand($dockercmd, $io, TRUE);
 
 		$dockercmd = 'docker kill $(docker ps -q)';
@@ -213,7 +213,6 @@ class BuildCommand extends ContainerAwareCommand {
 	private function setupD8($fs, $io, $appname) {
 
 		$app_dest = './app';
-
 		$application = $this->getApplication();
 		$utilRoot = $application->getUtilRoot();
 
@@ -268,21 +267,23 @@ class BuildCommand extends ContainerAwareCommand {
 
 	private function setupExampleApp($fs, $io, $appname) {
 
+    $app_dest = './app';
+    $application = $this->getApplication();
+    $utilRoot = $application->getUtilRoot();
+
 		$message = 'Setting up Example app';
 		$io->note($message);
 		// example app source and destination
-		$app_src = './docker_' . $appname . '/example/app/';
-		$app_dest = './app/repository/';
-
-		try {
-			$fs->mkdir($app_dest);
-			$fs->mirror($app_src, $app_dest);
-		} catch (IOExceptionInterface $e) {
-			echo 'An error occurred while creating your directory at ' . $e->getPath();
-		}
-
-		$fs->symlink('repository', './app/www', TRUE);
-
+    if (is_dir($utilRoot . '/bundles/default') && is_dir($app_dest . '/repository')) {
+      $app_src = $utilRoot . '/bundles/default';
+      try {
+        $fs->mkdir($app_dest . '/repository');
+        $fs->mirror($app_src, $app_dest . '/repository');
+      } catch (IOExceptionInterface $e) {
+        echo 'An error occurred while creating your directory at ' . $e->getPath();
+      }
+      $fs->symlink('repository', './app/www', TRUE);
+    }
 	}
 
 	private function installDrupal8($io, $install_helpers = FALSE) {
