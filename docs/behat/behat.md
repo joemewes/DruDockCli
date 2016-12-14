@@ -1,0 +1,2 @@
+Behat information
+-----------------

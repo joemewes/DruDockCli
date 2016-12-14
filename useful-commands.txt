@@ -33,6 +33,10 @@ docker inspect --format '{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).
 ## open debug VNC server viewer
 open vnc://:secret@localhost:$(docker inspect --format '{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).HostPort }}' $(docker ps --format {{.Names}} | grep firefox))
 
+example - 1
+    docker exec -it $(docker ps --format {{.Names}} | grep behat) behat --config /app/www/tests/behat.yml --suite global_features --profile local --tags about
+example - 2
+    docker exec -it $(docker ps --format {{.Names}} | grep behat) behat --config /docker/drupal_docker/repository/tests/behat.yml --suite global_features --profile local --tags login
 
 
 # SCREEN into HYVE

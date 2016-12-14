@@ -1,0 +1,130 @@
+default:
+  autoload:
+      '': %paths.base%/features/bootstrap
+  suites:
+    global_features:
+      paths:    [ %paths.base%/features/global ]
+      contexts:
+        - FeatureContext:
+            parameters:
+              drupal_users:
+                test_user:
+                  'pass'
+                test_editor:
+                  'pass'
+              email:
+                host:
+                  'docker.dev'
+                address:
+                  'testuser@docker.dev'
+                username:
+                  'the_behatuser'
+                password:
+                  'testpassword'
+        - Drupal\DrupalExtension\Context\MinkContext
+        - Drupal\DrupalExtension\Context\MessageContext
+        - Drupal\DrupalExtension\Context\DrushContext
+        - Drupal\DrupalExtension\Context\MarkupContext
+        - Devinci\DevinciExtension\Context\DebugContext:
+            asset_dump_path: /tmp/screenshots
+        - Devinci\DevinciExtension\Context\JavascriptContext:
+            maximum_wait: 30
+    staging_features:
+      paths:    [ %paths.base%/features/staging ]
+      contexts:
+        - FeatureContext:
+            parameters:
+              drupal_users:
+                test_user:
+                  'pass'
+                test_editor:
+                  'pass'
+        - Drupal\DrupalExtension\Context\MinkContext
+        - Drupal\DrupalExtension\Context\MessageContext
+        - Drupal\DrupalExtension\Context\DrushContext
+        - Drupal\DrupalExtension\Context\MarkupContext
+        - Devinci\DevinciExtension\Context\DebugContext:
+            asset_dump_path: /tmp/screenshots
+        - Devinci\DevinciExtension\Context\JavascriptContext:
+            maximum_wait: 30
+    local_features:
+      paths:    [ %paths.base%/features/local ]
+      contexts:
+        - FeatureContext:
+            parameters:
+              drupal_users:
+                test_user:
+                  'pass'
+                test_editor:
+                  'pass'
+              selectors:
+                tweets: '.twitter-timeline'
+              email:
+                host:
+                  'docker.dev'
+                address:
+                  'dd_behatuser@docker.dev'
+                username:
+                  'dd_behatuser'
+                password:
+                  'testpassword'
+        - Alex\MailCatcher\Behat\MailCatcherContext
+        - Drupal\DrupalExtension\Context\MinkContext
+        - Drupal\DrupalExtension\Context\MessageContext
+        - Drupal\DrupalExtension\Context\DrushContext
+        - Drupal\DrupalExtension\Context\MarkupContext
+        - Devinci\DevinciExtension\Context\DebugContext:
+            asset_dump_path: /tmp/screenshots
+        - Devinci\DevinciExtension\Context\JavascriptContext:
+            maximum_wait: 30
+  formatters:
+        pretty: true
+  extensions:
+    Behat\MinkExtension:
+      javascript_session:  'selenium2'
+      browser_name: firefox
+      goutte: ~
+      selenium2:
+        capabilities:
+          browser: firefox
+          version: ANY
+          deviceType: ANY
+    Drupal\DrupalExtension:
+      blackbox: ~
+      api_driver: 'drupal'
+      region_map:
+        header: '#navbar'
+        main_content: '.main-container'
+        admin_main_content: '#block-system-main'
+        footer: '.region-footer'
+        pager: '.pagination'
+      selectors:
+        message_selector: '.alert'
+        error_message_selector: '.alert.alert-error'
+        success_message_selector: '.alert.alert-success'
+        warning_message_selector: '.alert.alert-warning'
+      text:
+        log_out: 'Log out'
+        log_in: 'Log in'
+        password_field: 'Password '
+        username_field: 'E-mail '
+
+local:
+  extensions:
+    Tonic\Behat\ParallelScenarioExtension: ~
+    Alex\MailCatcher\Behat\MailCatcherExtension\Extension:
+      url: http://docker.dev:1080
+      purge_before_scenario: true
+    Behat\MinkExtension:
+      base_url: http://docker.dev
+      selenium2:
+        wd_host: "http://docker.dev:4444/wd/hub"
+        capabilities:
+          browser: firefox
+          version: ''
+          deviceType: ''
+    Drupal\DrupalExtension:
+      drush:
+        alias: 'docker.dockerdrupal'
+      drupal:
+        drupal_root: '/app/www'

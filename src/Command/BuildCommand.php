@@ -146,6 +146,13 @@ class BuildCommand extends ContainerAwareCommand {
 		$application = $this->getApplication();
 		$utilRoot = $application->getUtilRoot();
 
+    $config = $application->getAppConfig($io);
+    if ($config) {
+      $appname = $config['appname'];
+      $type = $config['apptype'];
+      $reqs = $config['reqs'];
+    }
+
 		if(!$fs->exists($app_dest)) {
 
 			try {
@@ -174,6 +181,10 @@ class BuildCommand extends ContainerAwareCommand {
 				$fs->copy($d7files . '/.gitignore', $app_dest . '/repository/.gitignore');
 				//local shared files
 				$fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
+
+				if(isset($reqs) && $reqs == 'Full') {
+          $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/repository/behat/');
+        }
 			}
 
 			// deploy an initial build

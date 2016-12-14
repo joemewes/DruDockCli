@@ -35,18 +35,14 @@ class DrushClearCacheCommand extends Command {
 			$type = $config['apptype'];
 		}
 
-		if ($type == 'D8') {
+		if (isset($type) && $type == 'D8') {
 			$cmd = 'cr all';
-		}
-		else {
-			if ($type == 'D7') {
-				$cmd = 'cc all';
-			}
-			else {
-				$io->error('You\'re not currently in an APP directory');
-				return;
-			}
-		}
+		} elseif (isset($type) && $type == 'D7') {
+      $cmd = 'cc all';
+    }	else {
+      $io->error('You\'re not currently in an Drupal APP directory');
+      return;
+		};
 
 		$io->section('EXEC drush ' . $cmd);
 		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush ' . $cmd;

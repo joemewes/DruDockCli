@@ -58,9 +58,9 @@ class InitCommand extends ContainerAwareCommand
       return;
     }
 
-    $message = 'If required, please type admin password to add \'127.0.0.1 docker.dev\' to /etc/hosts';
+    $message = "If required, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
     $io->note($message);
-    $this->addHost($application, $io);
+    $this->addHostConfig($application, $io);
 
     // GET AND SET APPNAME.
     $appname = $input->getArgument('appname');
@@ -191,15 +191,21 @@ class InitCommand extends ContainerAwareCommand
    * @param $application
    * @param $io
    */
-  private function addHost($application, $io) {
+  private function addHostConfig($application, $io) {
     // Add initial entry to hosts file.
     // OSX @TODO update as command for all systems and OS's.
+    $utilRoot = $application->getUtilRoot();
+
     $ip = '127.0.0.1';
     $hostname = 'docker.dev';
     $hosts_file = '/etc/hosts';
     if (!exec("cat " . $hosts_file . " | grep '" . $ip . " " . $hostname . "'")) {
       $command = new Process(sprintf('echo "%s %s" | sudo tee -a %s >/dev/null', $ip, $hostname, $hosts_file));
       $application->runcommand($command, $io, TRUE);
+    }
+
+    if(!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
+      $fs->copy($utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist', '/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist');
     }
   }
 

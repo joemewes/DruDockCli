@@ -198,6 +198,9 @@ class Application extends ParentApplication
     $commands[] = new Command\Redis\RedisFlushCommand();
 		$commands[] = new Command\Redis\RedisInfoCommand();
 
+    $commands[] = new Command\Behat\BehatStatusCommand();
+    $commands[] = new Command\Behat\BehatMonitorCommand();
+
 		$commands[] = new Command\Sync\AppSyncMonitorCommand();
 
     return $commands;
@@ -294,6 +297,7 @@ class Application extends ParentApplication
 
 		$process = new Process($command);
 		$process->setTimeout(3600);
+    $process->setTty(true);
 		$process->run(function ($type, $buffer) {
 			global $output;
 			if ($output) {
@@ -304,5 +308,8 @@ class Application extends ParentApplication
 		if (!$process->isSuccessful()) {
 			throw new ProcessFailedException($process);
 		}
+
+    $io->info('');
+
 	}
 }
