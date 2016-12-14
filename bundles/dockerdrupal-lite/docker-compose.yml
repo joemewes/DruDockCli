@@ -1,0 +1,78 @@
+
+version: "2"
+#
+# [ services definitions ]
+#
+services:
+  app:
+     image : 4alldigital/drupaldev-unison
+     volumes :
+       - ../app:/code
+       - app-sync:/app
+     hostname : app
+
+  db:
+    image : mariadb:10.1.11
+    ports :
+      - "3306:3306"
+    volumes :
+      - ddlite-mysqldata:/var/lib/mysql
+      - ./config/mysql:/etc/mysql/conf.d
+    env_file: mysql.env
+    hostname: db
+
+  php:
+    image : 4alldigital/drupaldev-php7:latest
+    volumes :
+      - ./config/20-xdebug.ini:/etc/php/7.0/fpm/conf.d/20-xdebug.ini
+    volumes_from:
+        - app:rw
+    environment:
+      XDEBUG_CONFIG: "remote_host=${DOCKER_HOST_IP}"
+      PHP_IDE_CONFIG: "serverName=docker.dev"
+      HOST_IP: "${DOCKER_HOST_IP}"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    hostname: php
+    extra_hosts:
+     - "docker.dev:${DOCKER_HOST_IP}"
+
+  nginx:
+    image : 4alldigital/drupaldev-nginx:latest
+    ports :
+      - "80:80"
+    volumes :
+      - ./sites-enabled:/etc/nginx/sites-enabled
+    volumes_from:
+      - app:rw
+    hostname: nginx
+
+  redis:
+    image : 4alldigital/drupaldev-redis:latest
+    hostname: redis
+    mem_limit: 100000000
+    memswap_limit: 2000000000
+
+  solr:
+      image : 4alldigital/drupaldev-solr:latest
+      ports :
+        - "8983:8983"
+      volumes :
+        - ./config/solr:/opt/solr/example/solr
+      hostname: solr
+
+  mailcatcher:
+    image : schickling/mailcatcher
+    ports :
+      - "1080:1080"
+    hostname: mailcatcher
+
+#
+# [ volumes definition ]
+#
+volumes:
+  ddlite-mysqldata:
+    driver: local
+  app-sync:
+    driver: local

@@ -1,0 +1,134 @@
+version: "2"
+#
+# [ services definitions ]
+#
+services:
+  app:
+    image : 4alldigital/drupaldev-unison
+    volumes :
+     - ../app:/code
+     - app-sync:/app
+    hostname : app
+
+  db:
+    image : mariadb:10.1.11
+    ports :
+      - "3306:3306"
+    volumes :
+      - dd-mysqldata:/var/lib/mysql
+      - ./config/mysql:/etc/mysql/conf.d
+    env_file: mysql.env
+    hostname: db
+
+  php:
+    image : 4alldigital/drupaldev-php7:latest
+    ports :
+     - "8022:22"
+    volumes :
+      - ./config/20-xdebug.ini:/etc/php/7.0/fpm/conf.d/20-xdebug.ini
+    volumes_from:
+        - app:rw
+    environment:
+      XDEBUG_CONFIG: "remote_host=10.254.254.254"
+      PHP_IDE_CONFIG: "serverName=docker.dev"
+      HOST_IP: "10.254.254.254"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    hostname: php
+    extra_hosts:
+     - "docker.dev:10.254.254.254"
+
+  nginx:
+    image : 4alldigital/drupaldev-nginx:latest
+    ports :
+      - "80:80"
+    volumes :
+      - ./sites-enabled:/etc/nginx/sites-enabled
+    volumes_from:
+      - app:rw
+    hostname: nginx
+
+  redis:
+    image : 4alldigital/drupaldev-redis:latest
+    hostname: redis
+    mem_limit: 100000000
+    memswap_limit: 2000000000
+
+  solr:
+    image : 4alldigital/drupaldev-solr:latest
+    ports :
+      - "8983:8983"
+    volumes :
+      - ./config/solr:/opt/solr/example/solr
+    hostname: solr
+
+  mailcatcher:
+    image : schickling/mailcatcher
+    ports :
+      - "1080:1080"
+    hostname: mailcatcher
+
+  behat:
+    image: 4alldigital/drupaldev-behat:latest
+    volumes:
+      - ./config/behat/alias.php:/root/.drush/docker.aliases.drushrc.php
+      - ../app/repository/behat/tests/:/root/behat/
+      - ../tests/screenshots/:/tmp/screenshots
+    volumes_from:
+        - app:rw
+    environment:
+      website: http://docker.dev
+    hostname: behat
+    extra_hosts:
+     - "docker.dev:10.254.254.254"
+
+  selenium:
+    image: selenium/hub:2.53.0
+    volumes:
+      - /dev/shm:/dev/shm
+      - ../tests/uploads/:/e2e/uploads
+    ports:
+      - 4444:4444
+    environment :
+      - SE_OPTS=-debug
+    hostname: selenium
+    extra_hosts:
+     - "docker.dev:10.254.254.254"
+
+  firefox:
+    image: selenium/node-firefox-debug:2.53.0
+    ports:
+      - 5900
+    environment:
+      - HUB_PORT_4444_TCP_ADDR=selenium
+      - HUB_PORT_4444_TCP_PORT=4444
+      - no_proxy=localhost
+      - HUB_ENV_no_proxy=localhost
+      - REMOTE_HOST_PARAM=-maxSession 4 -browser browserName=firefox,maxInstances=4
+    hostname: firefox
+    extra_hosts:
+     - "docker.dev:10.254.254.254"
+
+  chrome:
+    image: selenium/node-chrome-debug:2.53.0
+    ports:
+      - 5901
+    environment:
+      - HUB_PORT_4444_TCP_ADDR=selenium
+      - HUB_PORT_4444_TCP_PORT=4444
+      - no_proxy=localhost
+      - HUB_ENV_no_proxy=localhost
+      - REMOTE_HOST_PARAM=-maxSession 4 -browser browserName=chrome,maxInstances=4
+    hostname: chrome
+    extra_hosts:
+     - "docker.dev:10.254.254.254"
+
+#
+# [ volumes definition ]
+#
+volumes:
+  dd-mysqldata:
+    driver: local
+  app-sync:
+    driver: local
