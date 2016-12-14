@@ -5,6 +5,18 @@
 
 1. -> DEFAULT - [DockerDrupal-lite](https://github.com/4AllDigital/DockerDrupal-lite)
 2. -> WITH TESTING SUITE - [DockerDrupal](https://github.com/4AllDigital/DockerDrupal)
+
+APPROACH:
+
+    - initial :env command give app requirements Q
+        -> for now : dd/dd-lite option (later add /custom)
+    - specify appy req's choices in config.yml for use later
+    - download DD from git repo and build env
+    - NEW - add DD main commands
+    
+' THOUGHTS: should move dd-lite and dd into /CLI repo ?? '
+
+@2017
 3. -> CUSTOM - Q & A
 
     - Mysql [y/n]
