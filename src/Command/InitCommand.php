@@ -205,7 +205,8 @@ class InitCommand extends ContainerAwareCommand
     }
 
     if(!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
-      $fs->copy($utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist', '/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist');
+      $command = 'sudo cp -R ' . $utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist /Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist';
+      $application->runcommand($command, $io, TRUE);
     }
   }
 
