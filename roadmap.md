@@ -3,7 +3,12 @@
 ## build ENV- docker-compose.yml
 - Dynamic build of docker-compose.yml via Q & A rather than from alternative GIT repo
 
-1. -> DEFAULT - [DockerDrupal-lite](https://github.com/4AllDigital/DockerDrupal-lite)
+- [X] DEFAULT
+- [x] WITH TESTING SUITE
+- [] CUSTOM
+- [] READ-ONLY PROD
+
+1. -> DEFAULT - [DockerDrupal-lite](https://github.com/4AllDigital/DockerDrupal-lite)  
 2. -> WITH TESTING SUITE - [DockerDrupal](https://github.com/4AllDigital/DockerDrupal)
 
 APPROACH:
@@ -35,8 +40,14 @@ APPROACH:
 2. Copy/create relevant .env files
 3. Copy/create relevant /config files
 
+## remote control
+After merging and update of READ_ONLY prod environment:
+
+- [] ADD/GENERATE remote tools -> SSH keys/Drush alias'
+- [] Interact with remote /CLI - drush && docker && ??
+ 
+
 ## General continued things it must do :                                                                                    
-- build DockerDrupal lite? full?            
 - init app/dockerdrupal ./config.yaml on manually created app/old version
 - the use of Port :80 will prevent multiple apps/services running concurrently
 - with services running
@@ -54,12 +65,12 @@ UTIL
 - SUPRESS VERSION WARNING COMMAND - ADD TO CONFIG AND READ PRE-WARNING FROM CONFIG
 - \<CONTAINER\> bash
 - multisite drush -> args :multi
-- open mailcatcher
+- Interact with mailcatcher
+    - flush
+    - debug ??
 
 GENERAL
 
 - python -mwebbrowser http://docker.dev:8983/solr/#/SITE
 - python -mwebbrowser http://docker.dev:4444/grid/console
 - python -mwebbrowser http://docker.dev:1080
-- python -mwebbrowser http://docker.dev:8088
-
