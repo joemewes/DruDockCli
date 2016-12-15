@@ -55,6 +55,10 @@ composer global require dockerdrupal/cli
        status          Get current status of all containers
        stop            Stop all containers
        update          Update APP containers
+      behat
+       behat:cmd       Run behat commands 
+       behat:monitor   Runs example command against running APP and current config
+       behat:status    Runs example command against running APP and current config
       build
        build:destroy   Disable and delete APP and containers
        build:init      Fetch and build Drupal apps
