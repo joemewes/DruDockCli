@@ -3,10 +3,10 @@
 ## build ENV- docker-compose.yml
 - Dynamic build of docker-compose.yml via Q & A rather than from alternative GIT repo
 
-- [X] DEFAULT
-- [x] WITH TESTING SUITE
-- [ ] CUSTOM
+- [X] DEFAULT [Basic]
+- [X] WITH TESTING SUITE [Full]
 - [ ] READ-ONLY PROD
+- [ ] CUSTOM
 
 1. -> DEFAULT - [DockerDrupal-lite](https://github.com/4AllDigital/DockerDrupal-lite)  
 2. -> WITH TESTING SUITE - [DockerDrupal](https://github.com/4AllDigital/DockerDrupal)
