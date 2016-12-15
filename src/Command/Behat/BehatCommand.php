@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drush;
+namespace Docker\Drupal\Command\Behat;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,7 +25,7 @@ class BehatCommand extends Command {
 		$this
 			->setName('behat:cmd')
 			->setDescription('Run behat commands ')
-			->setHelp("This command will execute Behat commands directly against your Drupal APP.")
+			->setHelp("Example : [dockerdrupal behat:cmd --suite=global_features --profile=local --tags=about]")
       ->addOption('suite', '-s', InputOption::VALUE_OPTIONAL, 'Suite of features to test [global_features]')
       ->addOption('profile', '-p', InputOption::VALUE_OPTIONAL, 'Profile to test [local]')
       ->addOption('tags', '-t', InputOption::VALUE_OPTIONAL, 'Tags to test [about]');
@@ -43,6 +43,27 @@ class BehatCommand extends Command {
 
     if ($config) {
       $type = $config['apptype'];
+    }
+
+    $suite = $input->getOption('suite');
+    if (!$suite) {
+      $helper = $this->getHelper('question');
+      $question = new Question('Suite [global_features] : ', 'global_features');
+      $suite = $helper->ask($input, $output, $question);
+    }
+
+    $profile = $input->getOption('profile');
+    if (!$profile) {
+      $helper = $this->getHelper('question');
+      $question = new Question('Profile [local] : ', 'local');
+      $profile = $helper->ask($input, $output, $question);
+    }
+
+    $tags = $input->getOption('tags');
+    if (!$tags) {
+      $helper = $this->getHelper('question');
+      $question = new Question('Profile [about] : ', 'about');
+      $tags = $helper->ask($input, $output, $question);
     }
 
     if (isset($type) && $type == 'D8') {

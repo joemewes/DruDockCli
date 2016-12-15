@@ -99,15 +99,15 @@ default:
         footer: '.region-footer'
         pager: '.pagination'
       selectors:
-        message_selector: '.alert'
-        error_message_selector: '.alert.alert-error'
-        success_message_selector: '.alert.alert-success'
-        warning_message_selector: '.alert.alert-warning'
+        message_selector: '.message'
+        error_message_selector: '.message.error'
+        success_message_selector: '.message.success'
+        warning_message_selector: '.message.warning'
       text:
         log_out: 'Log out'
         log_in: 'Log in'
-        password_field: 'Password '
-        username_field: 'E-mail '
+        password_field: 'Password'
+        username_field: 'Username'
 
 local:
   extensions:

@@ -4,16 +4,16 @@ Feature: Register an account on timeshighereducation.com with valid username and
   As any user
   I should be able to register on the site
 
- @parallel-scenario
- Scenario: Login form
-   Given I am on the homepage
+  @parallel-scenario
+  Scenario: Login form
+    Given I am on the homepage
     And I am not logged in
     And I should see "User login"
-   When I fill in "Username" with "testuser"
+    When I fill in "Username" with "testuser"
     And I fill in "Password" with "Password1"
-   When I press "Log in"
+    When I press "Log in"
     And I wait until the page loads
-   Then I should see "Sorry, unrecognized username or password"
+    Then I should see "Sorry, unrecognized username or password"
 
   # @api @database @parallel-scenario @login
   # Scenario: Create and log in as a user
@@ -37,43 +37,45 @@ Feature: Register an account on timeshighereducation.com with valid username and
   #   Then I should see the success message "Registration successful. You are now logged in."
   #     And I should be logged in
 
- @blockuser @parallel-scenario @login
- Scenario: Block an account after 5 failed login attempts
-   Given users:
-     | name     | mail            | status |
-     | Joe User | joe@example.com | 1      |
-     And I am not logged in
-     And I go to "user/login"
-     And I fill in "Username" with "dev"
-     And I fill in "Password" with "invalid"
-     And I press "Log in"
-   Then I should see "Sorry, unrecognized username or password."
-     And I should see the link "Have you forgotten your password?"
-     And I fill in "Password" with "invalid"
-     And I press "Log in"
-     And I wait until the page loads
-     And I fill in "Password" with "invalid"
-     And I press "Log in"
-     And I wait until the page loads
-     And I fill in "Password" with "invalid"
-     And I press "Log in"
-     And I wait until the page loads
-     And I fill in "Password" with "invalid"
-     And I press "Log in"
-     And I wait until the page loads
-     And I fill in "Password" with "invalid"
-     And I press "Log in"
-     And I wait until the page loads
-   Then I should see "Sorry, there have been more than 5 failed login attempts for this account. It is temporarily blocked. Try again later or"
+  @blockuser @parallel-scenario @login
+  Scenario: Block an account after 5 failed login attempts
+    Given users:
+      | name     | mail            | status |
+      | Joe User | joe@example.com | 1      |
+    And I am not logged in
+    And I go to "user/login"
+    And I fill in "Username" with "dev"
+    And I fill in "Password" with "invalid"
+    And I press "Log in"
+    Then I should see "Sorry, unrecognized username or password."
+    And I should see the link "Have you forgotten your password?"
+    And I fill in "Password" with "invalid"
+    And I press "Log in"
+    And I wait until the page loads
+    And I fill in "Password" with "invalid"
+    And I press "Log in"
+    And I wait until the page loads
+    And I fill in "Password" with "invalid"
+    And I press "Log in"
+    And I wait until the page loads
+    And I fill in "Password" with "invalid"
+    And I press "Log in"
+    And I wait until the page loads
+    And I fill in "Password" with "invalid"
+    And I press "Log in"
+    And I wait until the page loads
+    Then I should see "Sorry, there have been more than 5 failed login attempts for this account. It is temporarily blocked. Try again later or"
     And I should see the link "request a new password"
 
- @authuser @parallel-scenario
- Scenario: Authenticated user profile
-   Given users:
-   | name      | mail             | roles              |
-   | Test User | joe@example.com  | authenticated user |
-   When I am logged in as "Test User"
-   When I click "My account"
+  @authuser @parallel-scenario
+  Scenario: Authenticated user profile
+    Given users:
+      | name      | mail               | roles              |
+      | Test User | admin@example.com  | authenticated user |
+    When I am logged in as "Test User"
+    When I click "My account"
     And I wait until the page loads
-   Then the "E-mail address" field should contain "joe@example.com"
+    When I click "Edit"
+    And I wait until the page loads
+    Then the "E-mail address" field should contain "admin@example.com"
 

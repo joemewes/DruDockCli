@@ -123,7 +123,7 @@ class FeatureContext extends Drupal\DrupalExtension\Context\DrupalContext
    */
   public function iAmOnThe($arg1)
   {
-      throw new PendingException();
+    throw new PendingException();
   }
 
   /**
@@ -168,12 +168,12 @@ class FeatureContext extends Drupal\DrupalExtension\Context\DrupalContext
     throw new Exception('The request is timed out');
   }
 
- /**
-  * @Given /^I wait (\d+) second(?:s|)$/
-  */
- public function iWaitSeconds($arg1) {
-   sleep($arg1);
- }
+  /**
+   * @Given /^I wait (\d+) second(?:s|)$/
+   */
+  public function iWaitSeconds($arg1) {
+    sleep($arg1);
+  }
 
   /**
    * @Given /^I should be logged in$/
@@ -213,7 +213,7 @@ class FeatureContext extends Drupal\DrupalExtension\Context\DrupalContext
    */
   public function iAmLoggedInAsTheWithThePassword($username, $password) {
     return array (
-      new Given("I fill in \"Username or e-mail address\" with \"$username\""),
+      new Given("I fill in \"Username\" with \"$username\""),
       new Given("I fill in \"Password\" with \"$password\""),
       new Given("I press \"Log in\""),
     );
@@ -1137,9 +1137,9 @@ class FeatureContext extends Drupal\DrupalExtension\Context\DrupalContext
   public function clickTheFirst($item, $container) {
     // get context
     $this->getSession()
-         ->getPage()
-         ->find('css', '.' . $container. ' .' . $item)
-         ->click();
+      ->getPage()
+      ->find('css', '.' . $container. ' .' . $item)
+      ->click();
   }
 
 
@@ -1352,7 +1352,7 @@ JS;
     }
   }
 
-   /**
+  /**
    * Focus on field
    *
    * @When /^I focus on field "([^"]*)"$/
@@ -1499,43 +1499,43 @@ JS;
   }
 
 
-    /**
+  /**
    * Attaches file to field with specified id|name|label|value.
    *
    * @When /^(?:|I )attach our file "(?P<path>[^"]*)" to "(?P<field>(?:[^"]|\\")*)"$/
    */
 
   public function attachFileToField($field, $path) {
-      $field = $this->fixStepArgument($field);
-      if ($this->getMinkParameter('files_path')) {
-          $fullPath = rtrim(realpath($this->getMinkParameter('files_path')), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$path;
-          if (is_file($fullPath)) {
-              $path = $fullPath;
-          }
+    $field = $this->fixStepArgument($field);
+    if ($this->getMinkParameter('files_path')) {
+      $fullPath = rtrim(realpath($this->getMinkParameter('files_path')), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$path;
+      if (is_file($fullPath)) {
+        $path = $fullPath;
       }
+    }
 
-      $localFile = $path;
-      $tempZip = tempnam('', 'WebDriverZip');
-      $zip = new \ZipArchive();
-      $zip->open($tempZip, \ZipArchive::CREATE);
-      $zip->addFile($localFile, basename($localFile));
-      $zip->close();
+    $localFile = $path;
+    $tempZip = tempnam('', 'WebDriverZip');
+    $zip = new \ZipArchive();
+    $zip->open($tempZip, \ZipArchive::CREATE);
+    $zip->addFile($localFile, basename($localFile));
+    $zip->close();
 
-      $remotePath = $this->getSession()->getDriver()->getWebDriverSession()->file([
-        'file' => base64_encode(file_get_contents($tempZip))
-      ]);
+    $remotePath = $this->getSession()->getDriver()->getWebDriverSession()->file([
+      'file' => base64_encode(file_get_contents($tempZip))
+    ]);
 
-      $samplefile = 'http://www-01.ibm.com/support/knowledgecenter/SVU13_7.2.1/com.ibm.ismsaas.doc/reference/AssetsImportCompleteSample.csv?lang=en-us';
+    $samplefile = 'http://www-01.ibm.com/support/knowledgecenter/SVU13_7.2.1/com.ibm.ismsaas.doc/reference/AssetsImportCompleteSample.csv?lang=en-us';
 
-      $this->getSession()->getPage()->attachFileToField($field, $remotePath);
+    $this->getSession()->getPage()->attachFileToField($field, $remotePath);
   }
   /*
    * @When /^(?:|I )click on "(?P<text>.+)" link$/
    */
   public function clickOnLink($text)
   {
-      $element = $this->getSession()->getPage()->find('xpath', '//a[text() = "' . $text . '"]');
-      $element->click();
+    $element = $this->getSession()->getPage()->find('xpath', '//a[text() = "' . $text . '"]');
+    $element->click();
   }
 
   /**
@@ -1546,11 +1546,11 @@ JS;
    * @Given /^I scroll to the "(?P<text>.+)" text$/
    */
   public function iScrollToElement($text) {
-     $js = 'var pos = jQuery( ":contains('.$text.'):last").offset();';
-     $js .= 'var top = pos.top - 120;';
-     $js .= 'var left = pos.left - 20;';
-     $js .= 'window.scrollTo((left < 0 ? 0 : left), (top < 0 ? 0 : top));';
-     $this->getSession()->executeScript($js);
+    $js = 'var pos = jQuery( ":contains('.$text.'):last").offset();';
+    $js .= 'var top = pos.top - 120;';
+    $js .= 'var left = pos.left - 20;';
+    $js .= 'window.scrollTo((left < 0 ? 0 : left), (top < 0 ? 0 : top));';
+    $this->getSession()->executeScript($js);
   }
 
   /**
@@ -1600,7 +1600,7 @@ JS;
     $this->getSession()->visit($this->locatePath($path));
   }
 
-   /**
+  /**
    * Wait until the id="updateprogress" element is gone,
    * or timeout after 3 minutes (180,000 ms).
    *
@@ -1614,11 +1614,11 @@ JS;
   /**
    * @Then /^I hit return on "([^"]*)"$/
    */
-   public function iHitReturn($field)
-   {
-      $element = $this->getSession()->getPage()->find("css", $field);
-      $this->getSession()->getDriver()->keyPress($element->getXPath(), 13);
-   }
+  public function iHitReturn($field)
+  {
+    $element = $this->getSession()->getPage()->find("css", $field);
+    $this->getSession()->getDriver()->keyPress($element->getXPath(), 13);
+  }
 
 
   /**
@@ -1630,7 +1630,7 @@ JS;
    */
   protected function fixStepArgument($argument)
   {
-      return str_replace('\\"', '"', $argument);
+    return str_replace('\\"', '"', $argument);
   }
 
   /**
@@ -1647,58 +1647,58 @@ JS;
    */
   public function beforeStep()
   {
-   $this->getSession()->resizeWindow(1440, 900, 'current');
+    $this->getSession()->resizeWindow(1440, 900, 'current');
   }
 
   /**
-    * @AfterScenario @database
-    */
+   * @AfterScenario @database
+   */
   public function cleanDB(AfterScenarioScope $scope)
-   {
-       // clean database after scenarios,
-       // tagged with @database
-        //db_delete('users')->condition('mail', $this->email['address'])->execute();
-      $usernames = array(
-        $this->users,
-      );
+  {
+    // clean database after scenarios,
+    // tagged with @database
+    //db_delete('users')->condition('mail', $this->email['address'])->execute();
+    $usernames = array(
+      $this->users,
+    );
 
-      // Check if this needs to be cleaned up.
-      $scenario = $scope->getScenario();
-      if (!$scenario->hasTag('database')) {
-        return;
-      }
+    // Check if this needs to be cleaned up.
+    $scenario = $scope->getScenario();
+    if (!$scenario->hasTag('database')) {
+      return;
+    }
 
-      // Need to use the api driver
-      $driver = $this->getDrupalParameter('api_driver');
-      if (!$driver) {
-        return;
-      }
-      if ('drupal' !== $driver) {
-        throw new \Exception('Must use the Drupal driver to clean up these scenarios.');
-      }
+    // Need to use the api driver
+    $driver = $this->getDrupalParameter('api_driver');
+    if (!$driver) {
+      return;
+    }
+    if ('drupal' !== $driver) {
+      throw new \Exception('Must use the Drupal driver to clean up these scenarios.');
+    }
 
-      // Bootstrap driver in case this is blackbox.
-      $this->getDriver($driver)->bootstrap();
+    // Bootstrap driver in case this is blackbox.
+    $this->getDriver($driver)->bootstrap();
 
-      // Change to doc root for odd loading issues.
-      $current_path = getcwd();
-      chdir(DRUPAL_ROOT);
+    // Change to doc root for odd loading issues.
+    $current_path = getcwd();
+    chdir(DRUPAL_ROOT);
 
-      $batch = FALSE;
-      foreach ($usernames as $email) {
-       // if ($user = user_load_by_mail($email)) {
-       //   $this->getDriver($driver)->userDelete($user);
-       //   $batch = TRUE;
-       // }
-      }
+    $batch = FALSE;
+    foreach ($usernames as $email) {
+      // if ($user = user_load_by_mail($email)) {
+      //   $this->getDriver($driver)->userDelete($user);
+      //   $batch = TRUE;
+      // }
+    }
 
-      if ($batch) {
-        $this->getDriver($driver)->processBatch();
-      }
+    if ($batch) {
+      $this->getDriver($driver)->processBatch();
+    }
 
-      // Change back.
-      chdir($current_path);
+    // Change back.
+    chdir($current_path);
 
-   }
+  }
 
 }

@@ -200,6 +200,7 @@ class Application extends ParentApplication
 
     $commands[] = new Command\Behat\BehatStatusCommand();
     $commands[] = new Command\Behat\BehatMonitorCommand();
+    $commands[] = new Command\Behat\BehatCommand();
 
 		$commands[] = new Command\Sync\AppSyncMonitorCommand();
 

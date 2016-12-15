@@ -44,6 +44,8 @@ class InitCommand extends ContainerAwareCommand
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $application = $this->getApplication();
+    $utilRoot = $application->getUtilRoot();
+
     $io = new DockerDrupalStyle($input, $output);
 
     // check Docker is running
@@ -138,16 +140,12 @@ class InitCommand extends ContainerAwareCommand
     $io->info(' ');
     $io->note($message);
 
-    var_dump($reqs);
-
     if ($reqs == 'Basic') {
-      $io->note('APP basic');
-      $command = 'git clone https://github.com/4alldigital/DockerDrupal-lite.git ' . $system_appname . '/docker_' . $system_appname;
+      $fs->mirror($utilRoot . '/bundles/dockerdrupal-lite/', $system_appname . '/docker_' . $system_appname);
     }
 
     if ($reqs == 'Full') {
-      $io->note('APP basic');
-      $command = 'git clone https://github.com/4AllDigital/DockerDrupal.git ' . $system_appname . '/docker_' . $system_appname;
+      $fs->mirror($utilRoot . '/bundles/dockerdrupal/', $system_appname . '/docker_' . $system_appname);
     }
 
     $application->runcommand($command, $io, TRUE);
