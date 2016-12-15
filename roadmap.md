@@ -5,8 +5,8 @@
 
 - [X] DEFAULT
 - [x] WITH TESTING SUITE
-- [] CUSTOM
-- [] READ-ONLY PROD
+- [ ] CUSTOM
+- [ ] READ-ONLY PROD
 
 1. -> DEFAULT - [DockerDrupal-lite](https://github.com/4AllDigital/DockerDrupal-lite)  
 2. -> WITH TESTING SUITE - [DockerDrupal](https://github.com/4AllDigital/DockerDrupal)
@@ -43,8 +43,8 @@ APPROACH:
 ## remote control
 After merging and update of READ_ONLY prod environment:
 
-- [] ADD/GENERATE remote tools -> SSH keys/Drush alias'
-- [] Interact with remote /CLI - drush && docker && ??
+- [ ] ADD/GENERATE remote tools -> SSH keys/Drush alias'
+- [ ] Interact with remote /CLI - drush && docker && ??
  
 
 ## General continued things it must do :                                                                                    
