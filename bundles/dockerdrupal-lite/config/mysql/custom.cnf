@@ -41,10 +41,10 @@ innodb_file_format=barracuda
 innodb_file_per_table=true
 
 # Uncomment if needed (mysql query logging)
-general_log_file        = /var/log/mysql/mysql.log
-general_log             = 1
-slow_query_log = 1
-slow_query_log_file = /var/log/mysql/mysql-slow.log
+# general_log_file        = /var/log/mysql/mysql.log
+# general_log             = 1
+# slow_query_log = 1
+# slow_query_log_file = /var/log/mysql/mysql-slow.log
 
 [mysqldump]
 quick

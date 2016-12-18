@@ -152,7 +152,7 @@ class InitCommand extends ContainerAwareCommand
 
     $this->initDocker($application, $io, $system_appname);
 
-    $message = 'DockerDrupal containers ready. Navigate to your app folder [cd ' . $system_appname . '] and build your app via ::: build:init';
+    $message = 'DockerDrupal containers ready. Navigate to your app folder [cd ' . $system_appname . '] and build your app using ::: [dockerdrupal build:init]';
     $io->info(' ');
     $io->note($message);
 
