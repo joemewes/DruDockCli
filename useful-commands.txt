@@ -19,6 +19,8 @@ docker exec -it $(docker ps --format {{.Names}} | grep php) bash
 
 # multisite drush -> args :multi
 docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docker.dev uli 1
+dockerdrupal drush:cmd -c " -l http://docker.dev uli" -> ADAPT into shortcut ??
+
 
 # open mailcatcher
 python -mwebbrowser http://localhost:1080
