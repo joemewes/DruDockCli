@@ -25,23 +25,24 @@ class StartCommand extends Command {
 			->setName('docker:start')
 			->setAliases(['start'])
 			->setDescription('Start APP containers')
-			->setHelp("This command will start all containers for the current APP via the docker-compose.yml file.");
+			->setHelp("Example : [dockerdrupal start]");
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
-		$io = new DockerDrupalStyle($input, $output);
-		$io->section("STARTING CONTAINERS");
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
+    $io = new DockerDrupalStyle($input, $output);
 
-		if($config = $application->getAppConfig($io)) {
-			$appname = $config['appname'];
-		}
+    if($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
+    }
 
-		if($application->checkForAppContainers($appname, $io)){
-			$command = $application->getComposePath($appname, $io).' start 2>&1';
-			$application->runcommand($command, $io);
-		}
-	}
+    $io->section("Starting APP:' . $appname . ' Containers");
+
+    if($application->checkForAppContainers($appname, $io)){
+      $command = $application->getComposePath($appname, $io).' start 2>&1';
+      $application->runcommand($command, $io);
+    }
+  }
 
 
 }

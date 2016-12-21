@@ -20,8 +20,7 @@ class BehatMonitorCommand extends Command {
   protected function configure() {
     $this
       ->setName('behat:monitor')
-      ->setDescription('Runs example command against running APP and current config')
-      ->setHelp("Currently hardcoded options [behat:status]");
+      ->setDescription('Lainch behat VNC viewer for debug/watch test suite');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {

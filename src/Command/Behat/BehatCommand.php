@@ -24,7 +24,7 @@ class BehatCommand extends Command {
 	protected function configure() {
 		$this
 			->setName('behat:cmd')
-			->setDescription('Run behat commands ')
+			->setDescription('Run behat commands')
 			->setHelp("Example : [dockerdrupal behat:cmd --suite=global_features --profile=local --tags=about]")
       ->addOption('suite', '-s', InputOption::VALUE_OPTIONAL, 'Suite of features to test [global_features]')
       ->addOption('profile', '-p', InputOption::VALUE_OPTIONAL, 'Profile to test [local]')

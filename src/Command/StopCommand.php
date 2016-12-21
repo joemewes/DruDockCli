@@ -23,18 +23,24 @@ class StopCommand extends Command
         $this
             ->setName('docker:stop')
             ->setAliases(['stop'])
-            ->setDescription('Stop all containers')
-            ->setHelp("This command will stop all running containers even if you're in another app/project folder...")
+            ->setDescription('Stop APP containers')
+            ->setHelp("Example : [dockerdrupal stop]");
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-			  $application = $this->getApplication();
-        $io = new DockerDrupalStyle($input, $output);
-        $io->section("STOPPING CONTAINERS");
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
+    $io = new DockerDrupalStyle($input, $output);
 
-        $command = 'docker stop $(docker ps -q) 2>&1';
-				$application->runcommand($command, $io);
+    if($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
     }
+
+    $io->section("Stopping APP:' . $appname . ' Containers");
+
+    if($application->checkForAppContainers($appname, $io)){
+      $command = $application->getComposePath($appname, $io).' stop 2>&1';
+      $application->runcommand($command, $io);
+    }
+  }
 }
