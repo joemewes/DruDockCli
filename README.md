@@ -2,6 +2,10 @@
 
 [DockerDrupal](https://www.4alldigital.io/docker-drupal) is Docker based development environment for local Drupal websites, Wordpress websites or PHP apps. Useful for debugging and developing your projects, with a possible intention of hosting sites using [DockerDrupal Prod](https://github.com/4alldigital/drupalprod-docker) (A read-only production environment).
 
+[![Latest Stable Version](https://poser.pugx.org/dockerdrupal/cli/v/stable)](https://packagist.org/packages/dockerdrupal/cli)
+
+[![License](https://poser.pugx.org/dockerdrupal/cli/license)](https://github.com/4AllDigital/DockerDrupalCli/blob/master/LICENSE.txt)
+
 # DockerDrupal-Cli - BETA
 ### CLI utility for DockerDrupal
 
