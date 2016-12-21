@@ -50,6 +50,7 @@ After merging and update of READ_ONLY prod environment:
 ## General continued things it must do :                                                                                    
 - init app/dockerdrupal ./config.yaml on manually created app/old version
 - the use of Port :80 will prevent multiple apps/services running concurrently
+- ADD PhantomCSS support for running testsuite.js
 - with services running
     - linux -> write 127.0.0.1 docker.dev to /etc/hosts file
     - Windows -> ??     
@@ -59,6 +60,14 @@ DRUSH
 
 - drush:features:revert \[all] (drush:fr)
 - drush:features:update \[all] (drush:fu)
+- drush:update \[all] (drush:up)
+- drush:update:db (drush:up:db)
+- drush:update:drupal (drush:up:drupal)
+
+PHANTOMCSS
+
+- phantomcss:cmd [Run pahtnomCSS commands/testsuits.js against runnign APP]
+
 
 UTIL
 
