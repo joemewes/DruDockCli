@@ -66,11 +66,7 @@ class BehatCommand extends Command {
       $tags = $helper->ask($input, $output, $question);
     }
 
-    if (isset($type) && $type == 'D8') {
-      // D8 behat sites not yet supporter
-      $io->info('Drupal 8 behat test suite not currently supported. ');
-      return;
-    } elseif (isset($type) && $type == 'D7') {
+    if (isset($type)) {
 
       $cmd = '--config /root/behat/behat.yml ';
 
