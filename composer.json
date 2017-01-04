@@ -18,7 +18,7 @@
     "symfony/config": "~2.8|~3.0",
     "symfony/var-dumper": "~2.8|~3.0",
     "symfony/framework-bundle": "~2.8|~3.0",
-    "stecman/symfony-console-completion": "^0.5.1",
+    "stecman/symfony-console-completion": "~0.7",
     "php": "^5.5|~7.0",
     "doctrine/cache": "^1.6",
     "guzzlehttp/guzzle": "^6.2",
