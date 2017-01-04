@@ -192,7 +192,9 @@ class Application extends ParentApplication
 		$commands[] = new Command\Drush\DrushClearCacheCommand();
 		$commands[] = new Command\Drush\DrushLoginCommand();
     $commands[] = new Command\Drush\DrushModuleEnableCommand();
+    $commands[] = new Command\Drush\DrushModuleDisableCommand();
     $commands[] = new Command\Drush\DrushUpDbCommand();
+
 
     $commands[] = new Command\Redis\RedisMonitorCommand();
     $commands[] = new Command\Redis\RedisPingCommand();

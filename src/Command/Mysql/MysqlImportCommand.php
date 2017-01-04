@@ -33,6 +33,12 @@ class MysqlImportCommand extends Command {
 
 		$io = new DockerDrupalStyle($input, $output);
 
+    $io->section("MYSQL ::: import database");
+
+    if($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
+    }
+
 		$helper = $this->getHelper('question');
 
 		$io->warning("Dropping the database is potentially a very bad thing to do.\nAny data stored in the database will be destroyed.");
@@ -53,16 +59,22 @@ class MysqlImportCommand extends Command {
 			if (file_exists($importpath)) {
 
 				//drop database;
-				$command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
-				$application->runcommand($command, $io);
+        if($application->checkForAppContainers($appname, $io)) {
 
-				// recreate dev_db
-				$command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
-				$application->runcommand($command, $io);
+          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
+          $application->runcommand($command, $io);
 
-				// import new .sql file
-				$command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
-				$application->runcommand($command, $io);
+          // recreate dev_db
+          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
+          $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
+          $application->runcommand($command, $io);
+
+          // import new .sql file
+          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
+          $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
+          $application->runcommand($command, $io);
+
+        }
 
 			} else {
 
