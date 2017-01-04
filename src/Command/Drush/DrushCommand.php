@@ -35,7 +35,7 @@ class DrushCommand extends Command {
 		$cmd = $input->getOption('cmd');
 
 		$io = new DockerDrupalStyle($input, $output);
-		$io->section('EXEC drush ' . $cmd);
+		$io->section('PHP ::: drush ' . $cmd);
 
 		if (!$cmd) {
 			$helper = $this->getHelper('question');
@@ -43,8 +43,13 @@ class DrushCommand extends Command {
 			$cmd = $helper->ask($input, $output, $question);
 		}
 
-		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush ' . $cmd;
-		$application->runcommand($command, $io);
+    if($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
+    }
 
+    if($application->checkForAppContainers($appname, $io)){
+      $command = $application->getComposePath($appname, $io).' exec -T php drush ' . $cmd;
+      $application->runcommand($command, $io);
+    }
 	}
 }

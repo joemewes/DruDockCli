@@ -28,9 +28,15 @@ class DrushLoginCommand extends Command {
 		$application = $this->getApplication();
 
 		$io = new DockerDrupalStyle($input, $output);
-		$io->section('EXEC drush ' . $cmd);
-		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush uli';
-		$application->runcommand($command, $io);
+		$io->section('PHP ::: drush uli');
 
+		if($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
+    }
+
+    if($application->checkForAppContainers($appname, $io)){
+      $command = $application->getComposePath($appname, $io).' exec -T php drush uli';
+      $application->runcommand($command, $io);
+    }
 	}
 }

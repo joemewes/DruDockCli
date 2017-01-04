@@ -16,45 +16,27 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class DemoCommand
  * @package Docker\Drupal\Command
  */
-class DrushClearCacheCommand extends Command {
+class DrushUpDbCommand extends Command {
 	protected function configure() {
 		$this
-			->setName('drush:cc')
-			->setDescription('Run drush cache clear ')
-			->setHelp("This command will clear Drupal APP caches.");
+			->setName('drush:updb')
+			->setDescription('Run Drush updb')
+			->setHelp("This command will run all pending database updates for the current Drupal app.");
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$application = $this->getApplication();
 
 		$io = new DockerDrupalStyle($input, $output);
-
-		$config = $application->getAppConfig($io);
-
-		if ($config) {
-			$type = $config['apptype'];
-		}
-
-		if (isset($type) && $type == 'D8') {
-			$cmd = 'cr all';
-		} elseif (isset($type) && $type == 'D7') {
-      $cmd = 'cc all';
-    }	else {
-      $io->error('You\'re not currently in an Drupal APP directory');
-      return;
-		};
-
-		$io->section('PHP ::: drush ' . $cmd);
+    $io->section("PHP ::: drush updb -y");
 
     if($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
     if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' exec -T php drush ' . $cmd;
+      $command = $application->getComposePath($appname, $io).' exec -T php drush updb -y';
       $application->runcommand($command, $io);
     }
-
-
 	}
 }

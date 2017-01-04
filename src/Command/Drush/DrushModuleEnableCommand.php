@@ -60,9 +60,14 @@ class DrushModuleEnableCommand extends Command {
 			}
 		}
 
-		$io->section('EXEC drush ' . $cmd);
-		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush ' . $cmd;
-		$application->runcommand($command, $io);
+		$io->section('PHP ::: drush ' . $cmd);
+    if($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
+    }
 
+    if($application->checkForAppContainers($appname, $io)){
+      $command = $application->getComposePath($appname, $io).' exec -T php drush ' . $cmd;
+      $application->runcommand($command, $io);
+    }
 	}
 }
