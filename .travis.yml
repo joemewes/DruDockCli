@@ -18,7 +18,7 @@ before_script:
   - composer install --no-dev
 
 script:
-  - phpunit -c dockerdrupal
+  - ./scripts/basic.sh
 
 notifications:
   slack: 4alldigital:QY0MCk9HdP2Ls5nELR55lKNr
