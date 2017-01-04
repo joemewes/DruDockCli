@@ -66,11 +66,11 @@ class MysqlImportCommand extends Command {
 
           // recreate dev_db
           $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
-          $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
           $application->runcommand($command, $io);
 
           // import new .sql file
-          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
+          // @todo resolve and update - https://github.com/docker/compose/issues/4290
+          //$command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
           $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
           $application->runcommand($command, $io);
 
