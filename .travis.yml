@@ -21,7 +21,9 @@ script:
   - ./scripts/basic.sh
 
 notifications:
-  slack: 4alldigital:QY0MCk9HdP2Ls5nELR55lKNr
+  slack:
+    rooms:
+      - 4alldigital:QY0MCk9HdP2Ls5nELR55lKNr
     on_success: change
     on_failure: change
   email: false
