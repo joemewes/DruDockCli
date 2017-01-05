@@ -104,6 +104,8 @@ class BuildCommand extends ContainerAwareCommand {
 
 	private function initDocker($io, $appname) {
 
+    $application = $this->getApplication();
+
 		if (exec('docker ps -q 2>&1', $exec_output)) {
 			$dockerstopcmd = 'docker stop $(docker ps -q)';
 			$this->runcommand($dockerstopcmd, $io, TRUE);
@@ -114,17 +116,13 @@ class BuildCommand extends ContainerAwareCommand {
 
 		// Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
 		// When 'Synchronization complete' kill this temp run container and start DockerDrupal.
-		// $dockerlogs = 'docker-compose -f '.$appname.'/docker_'.$appname.'/docker-compose.yml logs -f';
-		// $this->runcommand($dockerlogs, $io, TRUE);
 
-		$dockercmd = 'until docker-compose -f ./docker_' . $appname . '/docker-compose.yml run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "Nothing to do:" ; do : ; done';
-		$this->runcommand($dockercmd, $io, TRUE);
+      $command = 'until ' . $application->getComposePath($appname, $io) .
+        'run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
+        'docker kill $(docker ps -q) 2>&1; ' .
+        $application->getComposePath($appname, $io) . 'up -d';
 
-		$dockercmd = 'docker kill $(docker ps -q)';
-		$this->runcommand($dockercmd, $io, TRUE);
-
-		$dockercmd = 'docker-compose -f ./docker_' . $appname . '/docker-compose.yml up -d';
-		$this->runcommand($dockercmd, $io, TRUE);
+      $application->runcommand($command, $io);
 
 		// Check for running mySQL container before launching Drupal Installation
 		$message = 'Waiting for mySQL service.';
@@ -283,9 +281,9 @@ class BuildCommand extends ContainerAwareCommand {
     $utilRoot = $application->getUtilRoot();
 
 		$message = 'Setting up Example app';
-		$io->note($message);
+		$io->section($message);
 		// example app source and destination
-    if (is_dir($utilRoot . '/bundles/default') && is_dir($app_dest . '/repository')) {
+    if (is_dir($utilRoot . '/bundles/default')) {
       $app_src = $utilRoot . '/bundles/default';
       try {
         $fs->mkdir($app_dest . '/repository');

@@ -36,7 +36,7 @@ class StopCommand extends Command
       $appname = $config['appname'];
     }
 
-    $io->section("Stopping APP:" . $appname . " Containers");
+    $io->section("APP ::: Stopping " . $appname . " containers");
 
     if($application->checkForAppContainers($appname, $io)){
       $command = $application->getComposePath($appname, $io).' stop 2>&1';

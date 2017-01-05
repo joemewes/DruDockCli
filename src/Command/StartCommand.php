@@ -36,7 +36,7 @@ class StartCommand extends Command {
       $appname = $config['appname'];
     }
 
-    $io->section("Starting APP:' . $appname . ' Containers");
+    $io->section("APP ::: Starting " . $appname . " containers");
 
     if($application->checkForAppContainers($appname, $io)){
       $command = $application->getComposePath($appname, $io).' start 2>&1';
