@@ -261,7 +261,7 @@ class BuildCommand extends ContainerAwareCommand {
 			$fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0666, 0000, TRUE);
 
 			// Set perms for executables
-			$fs->chmod($app_dest . '/vendor', 0777, 0000, TRUE);
+			// $fs->chmod($app_dest . '/vendor', 0777, 0000, TRUE);
 
 			// setup $VAR for redis cache_prefix in settings.local.php template
 			$cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
