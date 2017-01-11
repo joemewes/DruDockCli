@@ -378,18 +378,16 @@ class Application extends ParentApplication
    * @param $application
    * @param $io
    */
-  public function addHostConfig($io) {
+  public function addHostConfig($io, $update) {
     // Add initial entry to hosts file.
     // OSX @TODO update as command for all systems and OS's.
     $utilRoot = $this->getUtilRoot();
 
     $ip = '127.0.0.1';
 
-    if($config = $this->getAppConfig($io)) {
+    if($update && $config = $this->getAppConfig($io)) {
       $apphost = $config['host'];
-    }
-
-    if(!isset($apphost)) {
+    }else{
       $apphost = 'docker.dev';
     }
 

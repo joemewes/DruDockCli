@@ -36,7 +36,8 @@ class InitCommand extends ContainerAwareCommand
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
       ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full]')
-      ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]');
+      ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
+      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -60,7 +61,7 @@ class InitCommand extends ContainerAwareCommand
 
     $message = "If prompted, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
     $io->note($message);
-    $application->addHostConfig($io);
+    $application->addHostConfig($io, FALSE);
 
     // GET AND SET APPNAME.
     $appname = $input->getArgument('appname');
@@ -105,6 +106,8 @@ class InitCommand extends ContainerAwareCommand
       $helper = $this->getHelper('question');
       $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
       $gitrepo = $helper->ask($input, $output, $question);
+    }else{
+      $gitrepo = '';
     }
 
     // GET AND SET APP REQUIREMENTS.
@@ -185,14 +188,15 @@ class InitCommand extends ContainerAwareCommand
     if ($reqs == 'Full') {
       $fs->mirror($utilRoot . '/bundles/dockerdrupal/', $system_appname . '/docker_' . $system_appname);
     }
-
-    $application->runcommand($command, $io, TRUE);
-
+    
     $this->initDocker($application, $io, $system_appname);
 
-    $message = 'DockerDrupal containers ready. Navigate to your app folder [cd ' . $system_appname . '] and build your app using ::: [dockerdrupal build:init]';
     $io->info(' ');
-    $io->note($message);
+    $io->section("DockerDrupal ::: Ready");
+
+    $info = 'Navigate to app folder [cd ' . $system_appname . '] and run [dockerdrupal build:init]';
+    $io->info($info);
+    $io->info(' ');
 
   }
 
