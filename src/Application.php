@@ -29,7 +29,7 @@ class Application extends ParentApplication
   /**
    * @var string
    */
-  const VERSION = '1.2.5';
+  const VERSION = '1.2.6';
 
   /**
    * @var string
@@ -246,13 +246,15 @@ class Application extends ParentApplication
   /**
    * @return array
    */
+
   public function getAppConfig($io){
     if(file_exists('.config.yml')){
       $config = Yaml::parse(file_get_contents('.config.yml'));
-      $dockerdrupal_version = $config['dockerdrupal']['version'];
-      if($dockerdrupal_version != $this->getVersion()){
+
+      if(substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)){
           $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
       }
+      
       return $config;
     }else{
       $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');
