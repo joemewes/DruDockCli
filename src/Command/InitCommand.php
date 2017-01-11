@@ -188,16 +188,14 @@ class InitCommand extends ContainerAwareCommand
     if ($reqs == 'Full') {
       $fs->mirror($utilRoot . '/bundles/dockerdrupal/', $system_appname . '/docker_' . $system_appname);
     }
-    
+
     $this->initDocker($application, $io, $system_appname);
 
     $io->info(' ');
     $io->section("DockerDrupal ::: Ready");
-
-    $info = 'Navigate to app folder [cd ' . $system_appname . '] and run [dockerdrupal build:init]';
+    $info = 'Go to app directory [cd ' . $system_appname . '] and run [dockerdrupal build:init]';
     $io->info($info);
     $io->info(' ');
-
   }
 
   /**
