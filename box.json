@@ -1,0 +1,24 @@
+{
+  "alias": "dockerdrupal.phar",
+  "chmod": "0755",
+  "directories": [
+    "bundles",
+    "src"
+  ],
+  "files": [
+    "LICENSE",
+    "bin/dockerdrupal.php",
+    "vendor/autoload.php"
+  ],
+  "finder": [
+    {
+      "name": "/(\\.php|\\.json|\\.yml|\\.twig)$/",
+      "exclude": ["Tests","scripts", "docs"],
+      "in": "vendor"
+    }
+  ],
+  "git-version": "package_version",
+  "main": "bin/dockerdrupal",
+  "output": "dockerdrupal.phar",
+  "stub": true
+}
