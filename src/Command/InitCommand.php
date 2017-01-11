@@ -7,17 +7,14 @@
 
 namespace Docker\Drupal\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
 use Symfony\Component\Yaml\Yaml;
@@ -38,7 +35,8 @@ class InitCommand extends ContainerAwareCommand
       ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
-      ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full]');
+      ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full]')
+      ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -60,9 +58,9 @@ class InitCommand extends ContainerAwareCommand
       return;
     }
 
-    $message = "If required, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
+    $message = "If prompted, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
     $io->note($message);
-    $this->addHostConfig($application, $io);
+    $application->addHostConfig($io);
 
     // GET AND SET APPNAME.
     $appname = $input->getArgument('appname');
@@ -71,6 +69,42 @@ class InitCommand extends ContainerAwareCommand
       $helper = $this->getHelper('question');
       $question = new Question('Enter App name [dockerdrupal_app_' . $date . '] : ', 'my-app-' . $date);
       $appname = $helper->ask($input, $output, $question);
+    }
+
+    // GET AND SET APP PREFERRED HOST.
+    $host = $input->getOption('apphost');
+
+    if (!$host) {
+      // use default host http://docker.dev
+      $host = 'docker.dev';
+    }
+
+    // GET AND SET APP SOURCE.
+    $src = $input->getOption('appsrc');
+    $available_src = array('New', 'Git');
+
+    if ($src && !in_array($src, $available_src)) {
+      $io->warning('APP SRC : ' . $src . ' not allowed.');
+      $src = NULL;
+    }
+
+    if (!$src) {
+      $io->info(' ');
+      $io->title("SET APP SOURCE");
+      $helper = $this->getHelper('question');
+      $question = new ChoiceQuestion(
+        'Is this app a new build or loaded from a remote GIT repository [New, Git] : ',
+        $available_src,
+        'New'
+      );
+      $src = $helper->ask($input, $output, $question);
+    }
+
+    if($src == 'Git') {
+      $io->title("SET APP GIT URL");
+      $helper = $this->getHelper('question');
+      $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
+      $gitrepo = $helper->ask($input, $output, $question);
     }
 
     // GET AND SET APP REQUIREMENTS.
@@ -130,9 +164,13 @@ class InitCommand extends ContainerAwareCommand
     $config = array(
       'appname' => $appname,
       'apptype' => $type,
+      'host'=> $host,
       'reqs' => $reqs,
+      'appsrc' => $src,
+      'repo' =>  $gitrepo ? $gitrepo : '',
       'dockerdrupal' => array('version' => $application->getVersion(), 'date' => $date),
     );
+
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
 
@@ -184,28 +222,4 @@ class InitCommand extends ContainerAwareCommand
     $dockercmd = 'docker-compose -f ' . $appname . '/docker_' . $appname . '/docker-compose.yml pull';
     $application->runcommand($dockercmd, $io, TRUE);
   }
-
-  /**
-   * @param $application
-   * @param $io
-   */
-  private function addHostConfig($application, $io) {
-    // Add initial entry to hosts file.
-    // OSX @TODO update as command for all systems and OS's.
-    $utilRoot = $application->getUtilRoot();
-
-    $ip = '127.0.0.1';
-    $hostname = 'docker.dev';
-    $hosts_file = '/etc/hosts';
-    if (!exec("cat " . $hosts_file . " | grep '" . $ip . " " . $hostname . "'")) {
-      $command = new Process(sprintf('echo "%s %s" | sudo tee -a %s >/dev/null', $ip, $hostname, $hosts_file));
-      $application->runcommand($command, $io, TRUE);
-    }
-
-    if(!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
-      $command = 'sudo cp -R ' . $utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist /Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist';
-      $application->runcommand($command, $io, TRUE);
-    }
-  }
-
 }

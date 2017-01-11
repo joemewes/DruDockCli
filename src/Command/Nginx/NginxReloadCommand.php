@@ -15,7 +15,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
 
 /**
- * Class WatchCommand
+ * Class NginxReloadCommand
  * @package Docker\Drupal\Command\Nginx
  */
 class NginxReloadCommand extends Command

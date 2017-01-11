@@ -15,7 +15,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
 
 /**
- * Class WatchCommand
+ * Class NginxFlushPagespeedCommand
  * @package Docker\Drupal\Command\Nginx
  */
 class NginxFlushPagespeedCommand extends Command

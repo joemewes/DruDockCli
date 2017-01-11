@@ -180,13 +180,17 @@ class Application extends ParentApplication
     $commands[] = new Command\AboutCommand();
 		$commands[] = new Command\UpdateCommand();
 
+
 		$commands[] = new Command\Mysql\MysqlImportCommand();
 		$commands[] = new Command\Mysql\MysqlExportCommand();
 		$commands[] = new Command\Mysql\MysqlMonitorCommand();
 
+
 		$commands[] = new Command\Nginx\NginxMonitorCommand();
 		$commands[] = new Command\Nginx\NginxReloadCommand();
-		$commands[] = new Command\Nginx\NginxFlushPagespeedCommand();
+    $commands[] = new Command\Nginx\NginxFlushPagespeedCommand();
+    $commands[] = new Command\Nginx\NginxAddHostCommand();
+
 
 		$commands[] = new Command\Drush\DrushCommand();
 		$commands[] = new Command\Drush\DrushClearCacheCommand();
@@ -201,9 +205,11 @@ class Application extends ParentApplication
     $commands[] = new Command\Redis\RedisFlushCommand();
 		$commands[] = new Command\Redis\RedisInfoCommand();
 
+
     $commands[] = new Command\Behat\BehatStatusCommand();
     $commands[] = new Command\Behat\BehatMonitorCommand();
     $commands[] = new Command\Behat\BehatCommand();
+
 
 		$commands[] = new Command\Sync\AppSyncMonitorCommand();
 
@@ -254,7 +260,7 @@ class Application extends ParentApplication
       if(substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)){
           $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
       }
-      
+
       return $config;
     }else{
       $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');
@@ -316,6 +322,88 @@ class Application extends ParentApplication
 		}
 
     $io->info('');
-
 	}
+
+	/**
+   * @return string
+   */
+	function setNginxHost($io){
+
+    if($config = $this->getAppConfig($io)) {
+      $appname = $config['appname'];
+      $apphost = $config['host'];
+    }
+
+	  if(!isset($apphost)) {
+      $apphost = 'docker.dev';
+    }
+
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+    $nginxconfig = "server {
+    listen   80;
+    listen   [::]:80;
+
+    sendfile off;
+
+    client_max_body_size 20M;
+
+    index index.php index.html;
+    server_name $apphost;
+    error_log  /var/log/nginx/app-error.log;
+    access_log /var/log/nginx/app-access.log;
+    root /app/www;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$args;
+    }
+
+    location ~ \.php$ {
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass php:9000;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        fastcgi_param PATH_INFO \$fastcgi_path_info;
+        fastcgi_read_timeout 300;
+        fastcgi_cache  off;
+        fastcgi_intercept_errors on;
+    }
+}";
+
+    file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
+
+  }
+
+  /**
+   * @param $application
+   * @param $io
+   */
+  public function addHostConfig($io) {
+    // Add initial entry to hosts file.
+    // OSX @TODO update as command for all systems and OS's.
+    $utilRoot = $this->getUtilRoot();
+
+    $ip = '127.0.0.1';
+
+    if($config = $this->getAppConfig($io)) {
+      $apphost = $config['host'];
+    }
+
+    if(!isset($apphost)) {
+      $apphost = 'docker.dev';
+    }
+
+    $hosts_file = '/etc/hosts';
+
+    $exec = "cat " . $hosts_file . " | grep '" . $ip . " " . $apphost . "'";
+    if (!exec($exec)) {
+      $command = sprintf("echo '%s %s' | sudo tee -a %s >/dev/null", $ip, $apphost, $hosts_file);
+      $this->runcommand($command, $io, TRUE);
+    }
+
+    if(!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
+      $command = 'sudo cp -R ' . $utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist /Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist';
+      $this->runcommand($command, $io, TRUE);
+    }
+  }
 }
