@@ -50,7 +50,6 @@ class NginxAddHostCommand extends Command
     $currenthost = $apphost;
     $helper = $this->getHelper('question');
 
-    // ask for new hostname
     $question = new Question('Please enter new hostname : [' . $currenthost . '] ', $currenthost);
     $newhost = $helper->ask($input, $output, $question);
 
