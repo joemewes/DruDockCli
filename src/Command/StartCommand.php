@@ -10,10 +10,9 @@ namespace Docker\Drupal\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Docker\Drupal\Style\DockerDrupalStyle;
+
 
 /**
  * Class DemoCommand
@@ -38,11 +37,30 @@ class StartCommand extends Command {
 
     $io->section("APP ::: Starting " . $appname . " containers");
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' start 2>&1';
+   // $command = '$(docker ps | grep docker | wc -l)';
+    if(exec("docker ps | grep docker | wc -l") > 0){
+
+      $helper = $this->getHelper('question');
+      $question = new ConfirmationQuestion('You have other containers running. Would you like to stop them? ', false);
+
+      if (!$helper->ask($input, $output, $question)) {
+        return;
+      }
+
+      $io->info(' ');
+      $command = "docker stop $(docker ps -q)";
       $application->runcommand($command, $io);
+
+      if($application->checkForAppContainers($appname, $io)){
+        $command = $application->getComposePath($appname, $io).' start 2>&1';
+        $application->runcommand($command, $io);
+      }
+
+    } else {
+      if($application->checkForAppContainers($appname, $io)){
+        $command = $application->getComposePath($appname, $io).' start 2>&1';
+        $application->runcommand($command, $io);
+      }
     }
   }
-
-
 }
