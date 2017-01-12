@@ -6,7 +6,7 @@
     "src"
   ],
   "files": [
-    "LICENSE",
+    "LICENSE.txt",
     "bin/dockerdrupal.php",
     "vendor/autoload.php"
   ],
