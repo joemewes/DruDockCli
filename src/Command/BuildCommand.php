@@ -29,7 +29,6 @@ class BuildCommand extends ContainerAwareCommand {
 			->setAliases(['init'])
 			->setDescription('Fetch and build Drupal apps')
 			->setHelp('This command will fetch and build Drupal apps')
-			//->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
 			->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]');
 	}
 
@@ -43,11 +42,9 @@ class BuildCommand extends ContainerAwareCommand {
 			return;
 		}
 
-		// check Docker is running
 		$application->checkDocker($io, TRUE);
 
 		$fs = new Filesystem();
-		$date = date('Y-m-d--H-i-s');
 
 		$config = $application->getAppConfig($io);
 		if ($config) {
@@ -100,41 +97,6 @@ class BuildCommand extends ContainerAwareCommand {
 		if (!$process->isSuccessful()) {
 			throw new ProcessFailedException($process);
 		}
-	}
-
-	private function initDocker($io, $appname) {
-
-    $application = $this->getApplication();
-
-		if (exec('docker ps -q 2>&1', $exec_output)) {
-			$dockerstopcmd = 'docker stop $(docker ps -q)';
-			$this->runcommand($dockerstopcmd, $io, TRUE);
-		}
-
-		$message = 'Creating and configure DockerDrupal containers.... This may take a moment....';
-		$io->note($message);
-
-		// Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
-		// When 'Synchronization complete' kill this temp run container and start DockerDrupal.
-
-      $command = 'until ' . $application->getComposePath($appname, $io) .
-        'run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
-        'docker kill $(docker ps -q) 2>&1; ' .
-        $application->getComposePath($appname, $io) . 'up -d';
-
-      $application->runcommand($command, $io);
-
-		// Check for running mySQL container before launching Drupal Installation
-		$message = 'Waiting for mySQL service.';
-		$io->warning($message);
-		while (!@mysqli_connect('127.0.0.1', 'dev', 'DEVPASSWORD', 'dev_db')) {
-			sleep(1);
-			echo '.';
-		}
-		$io->text(' ');
-		$message = 'mySQL CONNECTED';
-		$io->success($message);
-
 	}
 
 	private function setupD7($fs, $io, $appname) {
@@ -225,11 +187,29 @@ class BuildCommand extends ContainerAwareCommand {
 		$application = $this->getApplication();
 		$utilRoot = $application->getUtilRoot();
 
-		if(!$fs->exists($app_dest)) {
+    $config = $application->getAppConfig($io);
+    if ($config) {
+      $appname = $config['appname'];
+      $appsrc = $config['appsrc'];
+      $apprepo = $config['repo'];
+    }
 
-			$command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
-			$io->note('Download and configure Drupal 8.... This may take a few minutes....');
-			$this->runcommand($command, $io, TRUE);
+    if(isset($appsrc) && $appsrc == 'Git') {
+      $command = 'git clone ' . $apprepo . ' app';
+      $this->runcommand($command, $io, TRUE);
+      $io->info('Downloading app from repo.... This may take a few minutes....');
+
+      $command = 'cd app && composer install';
+      $this->runcommand($command, $io, TRUE);
+    }
+
+		if(!$fs->exists($app_dest)) {
+      $command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
+      $io->info('Download and configure Drupal 8.... This may take a few minutes....');
+      $this->runcommand($command, $io, TRUE);
+    }
+
+    if($fs->exists($app_dest)) {
 
 			try {
 				$fs->mkdir($app_dest . '/config/sync');
@@ -245,13 +225,28 @@ class BuildCommand extends ContainerAwareCommand {
 			// Move DockerDrupal Drupal 8 config files into install
 			if (is_dir($utilRoot . '/bundles/d8') && is_dir($app_dest)) {
 				$d8files = $utilRoot . '/bundles/d8';
-				$fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
+
+				if(!$fs->exists($app_dest . '/composer.json'))
+				  $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
+
+        if(!$fs->exists($app_dest . '/web/sites/development.services.yml'))
 				$fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
-				$fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
-				$fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
-				$fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
-				$fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
-				$fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
+
+        if(!$fs->exists($app_dest . '/web/sites/default/services.yml'))
+          $fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
+
+        if(!$fs->exists($app_dest . '/web/robots.txt'))
+				  $fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
+
+        if(!$fs->exists($app_dest . '/web/sites/default/drushrc.php'))
+				  $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
+
+        if(!$fs->exists($app_dest . '/web/sites/default/settings.php'))
+				  $fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
+
+        if(!$fs->exists($app_dest . '/web/sites/default/settings.local.php'))
+				  $fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
+
 			}
 
 			// Set perms
@@ -339,5 +334,40 @@ class BuildCommand extends ContainerAwareCommand {
 //      }
 
 	}
+
+  private function initDocker($io, $appname) {
+
+    $application = $this->getApplication();
+
+    if (exec('docker ps -q 2>&1', $exec_output)) {
+      $dockerstopcmd = 'docker stop $(docker ps -q)';
+      $this->runcommand($dockerstopcmd, $io, TRUE);
+    }
+
+    $message = 'Creating and configure DockerDrupal containers.... This may take a moment....';
+    $io->note($message);
+
+    // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
+    // When 'Synchronization complete' kill this temp run container and start DockerDrupal.
+
+    $command = 'until ' . $application->getComposePath($appname, $io) .
+      'run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
+      'docker kill $(docker ps -q) 2>&1; ' .
+      $application->getComposePath($appname, $io) . 'up -d';
+
+    $application->runcommand($command, $io);
+
+    // Check for running mySQL container before launching Drupal Installation
+    $message = 'Waiting for mySQL service.';
+    $io->warning($message);
+    while (!@mysqli_connect('127.0.0.1', 'dev', 'DEVPASSWORD', 'dev_db')) {
+      sleep(1);
+      echo '.';
+    }
+    $io->text(' ');
+    $message = 'mySQL CONNECTED';
+    $io->success($message);
+
+  }
 
 }
