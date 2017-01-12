@@ -29,7 +29,7 @@ class Application extends ParentApplication
   /**
    * @var string
    */
-  const VERSION = '1.2.6';
+  const VERSION = '1.2.7';
 
   /**
    * @var string
@@ -198,6 +198,7 @@ class Application extends ParentApplication
     $commands[] = new Command\Drush\DrushModuleEnableCommand();
     $commands[] = new Command\Drush\DrushModuleDisableCommand();
     $commands[] = new Command\Drush\DrushUpDbCommand();
+    $commands[] = new Command\Drush\DrushInitConfigCommand();
 
 
     $commands[] = new Command\Redis\RedisMonitorCommand();
