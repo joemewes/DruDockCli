@@ -19,55 +19,56 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command
  */
 class DrushModuleEnableCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('drush:en')
-			->setDescription('Enable Drupal module')
-			->setHelp("This command will enable Drupal module. [dockerdrupal drush:en myModule]")
-			->addArgument('modulename', InputArgument::OPTIONAL, 'Specify NAME of module');
-	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
+  protected function configure() {
+    $this
+      ->setName('drush:en')
+      ->setDescription('Enable Drupal module')
+      ->setHelp("This command will enable Drupal module. [dockerdrupal drush:en myModule]")
+      ->addArgument('modulename', InputArgument::OPTIONAL, 'Specify NAME of module');
+  }
 
-		$io = new DockerDrupalStyle($input, $output);
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
 
-		// GET AND SET APPNAME
-		$modulename = $input->getArgument('modulename');
-		if(!$modulename){
-			$io->title("SET MODULE NAME");
-			$helper = $this->getHelper('question');
-			$question = new Question('Enter module name : ');
-			$modulename = $helper->ask($input, $output, $question);
-		}
+    $io = new DockerDrupalStyle($input, $output);
 
-		$config = $application->getAppConfig($io);
+    $modulename = $input->getArgument('modulename');
+    if (!$modulename) {
+      $io->title("SET MODULE NAME");
+      $helper = $this->getHelper('question');
+      $question = new Question('Enter module name : ');
+      $modulename = $helper->ask($input, $output, $question);
+    }
 
-		if ($config) {
-			$type = $config['apptype'];
-		}
+    $config = $application->getAppConfig($io);
 
-		if ($type == 'D8') {
-			$cmd = 'pm-enable ' . $modulename . ' -y';
-		}
-		else {
-			if ($type == 'D7') {
-				$cmd = 'en ' . $modulename . ' -y';
-			}
-			else {
-				$io->error('You\'re not currently in an APP directory');
-				return;
-			}
-		}
+    if ($config) {
+      $type = $config['apptype'];
+    }
 
-		$io->section('PHP ::: drush ' . $cmd);
-    if($config = $application->getAppConfig($io)) {
+    if ($type == 'D8') {
+      $cmd = 'pm-enable ' . $modulename . ' -y';
+    }
+    else {
+      if ($type == 'D7') {
+        $cmd = 'en ' . $modulename . ' -y';
+      }
+      else {
+        $io->error('You\'re not currently in an APP directory');
+        return;
+      }
+    }
+
+    $io->section('PHP ::: drush ' . $cmd);
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' exec -T php drush ' . $cmd;
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
       $application->runcommand($command, $io);
     }
-	}
+  }
+
 }

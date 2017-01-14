@@ -21,6 +21,7 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command\Mysql
  */
 class MysqlExportCommand extends Command {
+
   protected function configure() {
     $this
       ->setName('mysql:export')
@@ -55,4 +56,5 @@ class MysqlExportCommand extends Command {
       $application->runcommand($command, $io);
     }
   }
+
 }

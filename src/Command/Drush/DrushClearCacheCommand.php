@@ -17,44 +17,46 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command
  */
 class DrushClearCacheCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('drush:cc')
-			->setDescription('Run drush cache clear ')
-			->setHelp("This command will clear Drupal APP caches.");
-	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
+  protected function configure() {
+    $this
+      ->setName('drush:cc')
+      ->setDescription('Run drush cache clear ')
+      ->setHelp("This command will clear Drupal APP caches.");
+  }
 
-		$io = new DockerDrupalStyle($input, $output);
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
 
-		$config = $application->getAppConfig($io);
+    $io = new DockerDrupalStyle($input, $output);
 
-		if ($config) {
-			$type = $config['apptype'];
-		}
+    $config = $application->getAppConfig($io);
 
-		if (isset($type) && $type == 'D8') {
-			$cmd = 'cr all';
-		} elseif (isset($type) && $type == 'D7') {
+    if ($config) {
+      $type = $config['apptype'];
+    }
+
+    if (isset($type) && $type == 'D8') {
+      $cmd = 'cr all';
+    }
+    elseif (isset($type) && $type == 'D7') {
       $cmd = 'cc all';
-    }	else {
+    }
+    else {
       $io->error('You\'re not currently in an Drupal APP directory');
       return;
-		};
+    };
 
-		$io->section('PHP ::: drush ' . $cmd);
+    $io->section('PHP ::: drush ' . $cmd);
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' exec -T php drush ' . $cmd;
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
       $application->runcommand($command, $io);
     }
+  }
 
-
-	}
 }

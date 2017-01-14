@@ -17,10 +17,12 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command
  */
 class BehatMonitorCommand extends Command {
+
   protected function configure() {
     $this
       ->setName('behat:monitor')
-      ->setDescription('Lainch behat VNC viewer for debug/watch test suite');
+      ->setDescription('Launch behat VNC viewer')
+      ->setHelp("DD used Selenium:debug containers and this will allow watching of automated tests via OS default VNC viewer.");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -28,25 +30,17 @@ class BehatMonitorCommand extends Command {
 
     $io = new DockerDrupalStyle($input, $output);
 
-    $config = $application->getAppConfig($io);
-
-    if ($config) {
-      $type = $config['apptype'];
+    if ($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
     }
 
-    if (isset($type) && $type == 'D8') {
-      // D8 behat sites not yet supporter
-      $io->info('Drupal 8 behat test suite not currently supported. ');
-      return;
-    } elseif (isset($type) && $type == 'D7') {
+    if ($application->checkForAppContainers($appname, $io)) {
+
+      $io->section('EXEC behat ' . $cmd);
+
       $command = 'open vnc://:secret@localhost:$(docker inspect --format \'{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).HostPort }}\' $(docker ps --format {{.Names}} | grep firefox))';
-    }	else {
-      $io->error('You\'re not currently in an Drupal APP directory');
-      return;
-    };
-
-    $io->section('EXEC behat ' . $cmd);
-    $application->runcommand($command, $io);
-
+      $application->runcommand($command, $io);
+    }
   }
+
 }

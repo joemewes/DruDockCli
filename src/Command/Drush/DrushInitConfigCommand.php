@@ -19,46 +19,49 @@ use Symfony\Component\Yaml\Yaml;
  * @package Docker\Drupal\Command
  */
 class DrushInitConfigCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('drush:init:config')
-			->setDescription('Run drush config init')
-			->setHelp("This command will force import existing config into fresh installation.");
-	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
+  protected function configure() {
+    $this
+      ->setName('drush:init:config')
+      ->setDescription('Run drush config init')
+      ->setHelp("This command will force import existing config into fresh installation.");
+  }
 
-		$io = new DockerDrupalStyle($input, $output);
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
+
+    $io = new DockerDrupalStyle($input, $output);
     $io->section("PHP ::: drush config init");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
+    if ($application->checkForAppContainers($appname, $io)) {
 
       $site_settings = './app/config/sync/system.site.yml';
       $site_config = Yaml::parse(file_get_contents($site_settings));
       $uuid = $site_config['uuid'];
 
-      $command = $application->getComposePath($appname, $io).' exec -T php drush config-set \'system.site\' uuid ' . $uuid . ' -y';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush config-set \'system.site\' uuid ' . $uuid . ' -y';
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io).' exec -T php drush cr all';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush cr all';
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io).' exec -T php drush ev "\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")->delete();"';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush ev "\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")->delete();"';
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io).' exec -T php drush cron';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush cron';
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io).' exec -T php drush entity-updates -y';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush entity-updates -y';
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io).' exec -T php drush config-import -y';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush config-import -y';
       $application->runcommand($command, $io);
     }
-	}
+  }
+
 }
+

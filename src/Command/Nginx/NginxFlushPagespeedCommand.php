@@ -18,31 +18,29 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class NginxFlushPagespeedCommand
  * @package Docker\Drupal\Command\Nginx
  */
-class NginxFlushPagespeedCommand extends Command
-{
-  protected function configure()
-  {
-      $this
-          ->setName('nginx:flush')
-          ->setDescription('Flush nginx cache')
-          ->setHelp("This command will flush NGINX pagespeed cache.")
-      ;
+class NginxFlushPagespeedCommand extends Command {
+
+  protected function configure() {
+    $this
+      ->setName('nginx:flush')
+      ->setDescription('Flush nginx cache')
+      ->setHelp("This command will flush NGINX pagespeed cache.");
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
+  protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("Nginx ::: flush");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).'exec -T nginx bash -c "rm -rf /var/ngx_pagespeed_cache/*" 2>&1';
-			$application->runcommand($command, $io);
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'exec -T nginx bash -c "rm -rf /var/ngx_pagespeed_cache/*" 2>&1';
+      $application->runcommand($command, $io);
     }
   }
+
 }

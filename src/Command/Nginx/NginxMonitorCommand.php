@@ -18,31 +18,29 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class NginxMonitorCommand
  * @package Docker\Drupal\Command\Nginx
  */
-class NginxMonitorCommand extends Command
-{
-  protected function configure()
-  {
-      $this
-          ->setName('nginx:log')
-          ->setDescription('Monitor nginx activity')
-          ->setHelp("This command will output NGINX activity.")
-      ;
+class NginxMonitorCommand extends Command {
+
+  protected function configure() {
+    $this
+      ->setName('nginx:log')
+      ->setDescription('Monitor nginx activity')
+      ->setHelp("This command will output NGINX activity.");
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
+  protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("Nginx ::: Monitor");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).'exec -T nginx tail -f /var/log/nginx/app-error.log 2>&1';
-			$application->runcommand($command, $io);
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'exec -T nginx tail -f /var/log/nginx/app-error.log 2>&1';
+      $application->runcommand($command, $io);
     }
   }
+
 }

@@ -23,54 +23,54 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command
  */
 class ExecCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('docker:exec')
-			->setAliases(['exec'])
-			->setDescription('Execute bespoke commands at :container')
-			->setHelp("This command will run command inside specified container")
-			->addOption('service', 's', InputOption::VALUE_OPTIONAL, 'Specify the service/container [php]')
-			->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');
-	}
+  protected function configure() {
+    $this
+      ->setName('docker:exec')
+      ->setAliases(['exec'])
+      ->setDescription('Execute bespoke commands at :container')
+      ->setHelp("This command will run command inside specified container")
+      ->addOption('service', 's', InputOption::VALUE_OPTIONAL, 'Specify the service/container [php]')
+      ->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');
+  }
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+  protected function execute(InputInterface $input, OutputInterface $output) {
 
-		$application = $this->getApplication();
+    $application = $this->getApplication();
 
-		$cmd = $input->getOption('cmd');
-		$service = $input->getOption('service');
+    $cmd = $input->getOption('cmd');
+    $service = $input->getOption('service');
 
-		$io = new DockerDrupalStyle($input, $output);
-		$io->section("EXEC CMD");
+    $io = new DockerDrupalStyle($input, $output);
+    $io->section("EXEC CMD");
 
-		$running_containers = $application->getRunningContainerNames();
-		foreach ($running_containers as $c) {
-			$name_parts = explode('_', $c);
-			$available_services[] = $name_parts[1];
-		}
+    $running_containers = $application->getRunningContainerNames();
+    foreach ($running_containers as $c) {
+      $name_parts = explode('_', $c);
+      $available_services[] = $name_parts[1];
+    }
 
-		if (!$service) {
-			$helper = $this->getHelper('question');
-			$question = new ChoiceQuestion(
-				'Which service/container? : ',
-				$available_services
-			);
-			$service = $helper->ask($input, $output, $question);
-		}
+    if (!$service) {
+      $helper = $this->getHelper('question');
+      $question = new ChoiceQuestion(
+        'Which service/container? : ',
+        $available_services
+      );
+      $service = $helper->ask($input, $output, $question);
+    }
 
-		$config = $application->getAppConfig($io);
-		if ($config) {
-			$appname = $config['appname'];
-			$type = $config['apptype'];
-		}
+    $config = $application->getAppConfig($io);
+    if ($config) {
+      $appname = $config['appname'];
+      $type = $config['apptype'];
+    }
 
-		if (!$cmd) {
-			$helper = $this->getHelper('question');
-			$question = new Question('Enter command : ', 'bash');
-			$cmd = $helper->ask($input, $output, $question);
-		}
+    if (!$cmd) {
+      $helper = $this->getHelper('question');
+      $question = new Question('Enter command : ', 'bash');
+      $cmd = $helper->ask($input, $output, $question);
+    }
 
-		$command = 'docker exec -i $(docker ps --format {{.Names}} | grep ' . $service . ') ' . $cmd . ' 2>&1';
-		$application->runcommand($command, $io);
-	}
+    $command = 'docker exec -i $(docker ps --format {{.Names}} | grep ' . $service . ') ' . $cmd . ' 2>&1';
+    $application->runcommand($command, $io);
+  }
 }

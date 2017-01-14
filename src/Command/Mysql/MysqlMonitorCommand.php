@@ -18,31 +18,29 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class WatchCommand
  * @package Docker\Drupal\Command\Mysql
  */
-class MysqlMonitorCommand extends Command
-{
-  protected function configure()
-  {
-      $this
-          ->setName('mysql:log')
-          ->setDescription('Monitor mysql activity')
-          ->setHelp("This command will output MySQL activity.")
-      ;
+class MysqlMonitorCommand extends Command {
+
+  protected function configure() {
+    $this
+      ->setName('mysql:log')
+      ->setDescription('Monitor mysql activity')
+      ->setHelp("This command will output MySQL activity.");
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
+  protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("MySQL ::: Monitor");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).'exec -T db tail -f /var/log/mysql/mysql.log  2>&1';
-			$application->runcommand($command, $io);
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'exec -T db tail -f /var/log/mysql/mysql.log  2>&1';
+      $application->runcommand($command, $io);
     }
   }
+
 }

@@ -12,8 +12,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
 
 /**
@@ -21,35 +19,38 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command
  */
 class DrushCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('drush:cmd')
-			->setDescription('Run drush commands ')
-			->setHelp("This command will execute Drush commands directly against your Drupal APP.")
-			->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');
-	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
+  protected function configure() {
+    $this
+      ->setName('drush:cmd')
+      ->setDescription('Run drush commands ')
+      ->setHelp("This command will execute Drush commands directly against your Drupal APP.")
+      ->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');
+  }
 
-		$cmd = $input->getOption('cmd');
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
 
-		$io = new DockerDrupalStyle($input, $output);
-		$io->section('PHP ::: drush ' . $cmd);
+    $cmd = $input->getOption('cmd');
 
-		if (!$cmd) {
-			$helper = $this->getHelper('question');
-			$question = new Question('Enter command : ', 'bash');
-			$cmd = $helper->ask($input, $output, $question);
-		}
+    $io = new DockerDrupalStyle($input, $output);
+    $io->section('PHP ::: drush ' . $cmd);
 
-    if($config = $application->getAppConfig($io)) {
+    if (!$cmd) {
+      $helper = $this->getHelper('question');
+      $question = new Question('Enter command : ', 'bash');
+      $cmd = $helper->ask($input, $output, $question);
+    }
+
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' exec -T php drush ' . $cmd;
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
       $application->runcommand($command, $io);
     }
-	}
+  }
+
 }
+

@@ -20,46 +20,47 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  * @package Docker\Drupal\Command\Mysql
  */
 class MysqlImportCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('mysql:import')
-			->setDescription('Import .sql files')
-			->setHelp("Use this to import .sql files to the current running APPs dev_db. [dockerdrupal mysql:import -p ./latest.sql]")
-			->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify import file path including filename');
-	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
+  protected function configure() {
+    $this
+      ->setName('mysql:import')
+      ->setDescription('Import .sql files')
+      ->setHelp("Use this to import .sql files to the current running APPs dev_db. [dockerdrupal mysql:import -p ./latest.sql]")
+      ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify import file path including filename');
+  }
 
-		$io = new DockerDrupalStyle($input, $output);
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
+
+    $io = new DockerDrupalStyle($input, $output);
 
     $io->section("MYSQL ::: import database");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-		$helper = $this->getHelper('question');
+    $helper = $this->getHelper('question');
 
-		$io->warning("Dropping the database is potentially a very bad thing to do.\nAny data stored in the database will be destroyed.");
+    $io->warning("Dropping the database is potentially a very bad thing to do.\nAny data stored in the database will be destroyed.");
 
-		$question = new ConfirmationQuestion('Do you really want to drop the \'dev_db\' database [y/N] : ', FALSE);
-		if (!$helper->ask($input, $output, $question)) {
-			return;
-		}
+    $question = new ConfirmationQuestion('Do you really want to drop the \'dev_db\' database [y/N] : ', FALSE);
+    if (!$helper->ask($input, $output, $question)) {
+      return;
+    }
 
-		// GET AND SET APP TYPE
-		$path = $input->getOption('path');
-		if (!$path) {
-			// specify import path
-			$helper = $this->getHelper('question');
-			$question = new Question('Specify import path, including filename : ');
-			$importpath = $helper->ask($input, $output, $question);
+    // GET AND SET APP TYPE
+    $path = $input->getOption('path');
+    if (!$path) {
+      // specify import path
+      $helper = $this->getHelper('question');
+      $question = new Question('Specify import path, including filename : ');
+      $importpath = $helper->ask($input, $output, $question);
 
-			if (file_exists($importpath)) {
+      if (file_exists($importpath)) {
 
-				//drop database;
-        if($application->checkForAppContainers($appname, $io)) {
+        //drop database;
+        if ($application->checkForAppContainers($appname, $io)) {
 
           $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
           $application->runcommand($command, $io);
@@ -76,12 +77,14 @@ class MysqlImportCommand extends Command {
 
         }
 
-			} else {
+      }
+      else {
 
-				$io->error('Import .sql file not found at path ' . $importpath);
-				exit;
+        $io->error('Import .sql file not found at path ' . $importpath);
+        exit;
 
-			}
-		}
-	}
+      }
+    }
+  }
+
 }

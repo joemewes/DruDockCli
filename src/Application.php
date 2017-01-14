@@ -16,11 +16,10 @@ use Symfony\Component\Console\Application as ParentApplication;
 
 
 /**
-* Class Application
-* @package Docker\Drupal
-*/
-class Application extends ParentApplication
-{
+ * Class Application
+ * @package Docker\Drupal
+ */
+class Application extends ParentApplication {
   /**
    * @var string
    */
@@ -36,47 +35,42 @@ class Application extends ParentApplication
    */
   protected $directoryRoot;
 
-  public function __construct()
-  {
-      parent::__construct( $this::NAME, $this::VERSION);
+  public function __construct() {
+    parent::__construct($this::NAME, $this::VERSION);
 
-      $this->setDefaultTimezone();
-      $this->addCommands($this->registerCommands());
+    $this->setDefaultTimezone();
+    $this->addCommands($this->registerCommands());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function doRun(InputInterface $input, OutputInterface $output)
-  {
-      $this->registerCommands();
-      parent::doRun($input, $output);
+  public function doRun(InputInterface $input, OutputInterface $output) {
+    $this->registerCommands();
+    parent::doRun($input, $output);
   }
 
   /**
    * @return string
    */
-  public function getUtilRoot()
-  {
-      $utilRoot = realpath(__DIR__.'/../') . '/';
-      return $utilRoot;
+  public function getUtilRoot() {
+    $utilRoot = realpath(__DIR__ . '/../') . '/';
+    return $utilRoot;
   }
 
   /**
    * @return string
    */
-  public function getVersion()
-  {
-      return $this::VERSION;
+  public function getVersion() {
+    return $this::VERSION;
   }
 
 
   /**
    * @return ContainerBuilder
    */
-  public function getContainer()
-  {
-      return $this->container;
+  public function getContainer() {
+    return $this->container;
   }
 
   /**
@@ -86,75 +80,76 @@ class Application extends ParentApplication
    * so it needs to be done manually.
    * UTC is the fallback in case autodetection fails.
    */
-  protected function setDefaultTimezone()
-  {
-      $timezone = 'UTC';
-      if (is_link('/etc/localtime')) {
-          // Mac OS X (and older Linuxes)
-          // /etc/localtime is a symlink to the timezone in /usr/share/zoneinfo.
-          $filename = readlink('/etc/localtime');
-          if (strpos($filename, '/usr/share/zoneinfo/') === 0) {
-              $timezone = substr($filename, 20);
-          }
-      } elseif (file_exists('/etc/timezone')) {
-          // Ubuntu / Debian.
-          $data = file_get_contents('/etc/timezone');
-          if ($data) {
-              $timezone = trim($data);
-          }
-      } elseif (file_exists('/etc/sysconfig/clock')) {
-          // RHEL/CentOS
-          $data = parse_ini_file('/etc/sysconfig/clock');
-          if (!empty($data['ZONE'])) {
-              $timezone = trim($data['ZONE']);
-          }
+  protected function setDefaultTimezone() {
+    $timezone = 'UTC';
+    if (is_link('/etc/localtime')) {
+      // Mac OS X (and older Linuxes)
+      // /etc/localtime is a symlink to the timezone in /usr/share/zoneinfo.
+      $filename = readlink('/etc/localtime');
+      if (strpos($filename, '/usr/share/zoneinfo/') === 0) {
+        $timezone = substr($filename, 20);
       }
+    }
+    elseif (file_exists('/etc/timezone')) {
+      // Ubuntu / Debian.
+      $data = file_get_contents('/etc/timezone');
+      if ($data) {
+        $timezone = trim($data);
+      }
+    }
+    elseif (file_exists('/etc/sysconfig/clock')) {
+      // RHEL/CentOS
+      $data = parse_ini_file('/etc/sysconfig/clock');
+      if (!empty($data['ZONE'])) {
+        $timezone = trim($data['ZONE']);
+      }
+    }
 
-      date_default_timezone_set($timezone);
+    date_default_timezone_set($timezone);
   }
 
   /**
    * @output status table
    */
-  public function dockerHealthCheck($io){
-      $names = shell_exec("echo $(docker ps --format '{{.Names}}|{{.Status}}:')");
-      $n_array = explode(':',$names);
-      $rows = [];
-      foreach($n_array as $i => $n){
-          $c = explode('|', $n);
-          if($c[0] && $c[1]) {
-              $rows[$i]['Name'] = str_replace(' ', '', $c[0]);
-              $rows[$i]['Status'] = $c[1];
-          }
+  public function dockerHealthCheck($io) {
+    $names = shell_exec("echo $(docker ps --format '{{.Names}}|{{.Status}}:')");
+    $n_array = explode(':', $names);
+    $rows = [];
+    foreach ($n_array as $i => $n) {
+      $c = explode('|', $n);
+      if ($c[0] && $c[1]) {
+        $rows[$i]['Name'] = str_replace(' ', '', $c[0]);
+        $rows[$i]['Status'] = $c[1];
       }
-      $headers = ['Container Name', 'Status'];
-      $io->table($headers, $rows);
+    }
+    $headers = ['Container Name', 'Status'];
+    $io->table($headers, $rows);
   }
 
   /**
    * @return array
    */
-  public function getRunningContainerNames(){
-      $names = shell_exec("echo $(docker ps --format '{{.Names}}')");
-      $n_array = explode(' ',$names);
-      return $n_array;
+  public function getRunningContainerNames() {
+    $names = shell_exec("echo $(docker ps --format '{{.Names}}')");
+    $n_array = explode(' ', $names);
+    return $n_array;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultInputDefinition()
-  {
+  protected function getDefaultInputDefinition() {
     return new InputDefinition(
       [
         new InputArgument('command', InputArgument::REQUIRED),
-        new InputOption('--help', '-h', InputOption::VALUE_NONE),
-        new InputOption('--quiet', '-q', InputOption::VALUE_NONE),
-        new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE),
-        new InputOption('--version', '-V', InputOption::VALUE_NONE),
-        new InputOption('--ansi', '', InputOption::VALUE_NONE),
-        new InputOption('--no-ansi', '', InputOption::VALUE_NONE),
-        new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE),
+        new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display this help message'),
+        new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Do not output any message'),
+        new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages'),
+        new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version'),
+        new InputOption('--ansi', '', InputOption::VALUE_NONE, 'Force ANSI output'),
+        new InputOption('--no-ansi', '', InputOption::VALUE_NONE, 'Disable ANSI output'),
+        new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question'),
+        //new InputOption('--yes', '-y', InputOption::VALUE_NONE, 'Answer "yes" to all prompts'),
       ]
     );
   }
@@ -162,11 +157,10 @@ class Application extends ParentApplication
   /**
    * @return \Symfony\Component\Console\Command\Command[]
    */
-  protected function registerCommands()
-  {
+  protected function registerCommands() {
     static $commands = [];
     if (count($commands)) {
-        return $commands;
+      return $commands;
     }
 
     $commands[] = new Command\InitCommand();
@@ -178,23 +172,23 @@ class Application extends ParentApplication
     $commands[] = new Command\StatusCommand();
     $commands[] = new Command\ExecCommand();
     $commands[] = new Command\AboutCommand();
-		$commands[] = new Command\UpdateCommand();
+    $commands[] = new Command\UpdateCommand();
 
 
-		$commands[] = new Command\Mysql\MysqlImportCommand();
-		$commands[] = new Command\Mysql\MysqlExportCommand();
-		$commands[] = new Command\Mysql\MysqlMonitorCommand();
+    $commands[] = new Command\Mysql\MysqlImportCommand();
+    $commands[] = new Command\Mysql\MysqlExportCommand();
+    $commands[] = new Command\Mysql\MysqlMonitorCommand();
 
 
-		$commands[] = new Command\Nginx\NginxMonitorCommand();
-		$commands[] = new Command\Nginx\NginxReloadCommand();
+    $commands[] = new Command\Nginx\NginxMonitorCommand();
+    $commands[] = new Command\Nginx\NginxReloadCommand();
     $commands[] = new Command\Nginx\NginxFlushPagespeedCommand();
     $commands[] = new Command\Nginx\NginxAddHostCommand();
 
 
-		$commands[] = new Command\Drush\DrushCommand();
-		$commands[] = new Command\Drush\DrushClearCacheCommand();
-		$commands[] = new Command\Drush\DrushLoginCommand();
+    $commands[] = new Command\Drush\DrushCommand();
+    $commands[] = new Command\Drush\DrushClearCacheCommand();
+    $commands[] = new Command\Drush\DrushLoginCommand();
     $commands[] = new Command\Drush\DrushModuleEnableCommand();
     $commands[] = new Command\Drush\DrushModuleDisableCommand();
     $commands[] = new Command\Drush\DrushUpDbCommand();
@@ -204,7 +198,7 @@ class Application extends ParentApplication
     $commands[] = new Command\Redis\RedisMonitorCommand();
     $commands[] = new Command\Redis\RedisPingCommand();
     $commands[] = new Command\Redis\RedisFlushCommand();
-		$commands[] = new Command\Redis\RedisInfoCommand();
+    $commands[] = new Command\Redis\RedisInfoCommand();
 
 
     $commands[] = new Command\Behat\BehatStatusCommand();
@@ -212,7 +206,7 @@ class Application extends ParentApplication
     $commands[] = new Command\Behat\BehatCommand();
 
 
-		$commands[] = new Command\Sync\AppSyncMonitorCommand();
+    $commands[] = new Command\Sync\AppSyncMonitorCommand();
 
     return $commands;
   }
@@ -220,50 +214,51 @@ class Application extends ParentApplication
   /**
    * @return string
    */
-  public function checkDocker($io, $showoutput)
-  {
-      $command = 'docker info';
-      $process = new Process($command);
-      $process->setTimeout(2);
-      $process->run();
+  public function checkDocker($io, $showoutput) {
+    $command = 'docker info';
+    $process = new Process($command);
+    $process->setTimeout(2);
+    $process->run();
 
-      if (!$process->isSuccessful()) {
-          if($showoutput) {
-              $out = 'Can\'t connect to Docker. Is it running?';
-              $io->warning($out);
-          }
-          return false;
-      }else{
-          return true;
+    if (!$process->isSuccessful()) {
+      if ($showoutput) {
+        $out = 'Can\'t connect to Docker. Is it running?';
+        $io->warning($out);
       }
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
   }
 
   /**
    * @return string
    */
-  public function getDockerVersion(){
-      $command = 'docker --version';
-      $process = new Process($command);
-      $process->setTimeout(2);
-      $process->run();
-      $version = $process->getOutput();
-      return $version;
+  public function getDockerVersion() {
+    $command = 'docker --version';
+    $process = new Process($command);
+    $process->setTimeout(2);
+    $process->run();
+    $version = $process->getOutput();
+    return $version;
   }
 
   /**
    * @return array
    */
 
-  public function getAppConfig($io){
-    if(file_exists('.config.yml')){
+  public function getAppConfig($io) {
+    if (file_exists('.config.yml')) {
       $config = Yaml::parse(file_get_contents('.config.yml'));
 
-      if(substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)){
-          $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
+      if (substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)) {
+        $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
       }
 
       return $config;
-    }else{
+    }
+    else {
       $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');
       exit;
     }
@@ -272,16 +267,18 @@ class Application extends ParentApplication
   /**
    * @return string
    */
-  public function getComposePath($appname, $io){
+  public function getComposePath($appname, $io) {
 
     $fs = new Filesystem();
-    if($fs->exists('docker-compose.yml')) {
+    if ($fs->exists('docker-compose.yml')) {
       $dc = 'docker-compose ';
       return $dc;
-    }elseif($fs->exists('./docker_'.$appname.'/docker-compose.yml')){
-      $dc = 'docker-compose -f ./docker_'.$appname.'/docker-compose.yml ';
+    }
+    elseif ($fs->exists('./docker_' . $appname . '/docker-compose.yml')) {
+      $dc = 'docker-compose -f ./docker_' . $appname . '/docker-compose.yml ';
       return $dc;
-    }else{
+    }
+    else {
       $io->error("docker-compose.yml : Not Found");
       exit;
     }
@@ -290,52 +287,53 @@ class Application extends ParentApplication
   /**
    * @return Boolean
    */
-  public function checkForAppContainers($appname, $io){
+  public function checkForAppContainers($appname, $io) {
 
-    if(exec($this->getComposePath($appname, $io).'ps | grep '.preg_replace("/[^A-Za-z0-9 ]/", '', $appname))) {
+    if (exec($this->getComposePath($appname, $io) . 'ps | grep ' . preg_replace("/[^A-Za-z0-9 ]/", '', $appname))) {
       return TRUE;
-    }else{
+    }
+    else {
       $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
       exit;
     }
   }
 
-	/**
-	 * @return string
-	 */
-	public function runcommand($command, $io) {
-
-		global $output;
-		$output = $io;
-
-		$process = new Process($command);
-		$process->setTimeout(3600);
-    $process->setTty(true);
-		$process->run(function ($type, $buffer) {
-			global $output;
-			if ($output) {
-				$output->info($buffer);
-			}
-		});
-
-		if (!$process->isSuccessful()) {
-			throw new ProcessFailedException($process);
-		}
-
-    $io->info('');
-	}
-
-	/**
+  /**
    * @return string
    */
-	function setNginxHost($io){
+  public function runcommand($command, $io) {
 
-    if($config = $this->getAppConfig($io)) {
+    global $output;
+    $output = $io;
+
+    $process = new Process($command);
+    $process->setTimeout(3600);
+    $process->setTty(TRUE);
+    $process->run(function ($type, $buffer) {
+      global $output;
+      if ($output) {
+        $output->info($buffer);
+      }
+    });
+
+    if (!$process->isSuccessful()) {
+      throw new ProcessFailedException($process);
+    }
+
+    $io->info('');
+  }
+
+  /**
+   * @return string
+   */
+  function setNginxHost($io) {
+
+    if ($config = $this->getAppConfig($io)) {
       $appname = $config['appname'];
       $apphost = $config['host'];
     }
 
-	  if(!isset($apphost)) {
+    if (!isset($apphost)) {
       $apphost = 'docker.dev';
     }
 
@@ -386,9 +384,10 @@ class Application extends ParentApplication
 
     $ip = '127.0.0.1';
 
-    if($update && $config = $this->getAppConfig($io)) {
+    if ($update && $config = $this->getAppConfig($io)) {
       $apphost = $config['host'];
-    }else{
+    }
+    else {
       $apphost = 'docker.dev';
     }
 
@@ -400,7 +399,7 @@ class Application extends ParentApplication
       $this->runcommand($command, $io, TRUE);
     }
 
-    if(!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
+    if (!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
       $command = 'sudo cp -R ' . $utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist /Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist';
       $this->runcommand($command, $io, TRUE);
     }

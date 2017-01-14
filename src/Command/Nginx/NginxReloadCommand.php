@@ -18,31 +18,29 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class NginxReloadCommand
  * @package Docker\Drupal\Command\Nginx
  */
-class NginxReloadCommand extends Command
-{
-  protected function configure()
-  {
-      $this
-          ->setName('nginx:reload')
-          ->setDescription('Reload nginx activity')
-          ->setHelp("This command will reload NGINX config.")
-      ;
+class NginxReloadCommand extends Command {
+
+  protected function configure() {
+    $this
+      ->setName('nginx:reload')
+      ->setDescription('Reload nginx activity')
+      ->setHelp("This command will reload NGINX config.");
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
+  protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("Nginx ::: reload");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).'exec -T nginx nginx -s reload 2>&1';
-			$application->runcommand($command, $io);
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
+      $application->runcommand($command, $io);
     }
   }
+
 }
