@@ -16,30 +16,28 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class DemoCommand
  * @package Docker\Drupal\Command
  */
-class StopCommand extends Command
-{
-    protected function configure()
-    {
-        $this
-            ->setName('docker:stop')
-            ->setAliases(['stop'])
-            ->setDescription('Stop APP containers')
-            ->setHelp("Example : [dockerdrupal stop]");
-        ;
-    }
+class StopCommand extends Command {
+
+  protected function configure() {
+    $this
+      ->setName('docker:stop')
+      ->setAliases(['stop'])
+      ->setDescription('Stop current APP containers')
+      ->setHelp("Example : [dockerdrupal stop]");;
+  }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
     $io->section("APP ::: Stopping " . $appname . " containers");
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' stop 2>&1';
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . ' stop 2>&1';
       $application->runcommand($command, $io);
     }
   }

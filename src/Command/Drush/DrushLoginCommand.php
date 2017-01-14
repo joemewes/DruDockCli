@@ -17,26 +17,28 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command
  */
 class DrushLoginCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('drush:uli')
-			->setDescription('Run Drush ULI')
-			->setHelp("This command will output a login URL.");
-	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
+  protected function configure() {
+    $this
+      ->setName('drush:uli')
+      ->setDescription('Run Drush ULI')
+      ->setHelp("This command will output a login URL.");
+  }
 
-		$io = new DockerDrupalStyle($input, $output);
-		$io->section('PHP ::: drush uli');
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
 
-		if($config = $application->getAppConfig($io)) {
+    $io = new DockerDrupalStyle($input, $output);
+    $io->section('PHP ::: drush uli');
+
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' exec -T php drush uli';
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush uli';
       $application->runcommand($command, $io);
     }
-	}
+  }
+
 }

@@ -18,14 +18,13 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class WatchCommand
  * @package Docker\Drupal\Command\redis
  */
-class AppSyncMonitorCommand extends Command
-{
+class AppSyncMonitorCommand extends Command {
 
   protected function configure() {
     $this
       ->setName('sync:monitor')
-      ->setDescription('Montitor App sync activity')
-      ->setHelp("This command will output App Sync activity.");
+      ->setDescription('Montitor current App sync activity')
+      ->setHelp("This command will output App Sync activity. [dockerdrupal sync:monitor]");
   }
 
   /**

@@ -17,26 +17,28 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\Command
  */
 class DrushUpDbCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('drush:updb')
-			->setDescription('Run Drush updb')
-			->setHelp("This command will run all pending database updates for the current Drupal app.");
-	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
+  protected function configure() {
+    $this
+      ->setName('drush:updb')
+      ->setDescription('Run Drush updb')
+      ->setHelp("This command will run all pending database updates for the current Drupal app.");
+  }
 
-		$io = new DockerDrupalStyle($input, $output);
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
+
+    $io = new DockerDrupalStyle($input, $output);
     $io->section("PHP ::: drush updb -y");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' exec -T php drush updb -y';
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . ' exec -T php drush updb -y';
       $application->runcommand($command, $io);
     }
-	}
+  }
+
 }

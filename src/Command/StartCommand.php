@@ -16,32 +16,33 @@ use Docker\Drupal\Style\DockerDrupalStyle;
 
 /**
  * Class DemoCommand
+ *
  * @package Docker\Drupal\Command
  */
 class StartCommand extends Command {
-	protected function configure() {
-		$this
-			->setName('docker:start')
-			->setAliases(['start'])
-			->setDescription('Start APP containers')
-			->setHelp("Example : [dockerdrupal start]");
-	}
+
+  protected function configure() {
+    $this
+      ->setName('docker:start')
+      ->setAliases(['start'])
+      ->setDescription('Start current APP containers')
+      ->setHelp("Example : [dockerdrupal start]");
+  }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
     $io->section("APP ::: Starting " . $appname . " containers");
 
-   // $command = '$(docker ps | grep docker | wc -l)';
-    if(exec("docker ps | grep docker | wc -l") > 0){
+    if (exec("docker ps | grep docker | wc -l") > 0) {
 
       $helper = $this->getHelper('question');
-      $question = new ConfirmationQuestion('You have other containers running. Would you like to stop them? ', false);
+      $question = new ConfirmationQuestion('You have other containers running. Would you like to stop them? ', FALSE);
 
       if (!$helper->ask($input, $output, $question)) {
         return;
@@ -51,14 +52,15 @@ class StartCommand extends Command {
       $command = "docker stop $(docker ps -q)";
       $application->runcommand($command, $io);
 
-      if($application->checkForAppContainers($appname, $io)){
-        $command = $application->getComposePath($appname, $io).' start 2>&1';
+      if ($application->checkForAppContainers($appname, $io)) {
+        $command = $application->getComposePath($appname, $io) . ' start 2>&1';
         $application->runcommand($command, $io);
       }
 
-    } else {
-      if($application->checkForAppContainers($appname, $io)){
-        $command = $application->getComposePath($appname, $io).' start 2>&1';
+    }
+    else {
+      if ($application->checkForAppContainers($appname, $io)) {
+        $command = $application->getComposePath($appname, $io) . ' start 2>&1';
         $application->runcommand($command, $io);
       }
     }

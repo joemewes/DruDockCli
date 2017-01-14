@@ -18,31 +18,29 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * Class WatchCommand
  * @package Docker\Drupal\Command\redis
  */
-class RedisFlushCommand extends Command
-{
-  protected function configure()
-  {
-      $this
-          ->setName('redis:flush')
-          ->setDescription('Flush Redis cache')
-          ->setHelp("This command will flush all data REDIS key/value store (cache).")
-      ;
+class RedisFlushCommand extends Command {
+
+  protected function configure() {
+    $this
+      ->setName('redis:flush')
+      ->setDescription('Flush Redis cache')
+      ->setHelp("This command will flush all data REDIS key/value store (cache).");
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
+  protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("REDIS ::: flushall");
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if($application->checkForAppContainers($appname, $io)){
-      $command = $application->getComposePath($appname, $io).' exec -T redis redis-cli flushall';
-			$application->runcommand($command, $io);
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . ' exec -T redis redis-cli flushall';
+      $application->runcommand($command, $io);
     }
   }
+
 }
