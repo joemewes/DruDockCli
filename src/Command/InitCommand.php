@@ -35,7 +35,7 @@ class InitCommand extends ContainerAwareCommand
       ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
-      ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full]')
+      ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod]')
       ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]');
   }
@@ -72,14 +72,6 @@ class InitCommand extends ContainerAwareCommand
       $appname = $helper->ask($input, $output, $question);
     }
 
-    // GET AND SET APP PREFERRED HOST.
-    $host = $input->getOption('apphost');
-
-    if (!$host) {
-      // use default host http://docker.dev
-      $host = 'docker.dev';
-    }
-
     // GET AND SET APP SOURCE.
     $src = $input->getOption('appsrc');
     $available_src = array('New', 'Git');
@@ -112,7 +104,7 @@ class InitCommand extends ContainerAwareCommand
 
     // GET AND SET APP REQUIREMENTS.
     $reqs = $input->getOption('reqs');
-    $available_reqs = array('Basic', 'Full');
+    $available_reqs = array('Basic', 'Full', 'Prod');
 
     if ($reqs && !in_array($reqs, $available_reqs)) {
       $io->warning('REQS : ' . $reqs . ' not allowed.');
@@ -152,6 +144,17 @@ class InitCommand extends ContainerAwareCommand
       $type = $helper->ask($input, $output, $question);
     }
 
+    // GET AND SET APP PREFERRED HOST.
+    $apphost = $input->getOption('apphost');
+
+    if (!$apphost) {
+      $io->info(' ');
+      $io->title("SET APP HOSTNAME");
+      $helper = $this->getHelper('question');
+      $question = new Question('Enter preferred app hostname [docker.dev] : ');
+      $apphost = $helper->ask($input, $output, $question);
+    }
+
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
     if (!$fs->exists($system_appname)) {
@@ -163,14 +166,83 @@ class InitCommand extends ContainerAwareCommand
       return;
     }
 
+    switch ($reqs) {
+      case 'Basic':
+        $fs->mirror($utilRoot . '/bundles/dockerdrupal-lite/', $system_appname . '/docker_' . $system_appname);
+        if (!$apphost) { $apphost = 'docker.dev'; }
+
+        break;
+
+      case 'Full':
+        $fs->mirror($utilRoot . '/bundles/dockerdrupal/', $system_appname . '/docker_' . $system_appname);
+        if (!$apphost) { $apphost = 'docker.dev'; }
+
+        break;
+
+      case 'Prod':
+        $fs->mirror($utilRoot . '/bundles/dockerdrupal-prod/', $system_appname . '/docker_' . $system_appname);
+        if (!$apphost) { $apphost = 'docker.prod'; }
+
+        // Set build path.
+        $composebuild = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose.yml'));
+        $composebuild['services']['app']['build']['dockerfile'] = './docker_' . $system_appname . '/build/Dockerfile';
+
+        $composebuild['networks']['proxy']['external']['name'] = 'proxy_' . $system_appname . '_proxy';
+        $composebuild['networks']['database']['external']['name'] = 'data_' . $system_appname . '_data';
+
+
+        $composeconfig = Yaml::dump($composebuild);
+        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose.yml', $composeconfig);
+
+        // set proxy network name
+        $proxynet = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml'));
+        $proxynet['services']['nginx-proxy']['networks'] = [
+          $system_appname . '_proxy'
+        ];
+        unset($proxynet['networks']['nginx']);
+        $proxynet['networks'][$system_appname . '_proxy'] = [
+          'driver' => 'bridge'
+        ];
+
+        $proxynetconfig = Yaml::dump($proxynet);
+        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml', $proxynetconfig);
+
+        // Set database name.
+        $database = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml'));
+
+        unset($database['networks']['data']);
+        $database['networks'][$system_appname . '_data'] = [
+          'driver' => 'bridge'
+        ];
+
+        $database['services']['db']['networks'] = [$system_appname . '_data'];
+        $database['services']['solr']['networks'] = [$system_appname . '_data'];
+        $database['services']['redis']['networks'] = [$system_appname . '_data'];
+
+        $databaseconfig = Yaml::dump($database);
+        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml', $databaseconfig);
+
+        break;
+
+      default:
+        $fs->mirror($utilRoot . '/bundles/dockerdrupal-lite/', $system_appname . '/docker_' . $system_appname);
+        if (!$apphost) { $apphost = 'docker.dev'; }
+
+        break;
+    }
+
     // SETUP APP CONFIG FILE.
     $config = array(
       'appname' => $appname,
       'apptype' => $type,
-      'host'=> $host,
+      'host'=> $apphost,
       'reqs' => $reqs,
       'appsrc' => $src,
       'repo' =>  $gitrepo ? $gitrepo : '',
+      'created' => $date =  date('Y-m-d--H-i-s'),
+      'builds' => [
+        $date =  date('Y-m-d--H-i-s'),
+      ],
       'dockerdrupal' => array('version' => $application->getVersion(), 'date' => $date),
     );
 
@@ -181,15 +253,7 @@ class InitCommand extends ContainerAwareCommand
     $io->info(' ');
     $io->note($message);
 
-    if ($reqs == 'Basic') {
-      $fs->mirror($utilRoot . '/bundles/dockerdrupal-lite/', $system_appname . '/docker_' . $system_appname);
-    }
-
-    if ($reqs == 'Full') {
-      $fs->mirror($utilRoot . '/bundles/dockerdrupal/', $system_appname . '/docker_' . $system_appname);
-    }
-
-    $this->initDocker($application, $io, $system_appname);
+    $this->getDockerDrupal($application, $io, $system_appname);
 
     $io->info(' ');
     $io->section("DockerDrupal ::: Ready");
@@ -203,7 +267,7 @@ class InitCommand extends ContainerAwareCommand
    * @param $io
    * @param $appname
    */
-  private function initDocker($application, $io, $appname) {
+  private function getDockerDrupal($application, $io, $appname) {
 
     if (exec('docker ps -q 2>&1', $exec_output)) {
       $dockerstopcmd = 'docker stop $(docker ps -q)';

@@ -208,6 +208,10 @@ class Application extends ParentApplication {
 
     $commands[] = new Command\Sync\AppSyncMonitorCommand();
 
+
+    $commands[] = new Command\Prod\ProdUpdateCommand();
+
+
     return $commands;
   }
 
@@ -265,17 +269,50 @@ class Application extends ParentApplication {
   }
 
   /**
+   * @return Boolean
+   */
+
+  public function setAppConfig($config, $appname, $io) {
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+
+    if (file_exists('.config.yml')) {
+      $yaml = Yaml::dump($config);
+      file_put_contents('.config.yml', $yaml);
+      return TRUE;
+    }
+    else {
+      $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');
+      exit;
+    }
+  }
+
+  /**
    * @return string
    */
   public function getComposePath($appname, $io) {
 
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+
+    if($config = $this->getAppConfig($io)) {
+      $reqs = $config['reqs'];
+      $latestbuild = $config['builds'];
+    }
+
     $fs = new Filesystem();
+
+    if(isset($reqs) && $reqs == 'Prod') {
+      $projectname = $system_appname . '--' . end($latestbuild);
+      $project = '--project-name=' . $projectname;
+    } else {
+      $project = '';
+    }
+
     if ($fs->exists('docker-compose.yml')) {
       $dc = 'docker-compose ';
       return $dc;
     }
-    elseif ($fs->exists('./docker_' . $appname . '/docker-compose.yml')) {
-      $dc = 'docker-compose -f ./docker_' . $appname . '/docker-compose.yml ';
+    elseif ($fs->exists('./docker_' . $system_appname . '/docker-compose.yml')) {
+      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose.yml ' . $project . ' ';
       return $dc;
     }
     else {
@@ -285,17 +322,80 @@ class Application extends ParentApplication {
   }
 
   /**
+   * @return string
+   */
+  public function getDataComposePath($appname, $io) {
+
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+
+    if($config = $this->getAppConfig($io)) {
+      $reqs = $config['reqs'];
+    }
+
+    $fs = new Filesystem();
+
+    if(isset($reqs) && $reqs == 'Prod') {
+      $project = '--project-name=data';
+    }else {
+      $io->error("docker-compose-data.yml : Not Found");
+      exit;
+    }
+
+    if ($fs->exists('./docker_' . $system_appname . '/docker-compose-data.yml')) {
+      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
+      return $dc;
+    }
+    else {
+      $io->error("docker-compose-data.yml : Not Found");
+      exit;
+    }
+  }
+
+  /**
+   * @return string
+   */
+  public function getProxyComposePath($appname, $io) {
+
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+
+    if($config = $this->getAppConfig($io)) {
+      $reqs = $config['reqs'];
+    }
+
+    $fs = new Filesystem();
+
+    if(isset($reqs) && $reqs == 'Prod') {
+      $project = '--project-name=proxy';
+    }else {
+      $io->error("docker-compose-data.yml : Not Found");
+      exit;
+    }
+
+    if ($fs->exists('./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml')) {
+      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml ' . $project . ' ';
+      return $dc;
+    }
+    else {
+      $io->error("docker-compose-data.yml : Not Found");
+      exit;
+    }
+  }
+
+  /**
    * @return Boolean
    */
   public function checkForAppContainers($appname, $io) {
 
-    if (exec($this->getComposePath($appname, $io) . 'ps | grep ' . preg_replace("/[^A-Za-z0-9 ]/", '', $appname))) {
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+    // Check for standard app containers
+    if (exec($this->getComposePath($appname, $io) . 'ps | grep ' . preg_replace("/[^A-Za-z0-9 ]/", '', $system_appname))) {
       return TRUE;
     }
     else {
       $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
-      exit;
+      //exit;
     }
+
   }
 
   /**

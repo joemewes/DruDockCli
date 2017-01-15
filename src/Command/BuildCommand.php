@@ -50,6 +50,7 @@ class BuildCommand extends ContainerAwareCommand {
 		if ($config) {
 			$appname = $config['appname'];
 			$type = $config['apptype'];
+			$apphost = $config['host'];
 		}
 
 		$system_appname = strtolower(str_replace(' ', '', $appname));
@@ -76,7 +77,7 @@ class BuildCommand extends ContainerAwareCommand {
 		}
 
 		$io->note($message);
-		shell_exec('python -mwebbrowser http://docker.dev');
+		shell_exec('python -mwebbrowser http://' . $apphost);
 
 	}
 
@@ -264,7 +265,7 @@ class BuildCommand extends ContainerAwareCommand {
 			$process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
 			$process->run();
 
-			// Symlink PHP7 container working directory ie. /app/www
+			// Symlink PHP7 container working directory ie. /app/www.
 			$fs->symlink('./web', $app_dest . '/www', TRUE);
 		}
 	}
@@ -347,27 +348,79 @@ class BuildCommand extends ContainerAwareCommand {
     $message = 'Creating and configure DockerDrupal containers.... This may take a moment....';
     $io->note($message);
 
-    // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
-    // When 'Synchronization complete' kill this temp run container and start DockerDrupal.
-
-    $command = 'until ' . $application->getComposePath($appname, $io) .
-      'run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
-      'docker kill $(docker ps -q) 2>&1; ' .
-      $application->getComposePath($appname, $io) . 'up -d';
-
-    $application->runcommand($command, $io);
-
-    // Check for running mySQL container before launching Drupal Installation
-    $message = 'Waiting for mySQL service.';
-    $io->warning($message);
-    while (!@mysqli_connect('127.0.0.1', 'dev', 'DEVPASSWORD', 'dev_db')) {
-      sleep(1);
-      echo '.';
+    if($config = $application->getAppConfig($io)) {
+      $appreqs = $config['reqs'];
+      $build = end($config['builds']);
     }
-    $io->text(' ');
-    $message = 'mySQL CONNECTED';
-    $io->success($message);
 
+    if(isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
+
+      // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
+      // When 'Synchronization complete' kill this temp run container and start DockerDrupal.
+
+      $command = 'until ' . $application->getComposePath($appname, $io) .
+        'run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
+        'docker kill $(docker ps -q) 2>&1; ' .
+        $application->getComposePath($appname, $io) . 'up -d';
+
+      $application->runcommand($command, $io);
+
+      // Check for running mySQL container before launching Drupal Installation
+      $message = 'Waiting for mySQL service.';
+      $io->warning($message);
+      while (!@mysqli_connect('127.0.0.1', 'dev', 'DEVPASSWORD', 'dev_db')) {
+        sleep(1);
+        echo '.';
+      }
+      $io->text(' ');
+      $message = 'mySQL CONNECTED';
+      $io->success($message);
+    }
+
+    // Production option specific build.
+    if(isset($appreqs) && $appreqs == 'Prod') {
+
+      $appname = $config['appname'];
+      $system_appname = strtolower(str_replace(' ', '', $appname));
+
+      $io->section("Docker ::: Build prod environment");
+
+      // Setup proxy newtwork.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose-nginx-proxy.yml --project-name=proxy up -d';
+      $application->runcommand($command, $io);
+
+      // Setup data service.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose-data.yml --project-name=data up -d';
+      $application->runcommand($command, $io);
+
+      // RUN APP BUILD.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose.yml --project-name=' . $system_appname . '--' . $build . ' build --no-cache';
+      $application->runcommand($command, $io);
+
+      //RUN APP.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose.yml --project-name=' . $system_appname . '--' . $build . ' up -d app';
+      $application->runcommand($command, $io);
+
+      //START PROJECT.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose.yml --project-name=' . $system_appname . '--' . $build . ' up -d';
+      $application->runcommand($command, $io);
+
+      // Check for running mySQL container before launching Drupal Installation
+      $message = 'Waiting for mySQL service.';
+
+      $command = exec('docker port mysql 3306');
+      $port = explode(':', $command);
+
+      $io->warning($message);
+      while (!@mysqli_connect('127.0.0.1', 'dev', 'DRUPALPASSENV', 'prod', $port[1])) {
+        sleep(1);
+        echo '.';
+      }
+      $io->text(' ');
+      $message = 'mySQL CONNECTED';
+      $io->success($message);
+
+    }
   }
 
 }
