@@ -41,18 +41,37 @@ class DestroyCommand extends Command {
       FALSE,
       '/^(y)/i'
     );
+
     if (!$helper->ask($input, $output, $question)) {
       return;
     }
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
+      $appreqs = $config['reqs'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
-      $application->runcommand($command, $io);
+    if (isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
+      if ($application->checkForAppContainers($appname, $io)) {
+          $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
+          $application->runcommand($command, $io);
+      }
     }
+
+    if(isset($appreqs) && $appreqs == 'Prod') {
+      if ($application->checkForAppContainers($appname, $io)) {
+        $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
+        $application->runcommand($command, $io);
+      }
+
+      $command = $application->getDataComposePath($appname, $io) . ' down -v 2>&1';
+      $application->runcommand($command, $io);
+
+      $command = $application->getProxyComposePath($appname, $io) . ' down -v 2>&1';
+      $application->runcommand($command, $io);
+
+    }
+
   }
 
 }
