@@ -28,7 +28,7 @@ class Application extends ParentApplication {
   /**
    * @var string
    */
-  const VERSION = '1.2.7';
+  const VERSION = '1.2.9';
 
   /**
    * @var string
@@ -294,8 +294,12 @@ class Application extends ParentApplication {
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
     if($config = $this->getAppConfig($io)) {
-      $reqs = $config['reqs'];
-      $latestbuild = $config['builds'];
+      if(isset($config['reqs'])){
+        $reqs = $config['reqs'];
+      }
+      if(isset($config['builds'])) {
+        $latestbuild = $config['builds'];
+      }
     }
 
     $fs = new Filesystem();

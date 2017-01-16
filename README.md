@@ -56,56 +56,63 @@ composer global require dockerdrupal/cli
 ## Initial Commands structure
 ```
      Available commands:
-       about           About DockerDrupal
-       destroy         Disable and delete APP and containers
-       env             Fetch and build DockerDrupal containers
-       exec            Execute bespoke commands at :container
-       help            Displays help for a command
-       init            Fetch and build Drupal apps
-       list            Lists commands
-       restart         Restart APP containers
-       start           Start APP containers
-       status          Get current status of all containers
-       stop            Stop all containers
-       update          Update APP containers
+       about              About DockerDrupal
+       destroy            Disable and delete APP and containers
+       env                Fetch and build DockerDrupal containers
+       exec               Execute bespoke commands at :container
+       help               Displays help for a command
+       init               Fetch and build Drupal apps
+       list               Lists commands
+       restart            Restart current APP containers
+       start              Start current APP containers
+       status             Get current status of all containers
+       stop               Stop current APP containers
+       update             Update current APP containers
       behat
-       behat:cmd       Run behat commands 
-       behat:monitor   Runs example command against running APP and current config
-       behat:status    Runs example command against running APP and current config
+       behat:cmd          Run behat commands
+       behat:monitor      Launch behat VNC viewer
+       behat:status       Runs example command against running APP and current config
       build
-       build:destroy   Disable and delete APP and containers
-       build:init      Fetch and build Drupal apps
+       build:destroy      Disable and delete APP and containers
+       build:init         Fetch and build Drupal apps
       docker
-       docker:exec     Execute bespoke commands at :container
-       docker:restart  Restart APP containers
-       docker:start    Start APP containers
-       docker:status   Get current status of all containers
-       docker:stop     Stop all containers
-       docker:update   Update APP containers
+       docker:exec        Execute bespoke commands at :container
+       docker:restart     Restart current APP containers
+       docker:start       Start current APP containers
+       docker:status      Get current status of all containers
+       docker:stop        Stop current APP containers
+       docker:update      Update current APP containers
       drush
-       drush:cc        Run drush cache clear 
-       drush:cmd       Run drush commands 
-       drush:en        Enable Drupal module
-       drush:uli       Run Drush ULI
+       drush:cc           Run drush cache clear 
+       drush:cmd          Run drush commands 
+       drush:dis          Disable/Uninstall Drupal module
+       drush:en           Enable Drupal module
+       drush:init:config  Run drush config init
+       drush:uli          Run Drush ULI
+       drush:updb         Run Drush updb
       env
-       env:init        Fetch and build DockerDrupal containers
+       env:init           Fetch and build DockerDrupal containers
       mysql
-       mysql:export    Export .sql files
-       mysql:import    Import .sql files
-       mysql:log       Monitor mysql activity
+       mysql:export       Export .sql files
+       mysql:import       Import .sql files
+       mysql:log          Monitor mysql activity
       nginx
-       nginx:flush     Flush nginx cache
-       nginx:log       Monitor nginx activity
-       nginx:reload    Reload nginx activity
+       nginx:addhost      Add nginx host to DD and host OS
+       nginx:flush        Flush nginx cache
+       nginx:log          Monitor nginx activity
+       nginx:reload       Reload nginx activity
+      prod
+       prod:update        Rebuild app and deploy latest code into app containers
       redis
-       redis:flush     Flush Redis cache
-       redis:info      Get Redis running config information
-       redis:monitor   Montitor redis activity
-       redis:ping      Ping Redis
+       redis:flush        Flush Redis cache
+       redis:info         Get Redis running config information
+       redis:monitor      Montitor redis activity
+       redis:ping         Ping Redis
       self
-       self:about      About DockerDrupal
+       self:about         About DockerDrupal
       sync
-       sync:monitor    Montitor App sync activity
+       sync:monitor       Montitor current App sync activity
+
        
 ```
 
