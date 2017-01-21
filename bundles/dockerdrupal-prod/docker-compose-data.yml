@@ -10,7 +10,6 @@ services:
     env_file: mysql.env
     hostname: db
     restart: always
-    container_name: mysql
     networks:
       - data
 
@@ -22,14 +21,12 @@ services:
     restart: always
     networks:
           - data
-    container_name: solr
     networks:
       - data
 
   redis:
     image : 4alldigital/drupalprod-redis
     hostname: redis
-    container_name: redis
     restart: always
     mem_limit: 1000000000
     memswap_limit: 2000000000

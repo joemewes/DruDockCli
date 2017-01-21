@@ -290,6 +290,7 @@ class BuildCommand extends ContainerAwareCommand {
 
 	private function installDrupal8($io, $install_helpers = FALSE) {
 
+    $application = $this->getApplication();
 		$message = 'Run Drupal Installation.... This may take a few minutes....';
 		$io->note($message);
 		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) chmod -R 777 ../vendor/ && docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
@@ -312,6 +313,7 @@ class BuildCommand extends ContainerAwareCommand {
 
 	private function installDrupal7($io, $install_helpers = FALSE) {
 
+    $application = $this->getApplication();
 		$message = 'Run Drupal Installation.... This may take a few minutes....';
 		$io->note($message);
 		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD7@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db -y';
