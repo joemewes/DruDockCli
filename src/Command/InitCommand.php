@@ -99,9 +99,9 @@ class InitCommand extends ContainerAwareCommand
     }
 
     // GET AND SET APP SOURCE.
-    $repo = $input->getOption('git');
+    $gitrepo = $input->getOption('git');
 
-    if (!$repo) {
+    if (!$gitrepo) {
       $io->title("SET APP GIT URL");
       $helper = $this->getHelper('question');
       $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
