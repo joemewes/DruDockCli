@@ -2,7 +2,6 @@
 
 namespace Docker\Drupal;
 
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,7 +11,6 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Application as ParentApplication;
 
 
@@ -29,7 +27,7 @@ class Application extends ParentApplication {
   /**
    * @var string
    */
-  const VERSION = '1.3.0-rc3';
+  const VERSION = '1.3.0-rc4';
 
   /**
    * @var string
@@ -215,27 +213,6 @@ class Application extends ParentApplication {
 
 
     return $commands;
-  }
-
-  /**
-   * @return string
-   */
-  public function checkDocker($io, $showoutput) {
-    $command = 'docker info';
-    $process = new Process($command);
-    $process->setTimeout(2);
-    $process->run();
-
-    if (!$process->isSuccessful()) {
-      if ($showoutput) {
-        $out = 'Can\'t connect to Docker. Is it running?';
-        $io->warning($out);
-      }
-      return FALSE;
-    }
-    else {
-      return TRUE;
-    }
   }
 
   /**

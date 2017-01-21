@@ -42,7 +42,8 @@ class BuildCommand extends ContainerAwareCommand {
 			return;
 		}
 
-		$application->checkDocker($io);
+    $command = 'docker info';
+    $application->runcommand($command, $io);
 
 		$fs = new Filesystem();
 
@@ -94,25 +95,6 @@ class BuildCommand extends ContainerAwareCommand {
 		$io->note($message);
 		shell_exec('python -mwebbrowser http://' . $apphost);
 
-	}
-
-	protected function runcommand($command, $io, $showoutput = TRUE) {
-
-		global $output;
-		$output = $io;
-
-		$process = new Process($command);
-		$process->setTimeout(3600);
-		$process->run(function ($type, $buffer) {
-			global $output;
-			if ($output) {
-				$output->info($buffer);
-			}
-		});
-
-		if (!$process->isSuccessful()) {
-			throw new ProcessFailedException($process);
-		}
 	}
 
 	private function setupD7($fs, $io, $appname) {
@@ -169,7 +151,7 @@ class BuildCommand extends ContainerAwareCommand {
 			$command = 'drush make ' . $app_dest . '/repository/project.make.yml ' . $app_dest . '/builds/' . $date . '/public';
 
 			$io->note('Download and configure Drupal 7.... This may take a few minutes....');
-			$this->runcommand($command, $io, TRUE);
+			$application->runcommand($command, $io);
 
 			$buildpath = 'builds/' . $date . '/public';
 			$fs->symlink($buildpath, $app_dest . '/www', TRUE);
@@ -212,17 +194,17 @@ class BuildCommand extends ContainerAwareCommand {
 
     if(isset($appsrc) && $appsrc == 'Git') {
       $command = 'git clone ' . $apprepo . ' app';
-      $this->runcommand($command, $io, TRUE);
+      $application->runcommand($command, $io);
       $io->info('Downloading app from repo.... This may take a few minutes....');
 
       $command = 'cd app && composer install';
-      $this->runcommand($command, $io, TRUE);
+      $application->runcommand($command, $io);
     }
 
 		if(!$fs->exists($app_dest)) {
       $command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
       $io->info('Download and configure Drupal 8.... This may take a few minutes....');
-      $this->runcommand($command, $io, TRUE);
+      $application->runcommand($command, $io);
     }
 
     if($fs->exists($app_dest)) {
@@ -311,19 +293,19 @@ class BuildCommand extends ContainerAwareCommand {
 		$message = 'Run Drupal Installation.... This may take a few minutes....';
 		$io->note($message);
 		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) chmod -R 777 ../vendor/ && docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
-		$this->runcommand($installcmd, $io, TRUE);
+		$application->runcommand($installcmd, $io);
 
 		if ($install_helpers) {
 			$message = 'Run APP composer update';
 			$io->note($message);
 			$composercmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) composer update';
-			$this->runcommand($composercmd, $io, TRUE);
+			$application->runcommand($composercmd, $io);
 			$message = 'Enable useful starter contrib modules';
 			$io->note($message);
 			$drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush en admin_toolbar ctools redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
-			$this->runcommand($drushcmd, $io, TRUE);
+			$application->runcommand($drushcmd, $io);
 			$drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush entity-updates -y';
-			$this->runcommand($drushcmd, $io, TRUE);
+			$application->runcommand($drushcmd, $io);
 		}
 
 	}
@@ -334,21 +316,7 @@ class BuildCommand extends ContainerAwareCommand {
 		$io->note($message);
 		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD7@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db -y';
 
-		$this->runcommand($installcmd, $io, TRUE);
-
-//      if($install_helpers) {
-//        $message = 'Run APP composer update';
-//        $io->note($message);
-//        $composercmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) composer update';
-//        $this->runcommand($composercmd, $io, TRUE);
-//        $message = 'Enable useful starter contrib modules';
-//        $io->note($message);
-//        $drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush en admin_toolbar ctools redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
-//        $this->runcommand($drushcmd, $io, TRUE);
-//        $drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush entity-updates -y';
-//        $this->runcommand($drushcmd, $io, TRUE);
-//      }
-
+		$application->runcommand($installcmd, $io);
 	}
 
   private function initDocker($io, $appname) {
@@ -357,7 +325,7 @@ class BuildCommand extends ContainerAwareCommand {
 
     if (exec('docker ps -q 2>&1', $exec_output)) {
       $dockerstopcmd = 'docker stop $(docker ps -q)';
-      $this->runcommand($dockerstopcmd, $io, TRUE);
+      $application->runcommand($dockerstopcmd, $io);
     }
 
     $message = 'Creating and configure DockerDrupal containers.... This may take a moment....';

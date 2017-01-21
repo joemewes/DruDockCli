@@ -14,7 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Process\Process;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
 use Symfony\Component\Yaml\Yaml;
@@ -49,7 +48,8 @@ class InitCommand extends ContainerAwareCommand
     $io = new DockerDrupalStyle($input, $output);
 
     // check Docker is running
-    $application->checkDocker($io, TRUE);
+    $command = 'docker info';
+    $application->runcommand($command, $io);
 
     $fs = new Filesystem();
     $date =  date('Y-m-d--H-i-s');
@@ -106,8 +106,6 @@ class InitCommand extends ContainerAwareCommand
       $helper = $this->getHelper('question');
       $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
       $gitrepo = $helper->ask($input, $output, $question);
-    }else{
-      $gitrepo = '';
     }
 
     // GET AND SET APP REQUIREMENTS.
