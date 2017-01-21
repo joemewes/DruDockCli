@@ -42,15 +42,30 @@ class BuildCommand extends ContainerAwareCommand {
 			return;
 		}
 
-		$application->checkDocker($io, TRUE);
+		$application->checkDocker($io);
 
 		$fs = new Filesystem();
 
 		$config = $application->getAppConfig($io);
 		if ($config) {
-			$appname = $config['appname'];
-			$type = $config['apptype'];
-			$apphost = $config['host'];
+		  if(!$config['appname']) {
+        $application->requireUpdate($io);
+      }else{
+        $appname = $config['appname'];
+      }
+
+      if(!$config['apptype']) {
+        $application->requireUpdate($io);
+      }else{
+        $type = $config['apptype'];
+      }
+
+      if(!$config['host']) {
+        $application->requireUpdate($io);
+      }else{
+        $apphost = $config['host'];
+      }
+
 		}
 
 		$system_appname = strtolower(str_replace(' ', '', $appname));

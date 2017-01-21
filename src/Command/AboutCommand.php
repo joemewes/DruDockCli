@@ -72,12 +72,12 @@ class AboutCommand extends Command {
 
     $io->simple('BUILD DRUPAL 8 APP');
     $io->info(' ');
-    $io->info('     dockerdrupal build:init my-new-app D8');
+    $io->info('     dockerdrupal env my-app --type D8 --reqs Basic --appsrc New --apphost docker.dev');
     $io->info(' ');
 
-    $io->simple('BUILD DRUPAL 7 APP');
+    $io->simple('BUILD DRUPAL 7 APP WITH FULL SELENIUM/BEHAT TEST SUITE');
     $io->info(' ');
-    $io->info('     dockerdrupal build:init my-new-app D7');
+    $io->info('     dockerdrupal env my-app --type D7 --reqs Basic --appsrc New --apphost docker.dev');
     $io->info(' ');
 
     $io->simple('AVAILABLE COMMANDS');

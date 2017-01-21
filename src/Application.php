@@ -12,6 +12,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Application as ParentApplication;
 
 
@@ -28,7 +29,7 @@ class Application extends ParentApplication {
   /**
    * @var string
    */
-  const VERSION = '1.2.9';
+  const VERSION = '1.3.0-rc1';
 
   /**
    * @var string
@@ -173,6 +174,7 @@ class Application extends ParentApplication {
     $commands[] = new Command\ExecCommand();
     $commands[] = new Command\AboutCommand();
     $commands[] = new Command\UpdateCommand();
+    $commands[] = new Command\UpdateConfigCommand();
 
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
@@ -508,4 +510,47 @@ class Application extends ParentApplication {
       $this->runcommand($command, $io, TRUE);
     }
   }
+
+  /**
+   * @return string
+   */
+  function getOs() {
+    $os = PHP_OS;
+    return $os;
+  }
+
+  function requireUpdate($io) {
+
+    $io->warning('This app .config.yml is out of date and missing data. Please run [dockerdrupal up:config].');
+    exit;
+  }
+
+  /**
+   * @return array
+   */
+  function getDDrequirements() {
+    $reqs = [
+      'appname',
+      'apptype',
+      'host',
+      'reqs',
+      'appsrc',
+      'repo',
+      ];
+    return $reqs;
+  }
+
+  /**
+   *
+   */
+
+  function setConfig($config){
+
+    $yaml = Yaml::dump($config);
+    file_put_contents('.config.yml', $yaml);
+
+  }
+
+
+
 }
