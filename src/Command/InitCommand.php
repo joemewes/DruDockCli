@@ -37,6 +37,7 @@ class InitCommand extends ContainerAwareCommand
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
       ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod]')
       ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
+      ->addOption('git', 'g', InputOption::VALUE_OPTIONAL, 'Git repository URL')
       ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]');
   }
 
@@ -97,7 +98,10 @@ class InitCommand extends ContainerAwareCommand
       $src = $helper->ask($input, $output, $question);
     }
 
-    if($src == 'Git') {
+    // GET AND SET APP SOURCE.
+    $repo = $input->getOption('git');
+
+    if (!$repo) {
       $io->title("SET APP GIT URL");
       $helper = $this->getHelper('question');
       $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
