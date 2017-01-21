@@ -1,0 +1,114 @@
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+
+# Logs and databases #
+######################
+*.log
+*.sql
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Thumbs.db
+._*
+*~
+
+# Vim generated files #
+######################
+*.un~
+*.swp
+
+# SASS #
+##########
+.sass-cache
+
+# Ignore CSS & Map File
+*.css
+*.map
+
+# Ignore the Node Modules folder
+/node_modules
+/bower_components
+
+# Ignore Eclipse IDE stuff
+.buildpath
+.project
+.settings/*
+.settings
+.htpasswd
+.DS_Store
+
+# Ignore Netbeans IDE stuff
+nbproject/*
+build.xml
+build/*
+nbbuild/*
+dist/*
+nbdist/*
+nbactions.xml
+nb-configuration.xml
+
+
+# local stuff
+
+mounts/conf/nginx/certs/*
+mounts/conf/nginx/ssl/*
+mounts/conf/nginx/sites-enabled/*
+!conf/nginx/sites-enabled/*.txt
+
+#mounts
+mounts/conf/solr/*
+!mounts/conf/solr/solr.xml
+!mounts/conf/solr/zoo.cfg
+
+mounts/conf/nginx/certs/*
+mounts/conf/nginx/ssl/*
+mounts/conf/nginx/sites-enabled/*
+!mounts/conf/nginx/sites-enabled/*.txt
+
+# site vhosts
+helpers/*
+
+# Example settings files #
+##########################
+settings/the.settings.local.php
+
+mounts/conf/nginx/certs/*
+mounts/conf/nginx/ssl/*
+#mounts/conf/nginx/sites-enabled/*
+#!mounts/conf/nginx/sites-enabled/*.txt
+
+# Behat cache
+mounts/conf/behat/cache/*
+
+#replace this with an exmaple file
+mounts/conf/behat/docker.aliases.drushrc.php
+
+# sublime temp files
+*.tmp
+
+# temp .sql dump in Volume mapped conf directory
+*.sql
+*.tar.gz
+
+npm/*
+
+.log
+logs/supervisord.log
+
+*.log
+*.override.yml
+
+*.log
+.idea/*

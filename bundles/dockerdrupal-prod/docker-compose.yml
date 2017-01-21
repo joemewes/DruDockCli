@@ -1,0 +1,77 @@
+version: "2"
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: ./dockerprod_hashoff/build/Dockerfile
+    volumes :
+      - app-data:/app:ro
+    hostname : app
+    read_only: true
+    networks:
+      - default
+      - proxy
+      - database
+
+  php:
+    image : 4alldigital/drupalprod-php7
+    volumes :
+      - app-data:/app:ro
+    hostname: php
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    restart: always
+    read_only: true
+    tmpfs:
+      - /run
+      - /run/php
+      - /tmp
+      - /var/run
+      - /var/log/
+      - /var/log/php7.0
+      - /var/log/supervisor
+    networks:
+      - default
+      - proxy
+      - database
+
+  nginx:
+    image : 4alldigital/drupalprod-nginx
+    volumes :
+      - ./mounts/sites-enabled:/etc/nginx/sites-enabled
+      - app-data:/app:ro
+    env_file: nginx.env
+    hostname: nginx
+    restart: always
+    read_only: true
+    tmpfs:
+      - /run
+      - /tmp
+      - /var/lib/nginx
+      - /var/log/nginx
+      - /var/log/supervisor
+      - /var/log/pagespeed
+      - /var/ngx_pagespeed_cache
+      - /etc/nginx/client_body_temp
+      - /etc/nginx/proxy_temp
+      - /etc/nginx/fastcgi_temp
+      - /etc/nginx/uwsgi_temp
+      - /etc/nginx/scgi_temp
+    networks:
+      - default
+      - proxy
+      - database
+
+volumes:
+  app-data:
+    driver: local
+
+networks:
+  default:
+  proxy:
+    external:
+      name: proxy_nginx
+  database:
+    external:
+      name: data_data
