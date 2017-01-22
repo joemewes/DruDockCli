@@ -491,6 +491,26 @@ class Application extends ParentApplication {
   /**
    * @return string
    */
+  public function checkDocker($io)
+  {
+    $command = 'docker info';
+    $process = new Process($command);
+    $process->setTimeout(2);
+    $process->run();
+    if (!$process->isSuccessful()) {
+      if($showoutput) {
+        $out = 'Can\'t connect to Docker. Is it running?';
+        $io->warning($out);
+      }
+      return false;
+    }else{
+      return true;
+    }
+  }
+
+  /**
+   * @return string
+   */
   function getOs() {
     $os = PHP_OS;
     return $os;

@@ -47,7 +47,7 @@ class AboutCommand extends Command {
     $io->info(' ');
     $io->section(' Docker status ');
 
-    if ($application->checkDocker($io, FALSE)) {
+    if ($application->checkDocker($io)) {
       $io->success(' Docker Running');
     }
     else {
