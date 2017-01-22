@@ -479,7 +479,7 @@ class Application extends ParentApplication {
     }
 
     location / {
-        try_files \$uri @drupal \$uri/index.html;
+        try_files \$uri @drupal;
     }
 
     # Don't allow direct access to PHP files in the vendor directory.
@@ -521,6 +521,13 @@ class Application extends ParentApplication {
 
     if($reqs == 'Prod'){
       file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
+
+      $nginxenv = "VIRTUAL_HOST=$apphost
+APPS_PATH=~/app
+VIRTUAL_NETWORK=nginx-proxy";
+
+      file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
+
     } else {
       file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
     }
