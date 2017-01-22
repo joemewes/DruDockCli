@@ -62,7 +62,10 @@ class NginxAddHostCommand extends Command {
     }
 
     $application->setNginxHost($io);
-    $application->addHostConfig($io, TRUE);
+
+    if($application->getOs() == 'Darwin') {
+      $application->addHostConfig($io, TRUE);
+    }
 
     if ($application->checkForAppContainers($appname, $io)) {
 

@@ -27,7 +27,7 @@ class Application extends ParentApplication {
   /**
    * @var string
    */
-  const VERSION = '1.3.0-rc10';
+  const VERSION = '1.3.0-rc11';
 
   /**
    * @var string
@@ -414,6 +414,7 @@ class Application extends ParentApplication {
     if ($config = $this->getAppConfig($io)) {
       $appname = $config['appname'];
       $apphost = $config['host'];
+      $reqs = $config['reqs'];
     }
 
     if (!isset($apphost)) {
@@ -425,35 +426,104 @@ class Application extends ParentApplication {
     listen   80;
     listen   [::]:80;
 
-    sendfile off;
-
-    client_max_body_size 20M;
-
     index index.php index.html;
     server_name $apphost;
     error_log  /var/log/nginx/app-error.log;
     access_log /var/log/nginx/app-access.log;
     root /app/www;
 
+    ## GENERIC
+    sendfile off;
+
+    client_max_body_size 20M;
+
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    # Very rarely should these ever be accessed outside of your lan
+    location ~* \.(txt|log)$ {
+        allow 192.168.0.0/16;
+        deny all;
+    }
+
+    location ~ \..*/.*\.php$ {
+        return 403;
+    }
+
+    location ~ ^/sites/.*/private/ {
+        return 403;
+    }
+
+    # Allow \"Well-Known URIs\" as per RFC 5785
+    location ~* ^/.well-known/ {
+        allow all;
+    }
+
+    # Block access to \"hidden\" files and directories whose names begin with a
+    # period. This includes directories used by version control systems such
+    # as Subversion or Git to store control files.
+    location ~ (^|/)\. {
+        return 403;
+    }
+
+    location @drupal {
+        rewrite ^/(.*)$ /index.php?q=$1 last;
+    }
+
     location / {
-        try_files \$uri \$uri/ /index.php?\$args;
+        try_files \$uri @drupal \$uri/index.html;
+    }
+
+    # Don't allow direct access to PHP files in the vendor directory.
+    location ~ /vendor/.*\.php$ {
+        deny all;
+        return 404;
     }
 
     location ~ \.php$ {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_pass php:9000;
         fastcgi_index index.php;
-        include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         fastcgi_param PATH_INFO \$fastcgi_path_info;
+        fastcgi_param REMOTE_ADDR \$http_x_real_ip;
+        include fastcgi_params;
         fastcgi_read_timeout 300;
         fastcgi_cache  off;
         fastcgi_intercept_errors on;
+        fastcgi_hide_header 'X-Drupal-Cache';
+        fastcgi_hide_header 'X-Generator';
+
+    }
+
+    location @rewrite {
+        rewrite ^/(.*)$ /index.php?q=$1;
+    }
+
+    # Fighting with Styles? This little gem is amazing.
+    location ~ ^/sites/.*/files/styles/ { # For Drupal >= 7
+        try_files \$uri @rewrite;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
     }
 }";
 
-    file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
-
+    if($reqs == 'Prod'){
+      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
+    } else {
+      file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
+    }
   }
 
   /**
