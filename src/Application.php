@@ -27,7 +27,7 @@ class Application extends ParentApplication {
   /**
    * @var string
    */
-  const VERSION = '1.3.0-rc6';
+  const VERSION = '1.3.0-rc7';
 
   /**
    * @var string
