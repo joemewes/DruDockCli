@@ -190,6 +190,7 @@ class BuildCommand extends ContainerAwareCommand {
       $appname = $config['appname'];
       $appsrc = $config['appsrc'];
       $apprepo = $config['repo'];
+      $reqs = $config['reqs'];
     }
 
     if(isset($appsrc) && $appsrc == 'Git') {
@@ -214,15 +215,22 @@ class BuildCommand extends ContainerAwareCommand {
 				$fs->mkdir($app_dest . '/web/sites/default/files');
 				$fs->mkdir($app_dest . '/web/themes/custom');
 				$fs->mkdir($app_dest . '/web/modules/custom');
+        $fs->mkdir($app_dest . '/shared/files');
 
 			} catch (IOExceptionInterface $e) {
 				//echo 'An error occurred while creating your directory at '.$e->getPath();
 				$io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
 			}
 
+			if($reqs == 'Prod'){
+			  $files_dir = 'd8prod';
+      }else{
+        $files_dir = 'd8';
+      }
+
 			// Move DockerDrupal Drupal 8 config files into install
-			if (is_dir($utilRoot . '/bundles/d8') && is_dir($app_dest)) {
-				$d8files = $utilRoot . '/bundles/d8';
+			if (is_dir($utilRoot . '/bundles/' . $files_dir) && is_dir($app_dest)) {
+				$d8files = $utilRoot . '/bundles/' . $files_dir;
 
 				if(!$fs->exists($app_dest . '/composer.json'))
 				  $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
@@ -291,23 +299,41 @@ class BuildCommand extends ContainerAwareCommand {
 	private function installDrupal8($io, $install_helpers = FALSE) {
 
     $application = $this->getApplication();
+    if($config = $application->getAppConfig($io)) {
+      $reqs = $config['reqs'];
+      $appname = $config['appname'];
+    }
 		$message = 'Run Drupal Installation.... This may take a few minutes....';
 		$io->note($message);
-		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) chmod -R 777 ../vendor/ && docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
-		$application->runcommand($installcmd, $io);
+    if($application->checkForAppContainers($appname, $io)) {
 
-		if ($install_helpers) {
-			$message = 'Run APP composer update';
-			$io->note($message);
-			$composercmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) composer update';
-			$application->runcommand($composercmd, $io);
-			$message = 'Enable useful starter contrib modules';
-			$io->note($message);
-			$drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush en admin_toolbar ctools redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
-			$application->runcommand($drushcmd, $io);
-			$drushcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush entity-updates -y';
-			$application->runcommand($drushcmd, $io);
-		}
+      if ($reqs == 'Basic' || $reqs == 'Full') {
+        $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/ && docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
+      }
+      if ($reqs == 'Prod') {
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
+      }
+      $application->runcommand($command, $io);
+
+      if ($install_helpers) {
+
+        $message = 'Run APP composer update';
+        $io->note($message);
+
+        $command = $application->getComposePath($appname, $io) . 'exec -T php composer update';
+        $application->runcommand($command, $io);
+
+        $message = 'Enable useful starter contrib modules';
+        $io->note($message);
+
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush en admin_toolbar ctools redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
+        $application->runcommand($command, $io);
+
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush entity-updates -y';
+        $application->runcommand($command, $io);
+
+      }
+    }
 
 	}
 

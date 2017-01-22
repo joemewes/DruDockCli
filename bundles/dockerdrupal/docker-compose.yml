@@ -26,6 +26,7 @@ services:
      - "8022:22"
     volumes :
       - ./config/20-xdebug.ini:/etc/php/7.0/fpm/conf.d/20-xdebug.ini
+      - ../app/shared/files:/app/www/sites/default/files:rw
     volumes_from:
         - app:rw
     environment:

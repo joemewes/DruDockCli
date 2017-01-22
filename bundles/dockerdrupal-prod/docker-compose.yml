@@ -17,6 +17,7 @@ services:
     image : 4alldigital/drupalprod-php7
     volumes :
       - app-data:/app:ro
+      - ../app/shared/files:/app/www/sites/default/files:rw
     hostname: php
     dns:
       - 8.8.8.8

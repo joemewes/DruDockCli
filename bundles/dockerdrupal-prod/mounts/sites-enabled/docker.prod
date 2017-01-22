@@ -4,8 +4,8 @@ server {
 
     index index.php index.html;
     server_name docker.prod;
-    error_log  /var/log/nginx/app.error.log;
-    access_log /var/log/nginx/app.access.log;
+    error_log  /var/log/nginx/app-error.log;
+    access_log /var/log/nginx/app-access.log;
     root /app/www;
 
     ## GENERIC
