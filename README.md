@@ -11,6 +11,9 @@
 
   START by installing & launching the Docker for Mac Application 
    - https://download.docker.com/mac/stable/Docker.dmg
+   
+### Minimum Requirements : 
+- Host OS must have PHP ^5.6
 
 ### Questions?
   Ping me on [Twitter](http://twitter.com/@4alldigital)
@@ -24,7 +27,7 @@
    
 ### Install via Launcher (.phar)
 ```
-	curl -LO https://4alldigital.io/sites/default/libraries/dockerdrupal.phar
+	curl -kLO https://4alldigital.io/sites/default/libraries/dockerdrupal.phar
 	mv dockerdrupal.phar /usr/local/bin/dockerdrupal
 	chmod +x /usr/local/bin/dockerdrupal
 
