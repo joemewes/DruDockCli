@@ -39,7 +39,7 @@ $config['system.performance']['js']['preprocess'] = FALSE;
 /**
  * Uncomment after enabling REDIS
  */
-//  $settings['container_yamls'][] = 'modules/contrib/redis/example.services.yml';
+//  $settings['container_yamls'][] = 'modules/contrib/redis/redis.services.yml';
 //  $settings['redis.connection']['interface'] = 'PhpRedis';
 //  $settings['redis.connection']['host'] = 'redis';
 //  $settings['cache']['default'] = 'cache.backend.redis';
