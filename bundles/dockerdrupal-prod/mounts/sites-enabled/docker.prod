@@ -55,7 +55,7 @@ server {
     }
 
     location / {
-        try_files $uri @drupal $uri/index.html;
+        try_files $uri @drupal;
     }
 
     # Don't allow direct access to PHP files in the vendor directory.
