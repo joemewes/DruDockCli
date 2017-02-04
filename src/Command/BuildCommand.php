@@ -244,14 +244,14 @@ class BuildCommand extends ContainerAwareCommand {
         if(!$fs->exists($app_dest . '/web/robots.txt'))
 				  $fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
 
-        if(!$fs->exists($app_dest . '/web/sites/default/drushrc.php'))
-				  $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
-
         if(!$fs->exists($app_dest . '/web/sites/default/settings.php'))
 				  $fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
 
         if(!$fs->exists($app_dest . '/web/sites/default/settings.local.php'))
 				  $fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
+
+        if(!$fs->exists($app_dest . '/web/sites/drushrc.php'))
+          $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/drushrc.php', TRUE);
 
 			}
 
