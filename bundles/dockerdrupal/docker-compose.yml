@@ -46,6 +46,7 @@ services:
       - "80:80"
     volumes :
       - ./sites-enabled:/etc/nginx/sites-enabled
+      - ../app/www/sites/default/files:/app/www/sites/default/files
     volumes_from:
       - app:rw
     hostname: nginx
