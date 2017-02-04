@@ -77,7 +77,8 @@ server {
         fastcgi_intercept_errors on;
         fastcgi_hide_header 'X-Drupal-Cache';
         fastcgi_hide_header 'X-Generator';
-
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
     }
 
     location @rewrite {
