@@ -77,19 +77,19 @@ class BuildCommand extends ContainerAwareCommand {
 		if (isset($type) && $type == 'DEFAULT') {
 			$this->setUpExampleApp($fs, $io, $system_appname);
 			$this->initDocker($io, $system_appname);
-			$message = 'Opening Default APP at http://docker.dev';
+			$message = 'Opening Default APP at http://' . $apphost;
 		}
 		if (isset($type) && $type == 'D7') {
 			$this->setupD7($fs, $io, $system_appname);
 			$this->initDocker($io, $system_appname);
 			$this->installDrupal7($io);
-			$message = 'Opening Drupal 7 base Installation at http://docker.dev';
+			$message = 'Opening Drupal 7 base Installation at http://' . $apphost;
 		}
 		if (isset($type) && $type == 'D8') {
 			$this->setupD8($fs, $io, $system_appname);
 			$this->initDocker($io, $system_appname);
 			$this->installDrupal8($io);
-			$message = 'Opening Drupal 8 base Installation at http://docker.dev';
+			$message = 'Opening Drupal 8 base Installation at http://' . $apphost;
 		}
 
 		$io->note($message);
@@ -361,7 +361,9 @@ class BuildCommand extends ContainerAwareCommand {
 
     if($config = $application->getAppConfig($io)) {
       $appreqs = $config['reqs'];
-      $build = end($config['builds']);
+      if(is_array($config['builds'])){
+        $build = end($config['builds']);
+      }
     }
 
     if(isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
