@@ -38,12 +38,12 @@ server {
         return 403;
     }
 
-    # Allow \"Well-Known URIs\" as per RFC 5785
+    # Allow "Well-Known URIs" as per RFC 5785
     location ~* ^/.well-known/ {
         allow all;
     }
 
-    # Block access to \"hidden\" files and directories whose names begin with a
+    # Block access to "hidden" files and directories whose names begin with a
     # period. This includes directories used by version control systems such
     # as Subversion or Git to store control files.
     location ~ (^|/)\. {
@@ -55,7 +55,7 @@ server {
     }
 
     location / {
-        try_files \$uri @drupal;
+        try_files $uri @drupal $uri/index.html;
     }
 
     # Don't allow direct access to PHP files in the vendor directory.
@@ -68,11 +68,11 @@ server {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_pass php:9000;
         fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        fastcgi_param PATH_INFO \$fastcgi_path_info;
-        fastcgi_param REMOTE_ADDR \$http_x_real_ip;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_param REMOTE_ADDR $http_x_real_ip;
         fastcgi_buffers 16 16k;
-        fastcgi_buffer_size 32k;
+				fastcgi_buffer_size 32k;
         include fastcgi_params;
         fastcgi_read_timeout 300;
         fastcgi_cache  off;
@@ -88,7 +88,7 @@ server {
 
     # Fighting with Styles? This little gem is amazing.
     location ~ ^/sites/.*/files/styles/ { # For Drupal >= 7
-        try_files \$uri @rewrite;
+        try_files $uri @rewrite;
     }
 
     location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
