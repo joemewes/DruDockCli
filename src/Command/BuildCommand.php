@@ -141,7 +141,7 @@ class BuildCommand extends ContainerAwareCommand {
 				$fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
 
 				if(isset($reqs) && $reqs == 'Full') {
-          $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/repository/behat/');
+          $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
         }
 			}
 

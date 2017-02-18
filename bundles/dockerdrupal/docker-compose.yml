@@ -75,7 +75,7 @@ services:
     image: 4alldigital/drupaldev-behat:latest
     volumes:
       - ./config/behat/alias.php:/root/.drush/docker.aliases.drushrc.php
-      - ../app/repository/behat/:/root/behat/
+      - ../app/behat/:/root/behat/
       - ../tests/screenshots/:/tmp/screenshots
     volumes_from:
         - app:rw
