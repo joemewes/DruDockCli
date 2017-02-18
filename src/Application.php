@@ -272,21 +272,22 @@ class Application extends ParentApplication {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
-    if($config = $this->getAppConfig($io)) {
-      if(isset($config['reqs'])){
+    if ($config = $this->getAppConfig($io)) {
+      if (isset($config['reqs'])) {
         $reqs = $config['reqs'];
       }
-      if(isset($config['builds'])) {
+      if (isset($config['builds'])) {
         $latestbuild = $config['builds'];
       }
     }
 
     $fs = new Filesystem();
 
-    if(isset($reqs) && $reqs == 'Prod') {
+    if (isset($reqs) && $reqs == 'Prod') {
       $projectname = $system_appname . '--' . end($latestbuild);
       $project = '--project-name=' . $projectname;
-    } elseif (isset($reqs) && $reqs == 'Stage') {
+    }
+    elseif (isset($reqs) && $reqs == 'Stage') {
       $projectname = $system_appname . '--' . end($latestbuild);
       $project = '--project-name=' . $projectname;
     }
@@ -315,21 +316,21 @@ class Application extends ParentApplication {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
-    if($config = $this->getAppConfig($io)) {
+    if ($config = $this->getAppConfig($io)) {
       $reqs = $config['reqs'];
       $appreqs = $config['reqs'];
-      if(is_array($config['builds'])){
+      if (is_array($config['builds'])) {
         $build = end($config['builds']);
       }
     }
 
     $fs = new Filesystem();
 
-    if(isset($reqs) && $reqs == 'Prod') {
+    if (isset($reqs) && $reqs == 'Prod') {
       $project = '--project-name=data';
     }
-    elseif (isset($reqs) && $reqs == 'Stage'){
-      if(!isset($build)){
+    elseif (isset($reqs) && $reqs == 'Stage') {
+      if (!isset($build)) {
         $io->error('Build :: ' . $build . ' missing.');
         return;
       }
@@ -357,15 +358,16 @@ class Application extends ParentApplication {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
-    if($config = $this->getAppConfig($io)) {
+    if ($config = $this->getAppConfig($io)) {
       $reqs = $config['reqs'];
     }
 
     $fs = new Filesystem();
 
-    if(isset($reqs) && $reqs == 'Prod') {
+    if (isset($reqs) && $reqs == 'Prod') {
       $project = '--project-name=proxy';
-    }else {
+    }
+    else {
       $io->error("docker-compose-data.yml : Not Found");
       exit;
     }
@@ -445,7 +447,7 @@ class Application extends ParentApplication {
     listen   [::]:80;
 
     index index.php index.html;
-    server_name docker.dev;
+    server_name ' . $apphost . ';
     error_log  /var/log/nginx/app-error.log;
     access_log /var/log/nginx/app-access.log;
     root /app/www;
@@ -539,7 +541,7 @@ class Application extends ParentApplication {
     }
 }';
 
-    if($reqs == 'Prod'){
+    if ($reqs == 'Prod') {
       file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
 
       $nginxenv = "VIRTUAL_HOST=$apphost
@@ -548,7 +550,8 @@ VIRTUAL_NETWORK=nginx-proxy";
 
       file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
 
-    } elseif ($reqs == 'Stage') {
+    }
+    elseif ($reqs == 'Stage') {
       file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
 
       $nginxenv = "VIRTUAL_HOST=$apphost
@@ -566,7 +569,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    * @param $application
    * @param $io
    */
-  public function addHostConfig($io, $update) {
+  public function addHostConfig($newhost, $io, $update) {
     // Add initial entry to hosts file.
     // OSX @TODO update as command for all systems and OS's.
     $utilRoot = $this->getUtilRoot();
@@ -583,42 +586,45 @@ VIRTUAL_NETWORK=nginx-proxy";
     }
 
     $hosts_file = '/etc/hosts';
+    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
+    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
+    $hosts_file_contents = file_get_contents($hosts_file);
 
-    $exec = "cat " . $hosts_file . " | grep '" . $ip . " " . $apphost . "'";
-    if (!exec($exec)) {
-      $command = sprintf("echo '%s %s' | sudo tee -a %s >/dev/null", $ip, $apphost, $hosts_file);
+    if (!strpos($hosts_file_contents, $app_host_config)) {
+      // Add new.
+      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
       $this->runcommand($command, $io, TRUE);
+    }
+    else {
+      // Replace existing.
+      $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
+      $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
+      exec($command);
     }
 
     if (!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
       $command = 'sudo cp -R ' . $utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist /Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist';
       $this->runcommand($command, $io, TRUE);
     }
-
-    // Update nginx.env
-//    $nginxconf = "VIRTUAL_HOST=" . $apphost . " \nAPPS_PATH=~/app \nVIRTUAL_NETWORK=nginx-proxy";
-//    $env_file = './' . $system_appname . '/nginx.env';
-//    $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $nginxconf, $env_file);
-//    $this->runcommand($command, $io, TRUE);
   }
 
   /**
    * @return string
    */
-  public function checkDocker($io)
-  {
+  public function checkDocker($io) {
     $command = 'docker info';
     $process = new Process($command);
     $process->setTimeout(2);
     $process->run();
     if (!$process->isSuccessful()) {
-      if($showoutput) {
+      if ($showoutput) {
         $out = 'Can\'t connect to Docker. Is it running?';
         $io->warning($out);
       }
-      return false;
-    }else{
-      return true;
+      return FALSE;
+    }
+    else {
+      return TRUE;
     }
   }
 
@@ -647,7 +653,7 @@ VIRTUAL_NETWORK=nginx-proxy";
       'reqs',
       'appsrc',
       'repo',
-      ];
+    ];
     return $reqs;
   }
 
@@ -655,13 +661,12 @@ VIRTUAL_NETWORK=nginx-proxy";
    *
    */
 
-  function setConfig($config){
+  function setConfig($config) {
 
     $yaml = Yaml::dump($config);
     file_put_contents('.config.yml', $yaml);
 
   }
-
 
 
 }

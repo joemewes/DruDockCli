@@ -72,7 +72,7 @@ class ExecCommand extends Command {
     }
 
     if ($application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . 'exec ' . $service . ' ' . $cmd . ' 2>&1';
+      $command = $application->getComposePath($appname, $io) . 'exec -T ' . $service . ' ' . $cmd . ' 2>&1';
       $application->runcommand($command, $io);
     }
   }

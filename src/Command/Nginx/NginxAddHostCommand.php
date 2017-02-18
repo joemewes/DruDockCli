@@ -11,10 +11,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DockerDrupalStyle;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Yaml\Yaml;
-
 
 /**
  * Class NginxAddHostCommand
@@ -31,8 +29,8 @@ class NginxAddHostCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
 
+    $io = new DockerDrupalStyle($input, $output);
     $io->section("Nginx ::: add host");
 
     if ($config = $application->getAppConfig($io)) {
@@ -46,9 +44,12 @@ class NginxAddHostCommand extends Command {
 
     $currenthost = $apphost;
     $helper = $this->getHelper('question');
-
     $question = new Question('Please enter new hostname : [' . $currenthost . '] ', $currenthost);
     $newhost = $helper->ask($input, $output, $question);
+
+    if ($application->getOs() == 'Darwin') {
+      $application->addHostConfig($newhost, $io, TRUE);
+    }
 
     if (file_exists('.config.yml')) {
       $config = Yaml::parse(file_get_contents('.config.yml'));
@@ -63,15 +64,9 @@ class NginxAddHostCommand extends Command {
 
     $application->setNginxHost($io);
 
-    if($application->getOs() == 'Darwin') {
-      $application->addHostConfig($io, TRUE);
-    }
-
     if ($application->checkForAppContainers($appname, $io)) {
-
       $command = $application->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
       $application->runcommand($command, $io);
     }
   }
-
 }
