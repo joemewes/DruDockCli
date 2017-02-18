@@ -285,7 +285,7 @@ class BuildCommand extends ContainerAwareCommand {
         }
 
         if (!$fs->exists($app_dest . '/web/sites/drushrc.php')) {
-          $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/drushrc.php', TRUE);
+          $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
         }
 
         if (isset($reqs) && $reqs == 'Full') {

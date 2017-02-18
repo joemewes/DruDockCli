@@ -62,6 +62,16 @@ class NginxAddHostCommand extends Command {
       exit;
     }
 
+    if (file_exists('./app/www/sites/default/drushrc.php')) {
+      $drushrc = file_get_contents('./app/www/sites/default/drushrc.php');
+      $newhosts = explode(' ', $newhost);
+      $newhost = $newhosts[0];
+      $currenthosts = explode(' ', $currenthost);
+      $host = $currenthosts[0];
+      $drushrc = str_replace($host, $newhost, $drushrc);
+      file_put_contents('./app/www/sites/default/drushrc.php', $drushrc);
+    }
+
     $application->setNginxHost($io);
 
     if ($application->checkForAppContainers($appname, $io)) {
