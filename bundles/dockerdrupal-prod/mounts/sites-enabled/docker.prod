@@ -72,7 +72,7 @@ server {
         fastcgi_param PATH_INFO $fastcgi_path_info;
         fastcgi_param REMOTE_ADDR $http_x_real_ip;
         fastcgi_buffers 16 16k;
-				fastcgi_buffer_size 32k;
+        fastcgi_buffer_size 32k;
         include fastcgi_params;
         fastcgi_read_timeout 300;
         fastcgi_cache  off;

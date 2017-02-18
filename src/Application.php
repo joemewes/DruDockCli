@@ -415,7 +415,9 @@ class Application extends ParentApplication {
       }
     });
 
-    if (!$process->isSuccessful()) {
+    // Hack to ignore docker-compose exec exit code when using Tty
+    // https://github.com/docker/compose/issues/3379.
+    if (!$process->isSuccessful() && ($process->getExitCode() != 129)) {
       throw new ProcessFailedException($process);
     }
 
@@ -512,7 +514,7 @@ class Application extends ParentApplication {
         fastcgi_param PATH_INFO $fastcgi_path_info;
         fastcgi_param REMOTE_ADDR $http_x_real_ip;
         fastcgi_buffers 16 16k;
-				fastcgi_buffer_size 32k;
+        fastcgi_buffer_size 32k;
         include fastcgi_params;
         fastcgi_read_timeout 300;
         fastcgi_cache  off;
@@ -538,7 +540,7 @@ class Application extends ParentApplication {
 }';
 
     if($reqs == 'Prod'){
-      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, stripslashes($nginxconfig));
+      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
 
       $nginxenv = "VIRTUAL_HOST=$apphost
 APPS_PATH=~/app
@@ -547,7 +549,7 @@ VIRTUAL_NETWORK=nginx-proxy";
       file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
 
     } elseif ($reqs == 'Stage') {
-      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, stripslashes($nginxconfig));
+      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
 
       $nginxenv = "VIRTUAL_HOST=$apphost
 APPS_PATH=~/app
@@ -556,7 +558,7 @@ VIRTUAL_NETWORK=nginx-proxy";
       file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
     }
     else {
-      file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', stripslashes($nginxconfig));
+      file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
     }
   }
 

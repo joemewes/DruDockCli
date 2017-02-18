@@ -36,8 +36,7 @@ class BehatMonitorCommand extends Command {
 
     if ($application->checkForAppContainers($appname, $io)) {
 
-      $io->section('EXEC behat ' . $cmd);
-
+      $io->section("BEHAT ::: VCN Monitor");
       $command = 'open vnc://:secret@localhost:$(docker inspect --format \'{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).HostPort }}\' $(docker ps --format {{.Names}} | grep firefox))';
       $application->runcommand($command, $io);
     }

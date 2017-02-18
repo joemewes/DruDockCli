@@ -277,6 +277,12 @@ class BuildCommand extends ContainerAwareCommand {
         if(!$fs->exists($app_dest . '/web/sites/drushrc.php'))
           $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/drushrc.php', TRUE);
 
+        if(isset($reqs) && $reqs == 'Full') {
+          $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
+          $command = $application->getComposePath($appname, $io) . 'exec -T behat composer update';
+          $application->runcommand($command, $io);
+        }
+
 			}
 
 			// Set perms
@@ -290,6 +296,8 @@ class BuildCommand extends ContainerAwareCommand {
 			$local_settings = $app_dest . '/web/sites/default/settings.local.php';
 			$process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
 			$process->run();
+
+      $fs->symlink('./web', $app_dest . '/www', TRUE);
 
 		}
 	}

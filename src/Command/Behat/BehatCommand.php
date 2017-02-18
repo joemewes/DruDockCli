@@ -75,10 +75,15 @@ class BehatCommand extends Command {
       }
     }
 
-    $io->section('EXEC behat ' . $cmd);
-    $command = 'docker exec -it $(docker ps --format {{.Names}} | grep behat) sh -c "behat ' . $cmd . '"';
-    $application->runcommand($command, $io);
+    $io->section("BEHAT :::" . $cmd);
 
+    if ($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
+    }
+
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'exec behat behat ' . $cmd;
+      $application->runcommand($command, $io);
+    }
   }
-
 }

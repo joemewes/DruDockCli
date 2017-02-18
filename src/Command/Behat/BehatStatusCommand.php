@@ -35,20 +35,17 @@ class BehatStatusCommand extends Command {
       $type = $config['apptype'];
     }
 
-    if (isset($type) && $type == 'D8') {
-      // D8 behat sites not yet supporter
-      $io->info('Drupal 8 behat test suite not currently supported. ');
-      return;
-    } elseif (isset($type) && $type == 'D7') {
-      $cmd = '--config /root/behat/behat.yml --suite global_features --profile local --tags about';
-    }	else {
-      $io->error('You\'re not currently in an Drupal APP directory');
-      return;
-    };
+    $cmd = '--config /root/behat/behat.yml --suite global_features --profile local --tags about';
+    $io->section("BEHAT ::: Example :: " . $cmd);
 
-    $io->section('EXEC behat ' . $cmd);
-    $command = 'docker exec -it $(docker ps --format {{.Names}} | grep behat) sh -c "behat ' . $cmd . '"';
-    $application->runcommand($command, $io);
+    if ($config = $application->getAppConfig($io)) {
+      $appname = $config['appname'];
+    }
+
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'exec behat behat ' . $cmd;
+      $application->runcommand($command, $io);
+    }
 
   }
 }
