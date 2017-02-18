@@ -36,7 +36,17 @@ class StartCommand extends Command {
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
-      $appreqs = $config['reqs'];
+      //$appreqs = $config['reqs'];
+    }
+
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . "ps | awk '{print $3}' | grep 'Up' | wc -l";
+      if(exec($command) > 0){
+        $io->info(' ');
+        $io->section("You have running containers for your current App.");
+        $io->info("Try one of the following is you are experiencing issues :: \n\n[dockerdrupal docker:stop]\n\n[dockerdrupal docker:restart]\n\n[dockerdrupal up:ct]\n");
+        return;
+      }
     }
 
     $io->section("APP ::: Starting " . $appname . " containers");
@@ -56,7 +66,6 @@ class StartCommand extends Command {
         $command = $application->getComposePath($appname, $io) . ' start 2>&1';
         $application->runcommand($command, $io);
       }
-
     }
     else {
       if ($application->checkForAppContainers($appname, $io)) {
