@@ -23,89 +23,92 @@ use Docker\Drupal\Style\DockerDrupalStyle;
  * @package Docker\Drupal\ContainerAwareCommand
  */
 class BuildCommand extends ContainerAwareCommand {
-	protected function configure() {
-		$this
-			->setName('build:init')
-			->setAliases(['init'])
-			->setDescription('Fetch and build Drupal apps')
-			->setHelp('This command will fetch and build Drupal apps')
-			->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]');
-	}
+  protected function configure() {
+    $this
+      ->setName('build:init')
+      ->setAliases(['init'])
+      ->setDescription('Fetch and build Drupal apps')
+      ->setHelp('This command will fetch and build Drupal apps')
+      ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]');
+  }
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$application = $this->getApplication();
-		$io = new DockerDrupalStyle($input, $output);
+  protected function execute(InputInterface $input, OutputInterface $output) {
+    $application = $this->getApplication();
+    $io = new DockerDrupalStyle($input, $output);
 
-		// check if this folder is has APP config
-		if (!file_exists('.config.yml')) {
-			$io->error('You\'re not currently in an APP directory');
-			return;
-		}
+    // check if this folder is has APP config
+    if (!file_exists('.config.yml')) {
+      $io->error('You\'re not currently in an APP directory');
+      return;
+    }
 
-		$fs = new Filesystem();
+    $fs = new Filesystem();
 
-		$config = $application->getAppConfig($io);
-		if ($config) {
-		  if(!$config['appname']) {
+    $config = $application->getAppConfig($io);
+    if ($config) {
+      if (!$config['appname']) {
         $application->requireUpdate($io);
-      }else{
+      }
+      else {
         $appname = $config['appname'];
       }
 
-      if(!$config['apptype']) {
+      if (!$config['apptype']) {
         $application->requireUpdate($io);
-      }else{
+      }
+      else {
         $type = $config['apptype'];
       }
 
-      if(!$config['host']) {
+      if (!$config['host']) {
         $application->requireUpdate($io);
-      }else{
+      }
+      else {
         $apphost = $config['host'];
       }
 
-		}
+    }
 
-		$system_appname = strtolower(str_replace(' ', '', $appname));
+    $system_appname = strtolower(str_replace(' ', '', $appname));
 
     $application->setNginxHost($io);
 
-    if($application->getOs() == 'Darwin') {
+    if ($application->getOs() == 'Darwin') {
       $application->addHostConfig($io, TRUE);
     }
 
-		/**
-		 * Install specific APP type
-		 */
-		if (isset($type) && $type == 'DEFAULT') {
-			$this->setUpExampleApp($fs, $io, $system_appname);
-			$this->initDocker($io, $system_appname);
-			$message = 'Opening Default APP at http://' . $apphost;
-		}
-		if (isset($type) && $type == 'D7') {
-			$this->setupD7($fs, $io, $system_appname, $input, $output);
-			$this->initDocker($io, $system_appname);
-			$this->installDrupal7($io);
-			$message = 'Opening Drupal 7 base Installation at http://' . $apphost;
-		}
-		if (isset($type) && $type == 'D8') {
-			$this->setupD8($fs, $io, $system_appname, $input, $output);
-			$this->initDocker($io, $system_appname);
-			$this->installDrupal8($io);
-			$message = 'Opening Drupal 8 base Installation at http://' . $apphost;
-		}
+    /**
+     * Install specific APP type
+     */
+    if (isset($type) && $type == 'DEFAULT') {
+      $this->setUpExampleApp($fs, $io, $system_appname);
+      $this->initDocker($io, $system_appname);
+      $message = 'Opening Default APP at http://' . $apphost;
+    }
+    if (isset($type) && $type == 'D7') {
+      $this->setupD7($fs, $io, $system_appname, $input, $output);
+      $this->initDocker($io, $system_appname);
+      $this->installDrupal7($io);
+      $message = 'Opening Drupal 7 base Installation at http://' . $apphost;
+    }
+    if (isset($type) && $type == 'D8') {
+      $this->setupD8($fs, $io, $system_appname, $input, $output);
+      $this->initDocker($io, $system_appname);
+      $this->installDrupal8($io);
+      $message = 'Opening Drupal 8 base Installation at http://' . $apphost;
+    }
 
-		$io->note($message);
-		shell_exec('python -mwebbrowser http://' . $apphost);
+    $io->note($message);
+    shell_exec('python -mwebbrowser http://' . $apphost);
 
-	}
+  }
 
-	private function setupD7($fs, $io, $appname, $input, $output) {
-		$app_dest = './app';
-		$date = date('Y-m-d--H-i-s');
+  private function setupD7($fs, $io, $appname, $input, $output) {
+    $app_dest = './app';
+    $date = date('Y-m-d--H-i-s');
 
-		$application = $this->getApplication();
-		$utilRoot = $application->getUtilRoot();
+    $application = $this->getApplication();
+    $utilRoot = $application->getUtilRoot();
 
     $config = $application->getAppConfig($io);
     if ($config) {
@@ -115,7 +118,7 @@ class BuildCommand extends ContainerAwareCommand {
       $reqs = $config['reqs'];
     }
 
-    if(isset($appsrc) && $appsrc == 'Git') {
+    if (isset($appsrc) && $appsrc == 'Git') {
       $command = 'git clone ' . $apprepo . ' app';
       $application->runcommand($command, $io);
       $io->info('Downloading app from repo.... This may take a few minutes....');
@@ -128,79 +131,79 @@ class BuildCommand extends ContainerAwareCommand {
       $fs->symlink($root, $app_dest . '/www', TRUE);
     }
 
-		if(!$fs->exists($app_dest)) {
+    if (!$fs->exists($app_dest)) {
 
-			try {
-				$fs->mkdir($app_dest);
+      try {
+        $fs->mkdir($app_dest);
 
-				$fs->mkdir($app_dest . '/repository/libraries/custom');
-				$fs->mkdir($app_dest . '/repository/modules/custom');
-				$fs->mkdir($app_dest . '/repository/scripts');
-				$fs->mkdir($app_dest . '/repository/themes/custom');
+        $fs->mkdir($app_dest . '/repository/libraries/custom');
+        $fs->mkdir($app_dest . '/repository/modules/custom');
+        $fs->mkdir($app_dest . '/repository/scripts');
+        $fs->mkdir($app_dest . '/repository/themes/custom');
 
-				$fs->mkdir($app_dest . '/shared/files');
-				$fs->mkdir($app_dest . '/builds');
+        $fs->mkdir($app_dest . '/shared/files');
+        $fs->mkdir($app_dest . '/builds');
 
-			} catch (IOExceptionInterface $e) {
-				//echo 'An error occurred while creating your directory at '.$e->getPath();
-				$io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
-			}
+      } catch (IOExceptionInterface $e) {
+        //echo 'An error occurred while creating your directory at '.$e->getPath();
+        $io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
+      }
 
-			// build repo content
-			if (is_dir($utilRoot . '/bundles/d7') && is_dir($app_dest . '/repository')) {
-				$d7files = $utilRoot . '/bundles/d7';
-				// potential repo files
-				$fs->copy($d7files . '/robots.txt', $app_dest . '/repository/robots.txt');
-				$fs->copy($d7files . '/settings.php', $app_dest . '/repository/settings.php');
-				$fs->copy($d7files . '/project.make.yml', $app_dest . '/repository/project.make.yml');
-				$fs->copy($d7files . '/.gitignore', $app_dest . '/repository/.gitignore');
-				//local shared files
-				$fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
+      // build repo content
+      if (is_dir($utilRoot . '/bundles/d7') && is_dir($app_dest . '/repository')) {
+        $d7files = $utilRoot . '/bundles/d7';
+        // potential repo files
+        $fs->copy($d7files . '/robots.txt', $app_dest . '/repository/robots.txt');
+        $fs->copy($d7files . '/settings.php', $app_dest . '/repository/settings.php');
+        $fs->copy($d7files . '/project.make.yml', $app_dest . '/repository/project.make.yml');
+        $fs->copy($d7files . '/.gitignore', $app_dest . '/repository/.gitignore');
+        //local shared files
+        $fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
 
-				if(isset($reqs) && $reqs == 'Full') {
+        if (isset($reqs) && $reqs == 'Full') {
           $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
         }
-			}
+      }
 
-			// deploy an initial build
+      // deploy an initial build
 
-			//replace this with make.yml script
-			$command = 'drush make ' . $app_dest . '/repository/project.make.yml ' . $app_dest . '/builds/' . $date . '/public';
+      //replace this with make.yml script
+      $command = 'drush make ' . $app_dest . '/repository/project.make.yml ' . $app_dest . '/builds/' . $date . '/public';
 
-			$io->note('Download and configure Drupal 7.... This may take a few minutes....');
-			$application->runcommand($command, $io);
+      $io->note('Download and configure Drupal 7.... This may take a few minutes....');
+      $application->runcommand($command, $io);
 
-			$buildpath = 'builds/' . $date . '/public';
-			$fs->symlink($buildpath, $app_dest . '/www', TRUE);
+      $buildpath = 'builds/' . $date . '/public';
+      $fs->symlink($buildpath, $app_dest . '/www', TRUE);
 
-			$rel = $fs->makePathRelative($app_dest . '/repository/', $app_dest . '/' . $buildpath);
+      $rel = $fs->makePathRelative($app_dest . '/repository/', $app_dest . '/' . $buildpath);
 
-			$fs->remove(array($app_dest . '/' . $buildpath . '/robots.txt'));
-			$fs->symlink($rel . 'robots.txt', $app_dest . '/' . $buildpath . '/robots.txt', TRUE);
+      $fs->remove([$app_dest . '/' . $buildpath . '/robots.txt']);
+      $fs->symlink($rel . 'robots.txt', $app_dest . '/' . $buildpath . '/robots.txt', TRUE);
 
-			$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/settings.php'));
-			$fs->symlink('../../' . $rel . 'settings.php', $app_dest . '/' . $buildpath . '/sites/default/settings.php', TRUE);
-			$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/files'));
-			$fs->symlink('../../../../../shared/settings.local.php', $app_dest . '/' . $buildpath . '/sites/default/settings.local.php', TRUE);
-			$fs->remove(array($app_dest . '/' . $buildpath . '/sites/default/files'));
-			$fs->symlink('../../../../../shared/files', $app_dest . '/' . $buildpath . '/sites/default/files', TRUE);
+      $fs->remove([$app_dest . '/' . $buildpath . '/sites/default/settings.php']);
+      $fs->symlink('../../' . $rel . 'settings.php', $app_dest . '/' . $buildpath . '/sites/default/settings.php', TRUE);
+      $fs->remove([$app_dest . '/' . $buildpath . '/sites/default/files']);
+      $fs->symlink('../../../../../shared/settings.local.php', $app_dest . '/' . $buildpath . '/sites/default/settings.local.php', TRUE);
+      $fs->remove([$app_dest . '/' . $buildpath . '/sites/default/files']);
+      $fs->symlink('../../../../../shared/files', $app_dest . '/' . $buildpath . '/sites/default/files', TRUE);
 
-			$fs->symlink($rel . '/sites/default/modules/custom', $app_dest . '/' . $buildpath . '/modules/custom', TRUE);
-			$fs->symlink($rel . '/profiles/custom', $app_dest . '/' . $buildpath . '/profiles/custom', TRUE);
-			$fs->symlink($rel . '/sites/default/themes/custom', $app_dest . '/' . $buildpath . '/themes/custom', TRUE);
+      $fs->symlink($rel . '/sites/default/modules/custom', $app_dest . '/' . $buildpath . '/modules/custom', TRUE);
+      $fs->symlink($rel . '/profiles/custom', $app_dest . '/' . $buildpath . '/profiles/custom', TRUE);
+      $fs->symlink($rel . '/sites/default/themes/custom', $app_dest . '/' . $buildpath . '/themes/custom', TRUE);
 
-			$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/files', 0777, 0000, TRUE);
-			$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.php', 0777, 0000, TRUE);
-			$fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.local.php', 0777, 0000, TRUE);
-		}
+      $fs->chmod($app_dest . '/' . $buildpath . '/sites/default/files', 0777, 0000, TRUE);
+      $fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.php', 0777, 0000, TRUE);
+      $fs->chmod($app_dest . '/' . $buildpath . '/sites/default/settings.local.php', 0777, 0000, TRUE);
+    }
 
-	}
+  }
 
-	private function setupD8($fs, $io, $appname, $input, $output) {
+  private function setupD8($fs, $io, $appname, $input, $output) {
 
-		$app_dest = './app';
-		$application = $this->getApplication();
-		$utilRoot = $application->getUtilRoot();
+    $app_dest = './app';
+    $application = $this->getApplication();
+    $utilRoot = $application->getUtilRoot();
 
     $config = $application->getAppConfig($io);
     if ($config) {
@@ -210,7 +213,7 @@ class BuildCommand extends ContainerAwareCommand {
       $reqs = $config['reqs'];
     }
 
-    if(isset($appsrc) && $appsrc == 'Git') {
+    if (isset($appsrc) && $appsrc == 'Git') {
       $command = 'git clone ' . $apprepo . ' app';
       $application->runcommand($command, $io);
       $io->info('Downloading app from repo.... This may take a few minutes....');
@@ -226,89 +229,97 @@ class BuildCommand extends ContainerAwareCommand {
       $application->runcommand($command, $io);
     }
 
-		if(!$fs->exists($app_dest)) {
+    if (!$fs->exists($app_dest)) {
       $command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
       $io->info('Download and configure Drupal 8.... This may take a few minutes....');
       $application->runcommand($command, $io);
     }
 
-    if($fs->exists($app_dest)) {
+    if ($fs->exists($app_dest)) {
 
-			try {
-				$fs->mkdir($app_dest . '/config/sync');
-				$fs->mkdir($app_dest . '/web/sites/default/files');
-				$fs->mkdir($app_dest . '/web/themes/custom');
-				$fs->mkdir($app_dest . '/web/modules/custom');
+      try {
+        $fs->mkdir($app_dest . '/config/sync');
+        $fs->mkdir($app_dest . '/web/sites/default/files');
+        $fs->mkdir($app_dest . '/web/themes/custom');
+        $fs->mkdir($app_dest . '/web/modules/custom');
         $fs->mkdir($app_dest . '/shared/files');
 
-			} catch (IOExceptionInterface $e) {
-				//echo 'An error occurred while creating your directory at '.$e->getPath();
-				$io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
-			}
+      } catch (IOExceptionInterface $e) {
+        // Echo 'An error occurred while creating your directory at '.$e->getPath();
+        $io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
+      }
 
-			if($reqs == 'Prod'){
-			  $files_dir = 'd8prod';
-      }else{
+      if ($reqs == 'Prod') {
+        $files_dir = 'd8prod';
+      }
+      else {
         $files_dir = 'd8';
       }
 
-			// Move DockerDrupal Drupal 8 config files into install
-			if (is_dir($utilRoot . '/bundles/' . $files_dir) && is_dir($app_dest)) {
-				$d8files = $utilRoot . '/bundles/' . $files_dir;
+      // Move DockerDrupal Drupal 8 config files into install
+      if (is_dir($utilRoot . '/bundles/' . $files_dir) && is_dir($app_dest)) {
+        $d8files = $utilRoot . '/bundles/' . $files_dir;
 
-				if(!$fs->exists($app_dest . '/composer.json'))
-				  $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
+        if (!$fs->exists($app_dest . '/composer.json')) {
+          $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
+        }
 
-        if(!$fs->exists($app_dest . '/web/sites/development.services.yml'))
-				$fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
+        if (!$fs->exists($app_dest . '/web/sites/development.services.yml')) {
+          $fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
+        }
 
-        if(!$fs->exists($app_dest . '/web/sites/default/services.yml'))
+        if (!$fs->exists($app_dest . '/web/sites/default/services.yml')) {
           $fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
+        }
 
-        if(!$fs->exists($app_dest . '/web/robots.txt'))
-				  $fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
+        if (!$fs->exists($app_dest . '/web/robots.txt')) {
+          $fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
+        }
 
-        if(!$fs->exists($app_dest . '/web/sites/default/settings.php'))
-				  $fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
+        if (!$fs->exists($app_dest . '/web/sites/default/settings.php')) {
+          $fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
+        }
 
-        if(!$fs->exists($app_dest . '/web/sites/default/settings.local.php'))
-				  $fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
+        if (!$fs->exists($app_dest . '/web/sites/default/settings.local.php')) {
+          $fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
+        }
 
-        if(!$fs->exists($app_dest . '/web/sites/drushrc.php'))
+        if (!$fs->exists($app_dest . '/web/sites/drushrc.php')) {
           $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/drushrc.php', TRUE);
+        }
 
-        if(isset($reqs) && $reqs == 'Full') {
+        if (isset($reqs) && $reqs == 'Full') {
           $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
         }
 
-			}
+      }
 
-			// Set perms
-			$fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
-			$fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
-			$fs->chmod($app_dest . '/web/sites/default/settings.php', 0666, 0000, TRUE);
-			$fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0666, 0000, TRUE);
+      // Set perms
+      $fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
+      $fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
+      $fs->chmod($app_dest . '/web/sites/default/settings.php', 0666, 0000, TRUE);
+      $fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0666, 0000, TRUE);
 
-			// setup $VAR for redis cache_prefix in settings.local.php template
-			$cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
-			$local_settings = $app_dest . '/web/sites/default/settings.local.php';
-			$process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
-			$process->run();
+      // setup $VAR for redis cache_prefix in settings.local.php template
+      $cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
+      $local_settings = $app_dest . '/web/sites/default/settings.local.php';
+      $process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
+      $process->run();
 
       $fs->symlink('./web', $app_dest . '/www', TRUE);
 
-		}
-	}
+    }
+  }
 
-	private function setupExampleApp($fs, $io, $appname) {
+  private function setupExampleApp($fs, $io, $appname) {
 
     $app_dest = './app';
     $application = $this->getApplication();
     $utilRoot = $application->getUtilRoot();
 
-		$message = 'Setting up Example app';
-		$io->section($message);
-		// example app source and destination
+    $message = 'Setting up Example app';
+    $io->section($message);
+    // example app source and destination
     if (is_dir($utilRoot . '/bundles/default')) {
       $app_src = $utilRoot . '/bundles/default';
       try {
@@ -319,38 +330,42 @@ class BuildCommand extends ContainerAwareCommand {
       }
       $fs->symlink('repository', './app/www', TRUE);
     }
-	}
+  }
 
-	private function installDrupal8($io, $install_helpers = FALSE) {
+  private function installDrupal8($io, $install_helpers = FALSE) {
 
     $application = $this->getApplication();
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $reqs = $config['reqs'];
       $appname = $config['appname'];
     }
 
-    if(isset($reqs) && $reqs == 'Full') {
+    if (isset($reqs) && $reqs == 'Full') {
       $command = $application->getComposePath($appname, $io) . 'exec -T behat composer update';
       $application->runcommand($command, $io);
     }
 
-		$message = 'Run Drupal Installation.... This may take a few minutes....';
-		$io->note($message);
-    if($application->checkForAppContainers($appname, $io)) {
+    $message = 'Run Drupal Installation.... This may take a few minutes....';
+    $io->note($message);
+    if ($application->checkForAppContainers($appname, $io)) {
 
       if ($reqs == 'Basic' || $reqs == 'Full') {
-        $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/ && docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
+        $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/';
+        $application->runcommand($command, $io);
+
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
+        $application->runcommand($command, $io);
       }
       if ($reqs == 'Prod') {
         $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
+        $application->runcommand($command, $io);
       }
       if ($reqs == 'Stage') {
         $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=stage --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
+        $application->runcommand($command, $io);
       }
-      $application->runcommand($command, $io);
 
       if ($install_helpers) {
-
         $message = 'Run APP composer update';
         $io->note($message);
 
@@ -365,21 +380,19 @@ class BuildCommand extends ContainerAwareCommand {
 
         $command = $application->getComposePath($appname, $io) . 'exec -T php drush entity-updates -y';
         $application->runcommand($command, $io);
-
       }
     }
+  }
 
-	}
-
-	private function installDrupal7($io, $install_helpers = FALSE) {
+  private function installDrupal7($io) {
 
     $application = $this->getApplication();
-		$message = 'Run Drupal Installation.... This may take a few minutes....';
-		$io->note($message);
-		$installcmd = 'docker exec -i $(docker ps --format {{.Names}} | grep php) drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD7@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db -y';
+    $message = 'Run Drupal Installation.... This may take a few minutes....';
+    $io->note($message);
 
-		$application->runcommand($installcmd, $io);
-	}
+    $command = $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD7@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db -y';
+    $application->runcommand($command, $io);
+  }
 
   private function initDocker($io, $appname) {
 
@@ -388,14 +401,14 @@ class BuildCommand extends ContainerAwareCommand {
     $message = 'Creating and configure DockerDrupal containers.... This may take a moment....';
     $io->note($message);
 
-    if($config = $application->getAppConfig($io)) {
+    if ($config = $application->getAppConfig($io)) {
       $appreqs = $config['reqs'];
-      if(is_array($config['builds'])){
+      if (is_array($config['builds'])) {
         $build = end($config['builds']);
       }
     }
 
-    if(isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
+    if (isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
 
       // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
       // When 'Synchronization complete' kill this temp run container and start DockerDrupal.
@@ -420,7 +433,7 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     // Production option specific build.
-    if(isset($appreqs) && $appreqs == 'Prod') {
+    if (isset($appreqs) && $appreqs == 'Prod') {
 
       $appname = $config['appname'];
       $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -467,7 +480,7 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     // Production option specific build.
-    if(isset($appreqs) && $appreqs == 'Stage') {
+    if (isset($appreqs) && $appreqs == 'Stage') {
 
       $appname = $config['appname'];
       $system_appname = strtolower(str_replace(' ', '', $appname));

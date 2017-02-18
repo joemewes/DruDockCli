@@ -44,6 +44,8 @@ class ExecCommand extends Command {
     $io->section("EXEC CMD");
 
     $running_containers = $application->getRunningContainerNames();
+    $available_services = [];
+
     foreach ($running_containers as $c) {
       $name_parts = explode('_', $c);
       $available_services[] = $name_parts[1];
@@ -61,7 +63,6 @@ class ExecCommand extends Command {
     $config = $application->getAppConfig($io);
     if ($config) {
       $appname = $config['appname'];
-      $type = $config['apptype'];
     }
 
     if (!$cmd) {
@@ -70,7 +71,9 @@ class ExecCommand extends Command {
       $cmd = $helper->ask($input, $output, $question);
     }
 
-    $command = 'docker exec -i $(docker ps --format {{.Names}} | grep ' . $service . ') ' . $cmd . ' 2>&1';
-    $application->runcommand($command, $io);
+    if ($application->checkForAppContainers($appname, $io)) {
+      $command = $application->getComposePath($appname, $io) . 'exec ' . $service . ' ' . $cmd . ' 2>&1';
+      $application->runcommand($command, $io);
+    }
   }
 }

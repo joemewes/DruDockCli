@@ -44,14 +44,14 @@ class InitCommand extends ContainerAwareCommand {
 
     $io = new DockerDrupalStyle($input, $output);
 
-    // check Docker is running
+    // Check Docker is running.
     $command = 'docker info';
     $application->runcommand($command, $io);
 
     $fs = new Filesystem();
     $date = date('Y-m-d--H-i-s');
 
-    // check if this folder is has APP config
+    // Check if this folder is has APP config.
     if (file_exists('.config.yml')) {
       $io->error('You\'re currently in an APP directory');
       return;
@@ -243,24 +243,23 @@ class InitCommand extends ContainerAwareCommand {
           $apphost = 'docker.stage';
         }
 
-        // Get Prod app proxy network ID
-        //$single_cmd = "docker inspect --format='{{ .Name }}' $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' $(docker ps --format {{.Names}} | grep nginx-proxy))";
+        // Get Prod app proxy network ID.
         $proxy_container = exec('docker ps --format {{.Names}} | grep nginx-proxy');
-        if(!$proxy_container){
+        if (!$proxy_container) {
           $io->error("Nginx-Proxy Container not found. You must be running a Prod app on this system to use a staging app.");
           return;
         }
 
         $cmd = "docker inspect --format='{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' " . $proxy_container;
         $networkid = exec($cmd);
-        if(!$networkid){
+        if (!$networkid) {
           $io->error("There has been an error detecting the Proxy Network ID.  Please report issue in the Github issue queue.");
           return;
         }
 
         $cmd = "docker inspect --format='{{ .Name }}' " . $networkid;
         $network_name = exec($cmd);
-        if(!$network_name){
+        if (!$network_name) {
           $io->error("There has been an error detecting the Proxy container name.  Please report issue in the Github issue queue.");
           return;
         }
