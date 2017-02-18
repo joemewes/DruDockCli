@@ -279,8 +279,6 @@ class BuildCommand extends ContainerAwareCommand {
 
         if(isset($reqs) && $reqs == 'Full') {
           $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
-          $command = $application->getComposePath($appname, $io) . 'exec -T behat composer update';
-          $application->runcommand($command, $io);
         }
 
 			}
@@ -330,6 +328,12 @@ class BuildCommand extends ContainerAwareCommand {
       $reqs = $config['reqs'];
       $appname = $config['appname'];
     }
+
+    if(isset($reqs) && $reqs == 'Full') {
+      $command = $application->getComposePath($appname, $io) . 'exec -T behat composer update';
+      $application->runcommand($command, $io);
+    }
+
 		$message = 'Run Drupal Installation.... This may take a few minutes....';
 		$io->note($message);
     if($application->checkForAppContainers($appname, $io)) {
