@@ -43,31 +43,36 @@ class DrushInitConfigCommand extends Command {
       $site_config = Yaml::parse(file_get_contents($site_settings));
       $uuid = $site_config['uuid'];
 
-      $command = $application->getComposePath($appname, $io) . ' exec -T php drush config-set \'system.site\' uuid ' . $uuid . ' -y';
-      $io->info($command);
+      $drushcmd = 'drush config-set \'system . site\' uuid ' . $uuid . ' -y';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
+      $io->info($drushcmd);
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io) . ' exec -T php drush cr all';
-      $io->info($command);
+      $drushcmd = 'drush cc all';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
+      $io->info($drushcmd);
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io) . ' exec -T php drush ev "if(\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")){\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")->delete();};"';
-      $io->info($command);
+      $drushcmd = 'drush ev "if(\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")){\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")->delete();};"';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
+      $io->info($drushcmd);
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io) . ' exec -T php drush cron';
-      $io->info($command);
+      $drushcmd = 'drush cron';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
+      $io->info($drushcmd);
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io) . ' exec -T php drush entity-updates -y';
-      $io->info($command);
+      $drushcmd = 'drush entity-updates -y';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
+      $io->info($drushcmd);
       $application->runcommand($command, $io);
 
-      $command = $application->getComposePath($appname, $io) . ' exec -T php drush config-import -y';
-      $io->info($command);
+      $drushcmd = 'drush config-import -y';
+      $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
+      $io->info($drushcmd);
       $application->runcommand($command, $io);
     }
   }
-
 }
 
