@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
 
@@ -80,13 +80,13 @@ class BuildCommand extends ContainerAwareCommand {
 			$message = 'Opening Default APP at http://' . $apphost;
 		}
 		if (isset($type) && $type == 'D7') {
-			$this->setupD7($fs, $io, $system_appname);
+			$this->setupD7($fs, $io, $system_appname, $input, $output);
 			$this->initDocker($io, $system_appname);
 			$this->installDrupal7($io);
 			$message = 'Opening Drupal 7 base Installation at http://' . $apphost;
 		}
 		if (isset($type) && $type == 'D8') {
-			$this->setupD8($fs, $io, $system_appname);
+			$this->setupD8($fs, $io, $system_appname, $input, $output);
 			$this->initDocker($io, $system_appname);
 			$this->installDrupal8($io);
 			$message = 'Opening Drupal 8 base Installation at http://' . $apphost;
@@ -97,7 +97,7 @@ class BuildCommand extends ContainerAwareCommand {
 
 	}
 
-	private function setupD7($fs, $io, $appname) {
+	private function setupD7($fs, $io, $appname, $input, $output) {
 		$app_dest = './app';
 		$date = date('Y-m-d--H-i-s');
 
@@ -107,8 +107,22 @@ class BuildCommand extends ContainerAwareCommand {
     $config = $application->getAppConfig($io);
     if ($config) {
       $appname = $config['appname'];
-      $type = $config['apptype'];
+      $appsrc = $config['appsrc'];
+      $apprepo = $config['repo'];
       $reqs = $config['reqs'];
+    }
+
+    if(isset($appsrc) && $appsrc == 'Git') {
+      $command = 'git clone ' . $apprepo . ' app';
+      $application->runcommand($command, $io);
+      $io->info('Downloading app from repo.... This may take a few minutes....');
+
+      $io->info(' ');
+      $io->title("SET APP DOCROOT");
+      $helper = $this->getHelper('question');
+      $question = new Question('Please specify repository relative path to site docroot [./web/] [./docroot/] [./] : ', './');
+      $root = $helper->ask($input, $output, $question);
+      $fs->symlink($root, $app_dest . '/www', TRUE);
     }
 
 		if(!$fs->exists($app_dest)) {
@@ -179,7 +193,7 @@ class BuildCommand extends ContainerAwareCommand {
 
 	}
 
-	private function setupD8($fs, $io, $appname) {
+	private function setupD8($fs, $io, $appname, $input, $output) {
 
 		$app_dest = './app';
 		$application = $this->getApplication();
@@ -197,6 +211,13 @@ class BuildCommand extends ContainerAwareCommand {
       $command = 'git clone ' . $apprepo . ' app';
       $application->runcommand($command, $io);
       $io->info('Downloading app from repo.... This may take a few minutes....');
+
+      $io->info(' ');
+      $io->title("SET APP DOCROOT");
+      $helper = $this->getHelper('question');
+      $question = new Question('Please specify repository relative path to site docroot [./web/] [./docroot/] [./] : ', './web/');
+      $root = $helper->ask($input, $output, $question);
+      $fs->symlink($root, $app_dest . '/www', TRUE);
 
       $command = 'cd app && composer install';
       $application->runcommand($command, $io);
@@ -261,17 +282,12 @@ class BuildCommand extends ContainerAwareCommand {
 			$fs->chmod($app_dest . '/web/sites/default/settings.php', 0666, 0000, TRUE);
 			$fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0666, 0000, TRUE);
 
-			// Set perms for executables
-			// $fs->chmod($app_dest . '/vendor', 0777, 0000, TRUE);
-
 			// setup $VAR for redis cache_prefix in settings.local.php template
 			$cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
 			$local_settings = $app_dest . '/web/sites/default/settings.local.php';
 			$process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
 			$process->run();
 
-			// Symlink PHP7 container working directory ie. /app/www.
-			$fs->symlink('./web', $app_dest . '/www', TRUE);
 		}
 	}
 
