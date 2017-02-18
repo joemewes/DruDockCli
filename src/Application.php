@@ -441,8 +441,6 @@ class Application extends ParentApplication {
     if (!$process->isSuccessful() && ($process->getExitCode() != 129)) {
       throw new ProcessFailedException($process);
     }
-
-    $io->info('');
   }
 
   /**
@@ -588,7 +586,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    * @param $application
    * @param $io
    */
-  public function addHostConfig($newhost, $io, $update) {
+  public function addHostConfig($newhost, $io, $update = FALSE) {
     // Add initial entry to hosts file.
     // OSX @TODO update as command for all systems and OS's.
     $utilRoot = $this->getUtilRoot();
@@ -604,21 +602,28 @@ VIRTUAL_NETWORK=nginx-proxy";
       $apphost = 'docker.dev';
     }
 
-    $hosts_file = '/etc/hosts';
-    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
-    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
-    $hosts_file_contents = file_get_contents($hosts_file);
+    if ($update) {
+      $hosts_file = '/etc/hosts';
+      $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
+      $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
+      $hosts_file_contents = file_get_contents($hosts_file);
 
-    if (!strpos($hosts_file_contents, $app_host_config)) {
-      // Add new.
-      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
+      if (!strpos($hosts_file_contents, $app_host_config)) {
+        // Add new.
+        $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
+        $this->runcommand($command, $io, TRUE);
+      }
+      else {
+        // Replace existing.
+        $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
+        $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
+        exec($command);
+      }
+    }else{
+      $hosts_file = '/etc/hosts';
+      $apphost = 'docker.dev';
+      $command = sprintf("echo '%s %s' | sudo tee -a %s >/dev/null", $ip, $apphost, $hosts_file);
       $this->runcommand($command, $io, TRUE);
-    }
-    else {
-      // Replace existing.
-      $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
-      $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
-      exec($command);
     }
 
     if (!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {

@@ -61,8 +61,7 @@ class InitCommand extends ContainerAwareCommand {
 
       $message = "If prompted, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
       $io->note($message);
-
-      $application->addHostConfig($io, FALSE);
+      $application->addHostConfig('docker.dev', $io);
     }
 
     // GET AND SET APPNAME.
