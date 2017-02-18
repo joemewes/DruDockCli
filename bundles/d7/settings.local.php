@@ -93,4 +93,12 @@ $conf['search_api_override_servers'] = array(
 //$conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
 //$conf['cache_prefix'] = '';
 
+
+//$conf['stage_file_proxy_hotlink'] = 0;
+//$conf['stage_file_proxy_use_imagecache_root'] = 1;
+//$conf['stage_file_proxy_origin_dir'] = 'sites/default/files';
+//$conf['stage_file_proxy_origin'] = 'http://example-file-source-site.com';
+
+$conf['theme_debug'] = TRUE;
+$conf['file_temporary_path'] = '/tmp';
 $base_url = "http://docker.dev";
