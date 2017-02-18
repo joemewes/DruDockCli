@@ -231,9 +231,28 @@ class Application extends ParentApplication {
    * @return array
    */
 
-  public function getAppConfig($io) {
+  public function getAppConfig($io, $skip_checks = FALSE) {
     if (file_exists('.config.yml')) {
       $config = Yaml::parse(file_get_contents('.config.yml'));
+      $config_keys = array_keys($config);
+      $requirements = $this->getDDrequirements();
+
+      if(!$skip_checks) {
+        $missing_reqs = [];
+        foreach ($requirements as $req) {
+          if (!in_array($req, $config_keys)) {
+            $missing_reqs[] = $req;
+          }
+        }
+
+        if (count($missing_reqs) > 0) {
+          $io->info('Your app is missing the following config, please run [dockerdrupal docker:update:config] : ');
+          foreach ($missing_reqs as $req) {
+            $io->warning($req);
+          }
+          exit;
+        }
+      }
 
       if (substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)) {
         $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
@@ -644,9 +663,10 @@ VIRTUAL_NETWORK=nginx-proxy";
 
   /**
    * @return array
+   *  Return keys of current required app config.
    */
   function getDDrequirements() {
-    $reqs = [
+    $app_config_reqs = [
       'appname',
       'apptype',
       'host',
@@ -654,19 +674,15 @@ VIRTUAL_NETWORK=nginx-proxy";
       'appsrc',
       'repo',
     ];
-    return $reqs;
+    return $app_config_reqs;
   }
 
   /**
-   *
+   * Set currently assigned config into yaml format and file.
    */
-
   function setConfig($config) {
-
     $yaml = Yaml::dump($config);
     file_put_contents('.config.yml', $yaml);
-
   }
-
 
 }

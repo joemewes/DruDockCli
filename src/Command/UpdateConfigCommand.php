@@ -35,7 +35,7 @@ class UpdateConfigCommand extends Command {
     $io = new DockerDrupalStyle($input, $output);
     $io->section("APP ::: UPDATING CONFIG");
 
-    $config = $application->getAppConfig($io);
+    $config = $application->getAppConfig($io, TRUE);
     $requirements = $application->getDDrequirements();
 
     foreach($requirements as $req) {
