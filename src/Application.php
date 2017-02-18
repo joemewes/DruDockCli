@@ -27,7 +27,7 @@ class Application extends ParentApplication {
   /**
    * @var string
    */
-  const VERSION = '1.3.4-alpha';
+  const VERSION = '1.3.4-alpha1';
 
   /**
    * @var string
@@ -579,7 +579,7 @@ VIRTUAL_NETWORK=nginx-proxy";
     else {
       $apphost = 'docker.dev';
     }
-    
+
     $hosts_file = '/etc/hosts';
 
     $exec = "cat " . $hosts_file . " | grep '" . $ip . " " . $apphost . "'";
