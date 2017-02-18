@@ -286,7 +286,11 @@ class Application extends ParentApplication {
     if(isset($reqs) && $reqs == 'Prod') {
       $projectname = $system_appname . '--' . end($latestbuild);
       $project = '--project-name=' . $projectname;
-    } else {
+    } elseif (isset($reqs) && $reqs == 'Stage') {
+      $projectname = $system_appname . '--' . end($latestbuild);
+      $project = '--project-name=' . $projectname;
+    }
+    else {
       $project = '';
     }
 
@@ -313,13 +317,25 @@ class Application extends ParentApplication {
 
     if($config = $this->getAppConfig($io)) {
       $reqs = $config['reqs'];
+      $appreqs = $config['reqs'];
+      if(is_array($config['builds'])){
+        $build = end($config['builds']);
+      }
     }
 
     $fs = new Filesystem();
 
     if(isset($reqs) && $reqs == 'Prod') {
       $project = '--project-name=data';
-    }else {
+    }
+    elseif (isset($reqs) && $reqs == 'Stage'){
+      if(!isset($build)){
+        $io->error('Build :: ' . $build . ' missing.');
+        return;
+      }
+      $project = '--project-name=' . $system_appname . '_data';
+    }
+    else {
       $io->error("docker-compose-data.yml : Not Found");
       exit;
     }
@@ -422,12 +438,12 @@ class Application extends ParentApplication {
     }
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
-    $nginxconfig = "server {
+    $nginxconfig = 'server {
     listen   80;
     listen   [::]:80;
 
     index index.php index.html;
-    server_name $apphost;
+    server_name docker.dev;
     error_log  /var/log/nginx/app-error.log;
     access_log /var/log/nginx/app-access.log;
     root /app/www;
@@ -462,12 +478,12 @@ class Application extends ParentApplication {
         return 403;
     }
 
-    # Allow \"Well-Known URIs\" as per RFC 5785
+    # Allow "Well-Known URIs" as per RFC 5785
     location ~* ^/.well-known/ {
         allow all;
     }
 
-    # Block access to \"hidden\" files and directories whose names begin with a
+    # Block access to "hidden" files and directories whose names begin with a
     # period. This includes directories used by version control systems such
     # as Subversion or Git to store control files.
     location ~ (^|/)\. {
@@ -482,7 +498,7 @@ class Application extends ParentApplication {
         try_files $uri @drupal;
     }
 
-    # Don't allow direct access to PHP files in the vendor directory.
+    # Don\'t allow direct access to PHP files in the vendor directory.
     location ~ /vendor/.*\.php$ {
         deny all;
         return 404;
@@ -492,15 +508,17 @@ class Application extends ParentApplication {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_pass php:9000;
         fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        fastcgi_param PATH_INFO \$fastcgi_path_info;
-        fastcgi_param REMOTE_ADDR \$http_x_real_ip;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_param REMOTE_ADDR $http_x_real_ip;
+        fastcgi_buffers 16 16k;
+				fastcgi_buffer_size 32k;
         include fastcgi_params;
         fastcgi_read_timeout 300;
         fastcgi_cache  off;
         fastcgi_intercept_errors on;
-        fastcgi_hide_header 'X-Drupal-Cache';
-        fastcgi_hide_header 'X-Generator';
+        fastcgi_hide_header \'X-Drupal-Cache\';
+        fastcgi_hide_header \'X-Generator\';
 
     }
 
@@ -510,14 +528,14 @@ class Application extends ParentApplication {
 
     # Fighting with Styles? This little gem is amazing.
     location ~ ^/sites/.*/files/styles/ { # For Drupal >= 7
-        try_files \$uri @rewrite;
+        try_files $uri @rewrite;
     }
 
     location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
         expires max;
         log_not_found off;
     }
-}";
+}';
 
     if($reqs == 'Prod'){
       file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, stripslashes($nginxconfig));
@@ -528,7 +546,16 @@ VIRTUAL_NETWORK=nginx-proxy";
 
       file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
 
-    } else {
+    } elseif ($reqs == 'Stage') {
+      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, stripslashes($nginxconfig));
+
+      $nginxenv = "VIRTUAL_HOST=$apphost
+APPS_PATH=~/app
+VIRTUAL_NETWORK=nginx-proxy";
+
+      file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
+    }
+    else {
       file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', stripslashes($nginxconfig));
     }
   }
@@ -546,11 +573,13 @@ VIRTUAL_NETWORK=nginx-proxy";
 
     if ($update && $config = $this->getAppConfig($io)) {
       $apphost = $config['host'];
+      $appname = $config['appname'];
+      $system_appname = strtolower(str_replace(' ', '', $appname));
     }
     else {
       $apphost = 'docker.dev';
     }
-
+    
     $hosts_file = '/etc/hosts';
 
     $exec = "cat " . $hosts_file . " | grep '" . $ip . " " . $apphost . "'";
@@ -563,6 +592,12 @@ VIRTUAL_NETWORK=nginx-proxy";
       $command = 'sudo cp -R ' . $utilRoot . '/bundles/osx/com.4alldigital.dockerdrupal.plist /Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist';
       $this->runcommand($command, $io, TRUE);
     }
+
+    // Update nginx.env
+//    $nginxconf = "VIRTUAL_HOST=" . $apphost . " \nAPPS_PATH=~/app \nVIRTUAL_NETWORK=nginx-proxy";
+//    $env_file = './' . $system_appname . '/nginx.env';
+//    $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $nginxconf, $env_file);
+//    $this->runcommand($command, $io, TRUE);
   }
 
   /**

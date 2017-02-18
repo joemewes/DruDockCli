@@ -69,7 +69,16 @@ class DestroyCommand extends Command {
 
       $command = $application->getProxyComposePath($appname, $io) . ' down -v 2>&1';
       $application->runcommand($command, $io);
+    }
 
+    if(isset($appreqs) && $appreqs == 'Stage') {
+      if ($application->checkForAppContainers($appname, $io)) {
+        $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
+        $application->runcommand($command, $io);
+      }
+
+      $command = $application->getDataComposePath($appname, $io) . ' down -v 2>&1';
+      $application->runcommand($command, $io);
     }
 
   }

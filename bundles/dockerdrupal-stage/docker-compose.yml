@@ -17,7 +17,7 @@ services:
     image : 4alldigital/drupalprod-php7
     volumes :
       - app-data:/app:ro
-      - ../app/www/sites/default/files:/app/www/sites/default/files:rw
+      - ../app/www/sites/default/files:/app/www/sites/default/files
     hostname: php
     dns:
       - 8.8.8.8
@@ -42,7 +42,7 @@ services:
     volumes :
       - ./mounts/sites-enabled:/etc/nginx/sites-enabled
       - app-data:/app:ro
-      - ../app/www/sites/default/files:/app/www/sites/default/files:rw
+      - ../app/www/sites/default/files:/app/www/sites/default/files
     env_file: nginx.env
     hostname: nginx
     restart: always

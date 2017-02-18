@@ -42,9 +42,6 @@ class BuildCommand extends ContainerAwareCommand {
 			return;
 		}
 
-    $command = 'docker info';
-    $application->runcommand($command, $io);
-
 		$fs = new Filesystem();
 
 		$config = $application->getAppConfig($io);
@@ -70,6 +67,12 @@ class BuildCommand extends ContainerAwareCommand {
 		}
 
 		$system_appname = strtolower(str_replace(' ', '', $appname));
+
+    $application->setNginxHost($io);
+
+    if($application->getOs() == 'Darwin') {
+      $application->addHostConfig($io, TRUE);
+    }
 
 		/**
 		 * Install specific APP type
@@ -329,6 +332,9 @@ class BuildCommand extends ContainerAwareCommand {
       if ($reqs == 'Prod') {
         $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
       }
+      if ($reqs == 'Stage') {
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=stage --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
+      }
       $application->runcommand($command, $io);
 
       if ($install_helpers) {
@@ -366,11 +372,6 @@ class BuildCommand extends ContainerAwareCommand {
   private function initDocker($io, $appname) {
 
     $application = $this->getApplication();
-
-    if (exec('docker ps -q 2>&1', $exec_output)) {
-      $dockerstopcmd = 'docker stop $(docker ps -q)';
-      $application->runcommand($dockerstopcmd, $io);
-    }
 
     $message = 'Creating and configure DockerDrupal containers.... This may take a moment....';
     $io->note($message);
@@ -414,7 +415,7 @@ class BuildCommand extends ContainerAwareCommand {
 
       $io->section("Docker ::: Build prod environment");
 
-      // Setup proxy newtwork.
+      // Setup proxy network.
       $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose-nginx-proxy.yml --project-name=proxy up -d';
       $application->runcommand($command, $io);
 
@@ -441,10 +442,56 @@ class BuildCommand extends ContainerAwareCommand {
       $port = explode(':', $command);
 
       $io->warning($message);
+
       while (!@mysqli_connect('127.0.0.1', 'dev', 'DRUPALPASSENV', 'prod', $port[1])) {
         sleep(1);
         echo '.';
       }
+      sleep(2);
+      $io->text(' ');
+      $message = 'mySQL CONNECTED';
+      $io->success($message);
+
+    }
+
+    // Production option specific build.
+    if(isset($appreqs) && $appreqs == 'Stage') {
+
+      $appname = $config['appname'];
+      $system_appname = strtolower(str_replace(' ', '', $appname));
+
+      $io->section("Docker ::: Build staging environment");
+
+      // Setup data service.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose-data.yml --project-name=' . $system_appname . '_data up -d';
+      $application->runcommand($command, $io);
+
+      // RUN APP BUILD.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose.yml --project-name=' . $system_appname . '--' . $build . ' build --no-cache';
+      $application->runcommand($command, $io);
+
+      //RUN APP.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose.yml --project-name=' . $system_appname . '--' . $build . ' up -d app';
+      $application->runcommand($command, $io);
+
+      //START PROJECT.
+      $command = 'docker-compose -f docker_' . $system_appname . '/docker-compose.yml --project-name=' . $system_appname . '--' . $build . ' up -d';
+      $application->runcommand($command, $io);
+
+      // Check for running mySQL container before launching Drupal Installation
+      $message = 'Waiting for mySQL service.';
+
+      $command = "docker-compose -f docker_" . $system_appname . "/docker-compose-data.yml --project-name=" . $system_appname . "_data port db 3306";
+      $port_info = exec($command);
+      $port = explode(':', $port_info);
+
+      $io->warning($message);
+
+      while (!@mysqli_connect('127.0.0.1', 'dev', 'DRUPALPASSENV', 'stage', $port[1])) {
+        sleep(1);
+        echo '.';
+      }
+      sleep(2);
       $io->text(' ');
       $message = 'mySQL CONNECTED';
       $io->success($message);
