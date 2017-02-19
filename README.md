@@ -5,6 +5,8 @@
 [![Latest Stable Version](https://poser.pugx.org/dockerdrupal/cli/v/stable)](https://packagist.org/packages/dockerdrupal/cli)
 [![Build Status](https://travis-ci.org/4AllDigital/DockerDrupalCli.svg?branch=master)](https://travis-ci.org/4AllDigital/DockerDrupalCli)
 [![License](https://poser.pugx.org/dockerdrupal/cli/license)](https://github.com/4AllDigital/DockerDrupalCli/blob/master/LICENSE.txt)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DockerDrupalCli/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 
 # DockerDrupal-Cli - BETA
 ### CLI utility for DockerDrupal
