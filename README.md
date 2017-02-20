@@ -27,12 +27,6 @@
    - video 1 (Installation and setup) - https://www.youtube.com/watch?v=XfmN47xdrgY
    - video 2 (Initialise Drupal7 Env && App) - https://www.youtube.com/watch?v=FoDeyEPEhiY
    
-### Install via Launcher (.phar)
-
-    curl -LO http://4alldigital.net/sites/default/libraries/dockerdrupal.phar
-    mv dockerdrupal.phar /usr/local/bin/dockerdrupal
-    chmod +x /usr/local/bin/dockerdrupal
-   
 ### Install via Composer
   - Install Composer [Globally](https://getcomposer.org/doc/00-intro.md#globally) 
   - Make sure you add composers vendor directory to your $PATH:
