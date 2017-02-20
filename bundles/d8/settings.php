@@ -5,6 +5,6 @@ $settings['update_free_access'] = FALSE;
 $settings['container_yamls'][] = __DIR__ . '/services.yml';
 $settings['install_profile'] = 'standard';
 
-if (file_exists('/app/web/sites/default/settings.local.php')) {
-    include '/app/web/sites/default/settings.local.php';
+if (file_exists('/app/www/sites/default/settings.local.php')) {
+    include '/app/www/sites/default/settings.local.php';
 }
