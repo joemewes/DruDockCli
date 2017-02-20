@@ -386,6 +386,11 @@ class BuildCommand extends ContainerAwareCommand {
   private function installDrupal7($io) {
 
     $application = $this->getApplication();
+    if ($config = $application->getAppConfig($io)) {
+      $reqs = $config['reqs'];
+      $appname = $config['appname'];
+    }
+
     $message = 'Run Drupal Installation.... This may take a few minutes....';
     $io->note($message);
 
