@@ -212,7 +212,7 @@ class BuildCommand extends ContainerAwareCommand {
       $reqs = $config['reqs'];
     }
 
-    if (isset($appsrc) && $appsrc == 'Git') {
+    if (isset($appsrc) && $appsrc == 'Git' && !$fs->exists($app_dest)) {
       $command = 'git clone ' . $apprepo . ' app';
       $application->runcommand($command, $io);
       $io->info('Downloading app from repo.... This may take a few minutes....');
