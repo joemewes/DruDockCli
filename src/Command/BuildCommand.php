@@ -99,7 +99,7 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     $io->note($message);
-    shell_exec('python -n -mwebbrowser http://' . $apphost);
+    shell_exec('python -mwebbrowser http://' . $apphost);
 
   }
 
