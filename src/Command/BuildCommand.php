@@ -260,33 +260,33 @@ class BuildCommand extends ContainerAwareCommand {
       if (is_dir($utilRoot . '/bundles/' . $files_dir) && is_dir($app_dest)) {
         $d8files = $utilRoot . '/bundles/' . $files_dir;
 
-        //if (!$fs->exists($app_dest . '/composer.json')) {
-        $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
-//        }
+        if (!$fs->exists($app_dest . '/composer.json')) {
+          $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
+        }
 
-        //if (!$fs->exists($app_dest . '/web/sites/development.services.yml')) {
-        $fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
-//        }
+        if (!$fs->exists($app_dest . '/web/sites/development.services.yml')) {
+          $fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
+        }
 
-        //if (!$fs->exists($app_dest . '/web/sites/default/services.yml')) {
-        $fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
-//        }
+        if (!$fs->exists($app_dest . '/web/sites/default/services.yml')) {
+          $fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
+        }
 
-        //if (!$fs->exists($app_dest . '/web/robots.txt')) {
-        $fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
-//        }
+        if (!$fs->exists($app_dest . '/web/robots.txt')) {
+          $fs->copy($d8files . '/robots.txt', $app_dest . '/web/robots.txt', TRUE);
+        }
 
-        //if (!$fs->exists($app_dest . '/web/sites/default/settings.php')) {
-        $fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
-//        }
+        if (!$fs->exists($app_dest . '/web/sites/default/settings.php')) {
+          $fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
+        }
 
-        //if (!$fs->exists($app_dest . '/web/sites/default/settings.local.php')) {
-        $fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
-//        }
+        if (!$fs->exists($app_dest . '/web/sites/default/settings.local.php')) {
+          $fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
+        }
 
-        //if (!$fs->exists($app_dest . '/web/sites/drushrc.php')) {
-        $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
-//        }
+        if (!$fs->exists($app_dest . '/web/sites/drushrc.php')) {
+          $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
+        }
 
         if (isset($reqs) && $reqs == 'Full') {
           $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
@@ -294,10 +294,18 @@ class BuildCommand extends ContainerAwareCommand {
       }
 
       // Set perms
-      $fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
-      $fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
-      $fs->chmod($app_dest . '/web/sites/default/settings.php', 0755, 0000, TRUE);
-      $fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0755, 0000, TRUE);
+      if($fs->exists($app_dest . '/config/sync')){
+        $fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
+      }
+      if($fs->exists($app_dest . '/web/sites/default/files')){
+        $fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
+      }
+      if($fs->exists($app_dest . '/web/sites/default/settings.php')){
+        $fs->chmod($app_dest . '/web/sites/default/settings.php', 0755, 0000, TRUE);
+      }
+      if($fs->exists($app_dest . '/web/sites/default/settings.local.php')){
+        $fs->chmod($app_dest . '/web/sites/default/settings.local.php', 0755, 0000, TRUE);
+      }
 
       // setup $VAR for redis cache_prefix in settings.local.php template
       $cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";

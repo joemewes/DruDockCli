@@ -45,6 +45,5 @@ $debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(['--no-d
 //}
 
 $application = new Application('DockerDrupal Console Application', '1.0');
-// @todo define default commands
 $application->setDefaultCommand('about');
 $application->run($input);
