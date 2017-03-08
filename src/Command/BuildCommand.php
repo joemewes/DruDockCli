@@ -16,6 +16,8 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Alchemy\Zippy\Zippy;
+use GuzzleHttp\Client;
 
 
 /**
@@ -43,6 +45,8 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     $fs = new Filesystem();
+    $client = new Client();
+    $zippy = Zippy::load();
 
     $config = $application->getAppConfig($io);
     if ($config) {
@@ -74,25 +78,25 @@ class BuildCommand extends ContainerAwareCommand {
     $application->setNginxHost($io);
 
     if ($application->getOs() == 'Darwin') {
-      $application->addHostConfig($io, TRUE);
+      $application->addHostConfig($fs, $client, $zippy, $apphost, $io, TRUE);
     }
 
     /**
      * Install specific APP type
      */
     if (isset($type) && $type == 'DEFAULT') {
-      $this->setUpExampleApp($fs, $io, $system_appname);
+      $this->setUpExampleApp($fs, $io, $system_appname, $client, $zippy);
       $this->initDocker($io, $system_appname);
       $message = 'Opening Default APP at http://' . $apphost;
     }
     if (isset($type) && $type == 'D7') {
-      $this->setupD7($fs, $io, $system_appname, $input, $output);
+      $this->setupD7($fs, $io, $system_appname, $input, $output, $client, $zippy);
       $this->initDocker($io, $system_appname);
       $this->installDrupal7($io);
       $message = 'Opening Drupal 7 base Installation at http://' . $apphost;
     }
     if (isset($type) && $type == 'D8') {
-      $this->setupD8($fs, $io, $system_appname, $input, $output);
+      $this->setupD8($fs, $io, $system_appname, $input, $output, $client, $zippy);
       $this->initDocker($io, $system_appname);
       $this->installDrupal8($io);
       $message = 'Opening Drupal 8 base Installation at http://' . $apphost;
@@ -103,7 +107,7 @@ class BuildCommand extends ContainerAwareCommand {
 
   }
 
-  private function setupD7($fs, $io, $appname, $input, $output) {
+  private function setupD7($fs, $io, $appname, $input, $output, $client, $zippy) {
     $app_dest = './app';
     $date = date('Y-m-d--H-i-s');
 
@@ -149,9 +153,11 @@ class BuildCommand extends ContainerAwareCommand {
         $io->error(sprintf('An error occurred while creating your directory at ' . $e->getPath()));
       }
 
+
+      $application->tmpRemoteBundle($fs, $client, $zippy, 'd7');
       // build repo content
-      if (is_dir($utilRoot . '/bundles/d7') && is_dir($app_dest . '/repository')) {
-        $d7files = $utilRoot . '/bundles/d7';
+      if (is_dir('/tmp/d7') && is_dir($app_dest . '/repository')) {
+        $d7files = '/tmp/d7';
         // potential repo files
         $fs->copy($d7files . '/robots.txt', $app_dest . '/repository/robots.txt');
         $fs->copy($d7files . '/settings.php', $app_dest . '/repository/settings.php');
@@ -159,9 +165,12 @@ class BuildCommand extends ContainerAwareCommand {
         $fs->copy($d7files . '/.gitignore', $app_dest . '/repository/.gitignore');
         //local shared files
         $fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
+        $fs->remove('/tmp/d7');
 
         if (isset($reqs) && $reqs == 'Full') {
-          $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
+          $application->tmpRemoteBundle($client, $zippy, 'behat');
+          $fs->mirror('/tmp/behat/', $app_dest . '/behat/');
+          $fs->remove('/tmp/behat/');
         }
       }
 
@@ -198,11 +207,10 @@ class BuildCommand extends ContainerAwareCommand {
 
   }
 
-  private function setupD8($fs, $io, $appname, $input, $output) {
+  private function setupD8($fs, $io, $appname, $input, $output, $client, $zippy) {
 
     $app_dest = './app';
     $application = $this->getApplication();
-    $utilRoot = $application->getUtilRoot();
 
     $config = $application->getAppConfig($io);
     if ($config) {
@@ -257,8 +265,9 @@ class BuildCommand extends ContainerAwareCommand {
       }
 
       // Move DockerDrupal Drupal 8 config files into install
-      if (is_dir($utilRoot . '/bundles/' . $files_dir) && is_dir($app_dest)) {
-        $d8files = $utilRoot . '/bundles/' . $files_dir;
+      $application->tmpRemoteBundle($fs, $client, $zippy, $files_dir);
+      if (is_dir('/tmp/' . $files_dir) && is_dir($app_dest)) {
+        $d8files = '/tmp/' . $files_dir;
 
         $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
         $fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
@@ -268,10 +277,12 @@ class BuildCommand extends ContainerAwareCommand {
         $fs->copy($d8files . '/settings.local.php', $app_dest . '/web/sites/default/settings.local.php', TRUE);
         $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
 
+        $fs->remove('/tmp/' . $files_dir);
         if (isset($reqs) && $reqs == 'Full') {
-          $fs->mirror($utilRoot . '/bundles/behat/', $app_dest . '/behat/');
+          $application->tmpRemoteBundle($client, $zippy, 'behat');
+          $fs->mirror('/tmp/behat/', $app_dest . '/behat/');
+          $fs->remove('/tmp/behat/');
         }
-
       }
 
       // Set perms
@@ -291,23 +302,24 @@ class BuildCommand extends ContainerAwareCommand {
     }
   }
 
-  private function setupExampleApp($fs, $io, $appname) {
+  private function setupExampleApp($fs, $io, $appname, $client, $zippy) {
 
     $app_dest = './app';
     $application = $this->getApplication();
-    $utilRoot = $application->getUtilRoot();
 
     $message = 'Setting up Example app';
     $io->section($message);
-    // example app source and destination
-    if (is_dir($utilRoot . '/bundles/default')) {
-      $app_src = $utilRoot . '/bundles/default';
+
+    $application->tmpRemoteBundle($fs, $client, $zippy, 'default');
+    if (is_dir('/tmp/default')) {
+      $app_src = '/tmp/default';
       try {
         $fs->mkdir($app_dest . '/repository');
         $fs->mirror($app_src, $app_dest . '/repository');
       } catch (IOExceptionInterface $e) {
         echo 'An error occurred while creating your directory at ' . $e->getPath();
       }
+      $fs->remove('/tmp/default');
       $fs->symlink('repository', './app/www', TRUE);
     }
   }

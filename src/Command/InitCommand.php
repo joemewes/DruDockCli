@@ -17,6 +17,8 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
 use Symfony\Component\Yaml\Yaml;
+use Alchemy\Zippy\Zippy;
+use GuzzleHttp\Client;
 
 
 /**
@@ -40,15 +42,11 @@ class InitCommand extends ContainerAwareCommand {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $utilRoot = $application->getUtilRoot();
 
     $io = new DockerDrupalStyle($input, $output);
-
-    // Check Docker is running.
-    $command = 'docker info';
-    $application->runcommand($command, $io);
-
     $fs = new Filesystem();
+    $client = new Client();
+    $zippy = Zippy::load();
     $date = date('Y-m-d--H-i-s');
 
     // Check if this folder is has APP config.
@@ -60,8 +58,10 @@ class InitCommand extends ContainerAwareCommand {
     if ($application->getOs() == 'Darwin') {
 
       $message = "If prompted, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
-      $io->note($message);
-      $application->addHostConfig('docker.dev', $io);
+      $io->info(' ');
+      $io->info($message);
+      $io->info(' ');
+      $application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io);
     }
 
     // GET AND SET APPNAME.
@@ -165,7 +165,6 @@ class InitCommand extends ContainerAwareCommand {
 
     if (!$fs->exists($system_appname)) {
       $fs->mkdir($system_appname, 0755);
-      $fs->mkdir($system_appname . '/docker_' . $system_appname, 0755);
     }
     else {
       $io->error('This app already exists');
@@ -174,7 +173,9 @@ class InitCommand extends ContainerAwareCommand {
 
     switch ($reqs) {
       case 'Basic':
-        $fs->mirror($utilRoot . '/bundles/dockerdrupal-lite/', $system_appname . '/docker_' . $system_appname);
+        $file = 'dockerdrupal-lite';
+        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
+
         if (!$apphost) {
           $apphost = 'docker.dev';
         }
@@ -182,7 +183,8 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Full':
-        $fs->mirror($utilRoot . '/bundles/dockerdrupal/', $system_appname . '/docker_' . $system_appname);
+        $file = 'dockerdrupal';
+        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.dev';
         }
@@ -190,7 +192,8 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Prod':
-        $fs->mirror($utilRoot . '/bundles/dockerdrupal-prod/', $system_appname . '/docker_' . $system_appname);
+        $file = 'dockerdrupal-prod';
+        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.prod';
         }
@@ -237,7 +240,8 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Stage':
-        $fs->mirror($utilRoot . '/bundles/dockerdrupal-stage/', $system_appname . '/docker_' . $system_appname);
+        $file = 'dockerdrupal-stage';
+        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.stage';
         }
@@ -291,7 +295,9 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       default:
-        $fs->mirror($utilRoot . '/bundles/dockerdrupal-lite/', $system_appname . '/docker_' . $system_appname);
+        $file = 'dockerdrupal-lite';
+        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
+
         if (!$apphost) {
           $apphost = 'docker.dev';
         }
