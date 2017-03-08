@@ -121,23 +121,27 @@ composer global require dockerdrupal/cli
       :$ dockerdrupal env my-great-app -t DEFAULT -r Basic -s New -p basic.docker.dev
       :$ cd my-great-app && dockerdrupal build:init
       --------------
+```    
+#### DEV Drupal 8  
+```
       --------------
       :$ dockerdrupal env my-drupal8-site -t D8 -r Basic -s New -p d8.docker.dev
       :$ cd my-drupal8-site && dockerdrupal build:init
       --------------
+```   
+#### DEV Drupal 7
+```
       --------------
       :$ dockerdrupal env my-drupal7-site -t D7 -r Full -s Git -p d7.docker.dev
       :$ cd my-drupal7-site && dockerdrupal build:init
       --------------
-
 ```
 
-# Next step :
+### Next step :
 
  - More utility commands and USER feedback
-
 For more information see [roadmap](https://github.com/4AllDigital/DockerDrupalCli/blob/master/roadmap.md)
 
-# Known issues
+### Known issues
 
-1. Its not finished
+1. Its not finished - still in early -alpha and requires community testing and feedback.
