@@ -168,7 +168,7 @@ class BuildCommand extends ContainerAwareCommand {
         $fs->remove('/tmp/d7');
 
         if (isset($reqs) && $reqs == 'Full') {
-          $application->tmpRemoteBundle($client, $zippy, 'behat');
+          $application->tmpRemoteBundle($fs, $client, $zippy, 'behat');
           $fs->mirror('/tmp/behat/', $app_dest . '/behat/');
           $fs->remove('/tmp/behat/');
         }
@@ -279,7 +279,7 @@ class BuildCommand extends ContainerAwareCommand {
 
         $fs->remove('/tmp/' . $files_dir);
         if (isset($reqs) && $reqs == 'Full') {
-          $application->tmpRemoteBundle($client, $zippy, 'behat');
+          $application->tmpRemoteBundle($fs, $client, $zippy, 'behat');
           $fs->mirror('/tmp/behat/', $app_dest . '/behat/');
           $fs->remove('/tmp/behat/');
         }
