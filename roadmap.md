@@ -26,7 +26,6 @@ APPROACH:
     - download DD from git repo and build env
     - NEW - add DD main commands
     
-' THOUGHTS: should move dd-lite and dd into /CLI repo ?? '
 
 @2017
 3. -> CUSTOM - Q & A
