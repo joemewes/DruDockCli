@@ -11,8 +11,13 @@
 # DockerDrupal-Cli - BETA
 ### CLI utility for DockerDrupal
 
-  START by installing & launching the Docker for Mac Application 
-   - https://download.docker.com/mac/stable/Docker.dmg
+  Install and setup Docker
+  
+    - Mac : https://www.docker.com/docker-mac
+    - Windows : https://www.docker.com/docker-windows
+    - Linux
+      - Ubuntu : https://www.docker.com/docker-ubuntu
+      - Centos : https://www.docker.com/docker-centos-distribution
    
 ### Minimum Requirements : 
 - Host OS must have PHP ^5.6
