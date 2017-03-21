@@ -14,14 +14,14 @@
 Install and setup Docker
   
 - Mac : https://www.docker.com/docker-mac : 
-[->](https://store.docker.com/editions/community/docker-ce-desktop-mac)
+######[download]######(https://store.docker.com/editions/community/docker-ce-desktop-mac)
 - Windows : https://www.docker.com/docker-windows
-[->](https://store.docker.com/editions/community/docker-ce-desktop-windows)
+######[download]######((https://store.docker.com/editions/community/docker-ce-desktop-windows)
 - Linux
   - Ubuntu : https://www.docker.com/docker-ubuntu
-  [->](https://store.docker.com/editions/community/docker-ce-server-ubuntu)
+  ######[download]######((https://store.docker.com/editions/community/docker-ce-server-ubuntu)
   - Centos : https://www.docker.com/docker-centos-distribution
-  [->](https://store.docker.com/editions/community/docker-ce-server-centos)
+  ######[download]######((https://store.docker.com/editions/community/docker-ce-server-centos)
    
 ### Minimum Requirements : 
 - Host OS must have PHP ^5.6
