@@ -23,7 +23,7 @@ class StopCommand extends Command {
       ->setName('docker:stop')
       ->setAliases(['stop'])
       ->setDescription('Stop current APP containers')
-      ->setHelp("Example : [dockerdrupal stop]");;
+      ->setHelp("Example : [dockerdrupal stop]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
