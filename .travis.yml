@@ -1,44 +1,38 @@
 dist: trusty
 sudo: required
-
 language: php
-
 php:
-  - 5.6
-  - 7
-  
+- 5.6
+- 7
+- hhvm
 matrix:
   fast_finish: true
   allow_failures:
-    - php: hhvm
-
+  - php: hhvm
 before_script:
-  - composer self-update
-  - composer install --no-dev
-
+- composer self-update
+- composer install --no-dev
 script:
-  - ./scripts/basic.sh
-  - sonar-scanner
-
+- ./scripts/basic.sh
+- sonar-scanner
 notifications:
   slack:
     rooms:
-      - 4alldigital:QY0MCk9HdP2Ls5nELR55lKNr
+    - 4alldigital:QY0MCk9HdP2Ls5nELR55lKNr
     on_success: change
     on_failure: change
   email: false
-  
 addons:
   sonarqube:
-    organization: "dockerdrupal"
-    token:
-      secure: 7640ec0defe18a639659a2d8a2062396607d60ff
+    organization: dockerdrupal
     branches:
-      - dev
-      - master
+    - dev
+    - master
 jdk:
-  - oraclejdk8
-  
+- oraclejdk8
 cache:
   directories:
-    - '$HOME/.sonar/cache'
+  - $HOME/.sonar/cache
+env:
+  global:
+    secure: UCja7NuWorDr2Ft+FuQ3DBNXP57aiSi0sSne37r3nzn66vGnJ9k/90fJE+h3HWnXsAjZbhITxVX4Eic037Z+K2LK9u2GUmzErMCz5dnKz9EuNNp2TpfRE6TuJZOBXeKoB/+6azHCJf1JnYJjVh2JBLi0xM1fugbl5idLMMqPbdImyCQW2jJXMOkiCGD6Wl8/BcySE11tI1SlgrgjvYwwHXHLWeCyr+6Yf2+AfVWQsyvqTQrJ86HIuv/NvyZC+rOZw9how6F3znWSQud/dVaF7EzVeFVQzgVNMCs3IHaQ/N2/YEktw7BbtbgbXApm/zeUA1MmyDn9GVqitz+ox/WyCySPKjSTHrGSBOp61dLe/7kYBUJ6YS+girHW3X5e+V4O1wR6ME51JiWwabJra/8976vrpE/Ed90BFLC3J3GF6SmULdzr1uXmXPYPY1i5wgtV4hsbe4ONd++bRZFft2vcZRzJzpk4KqAQCA+UxNxZloHXSDoc6P57A7G7hp7FPH3JISOvQxi9yr7EExOQ4iRoUaGCwyRuIvA7N7GnghTJkY+VMjTfirWQR5PxnKMGLvGmR410kNvMqLBC2Ebvj9PMyfupWDXwmzGzdzF1pF5LQ3yw3F3BGApj2xkDJ+ucCvV3e4JNcTfXsV/lwbmZx2myLE1Hg5lD3C2nEVrK+amUonY=
