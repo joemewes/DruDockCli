@@ -34,7 +34,7 @@ addons:
   sonarqube:
     organization: "dockerdrupal"
     token:
-      secure: SONAR_TOKEN
+      secure: 7640ec0defe18a639659a2d8a2062396607d60ff
     branches:
       - dev
       - master
