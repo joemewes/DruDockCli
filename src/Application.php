@@ -58,8 +58,7 @@ class Application extends ParentApplication {
    * @return string
    */
   public function getUtilRoot() {
-    $utilRoot = realpath(__DIR__ . '/../') . '/';
-    return $utilRoot;
+    return realpath(__DIR__ . '/../') . '/';
   }
 
   /**
