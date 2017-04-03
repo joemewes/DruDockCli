@@ -134,8 +134,7 @@ class Application extends ParentApplication {
    */
   public function getRunningContainerNames() {
     $names = shell_exec("echo $(docker ps --format '{{.Names}}')");
-    $n_array = explode(' ', $names);
-    return $n_array;
+    return explode(' ', $names);
   }
 
   /**
@@ -227,8 +226,7 @@ class Application extends ParentApplication {
     $process = new Process($command);
     $process->setTimeout(2);
     $process->run();
-    $version = $process->getOutput();
-    return $version;
+    return $process->getOutput();
   }
 
   /**
@@ -294,6 +292,9 @@ class Application extends ParentApplication {
   public function getComposePath($appname, $io) {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
+    $latestbuild =  [];
+    $reqs = '';
+    $fs = new Filesystem();
 
     if ($config = $this->getAppConfig($io)) {
       if (isset($config['reqs'])) {
@@ -304,27 +305,20 @@ class Application extends ParentApplication {
       }
     }
 
-    $fs = new Filesystem();
-
-    if (isset($reqs) && $reqs == 'Prod') {
-      $projectname = $system_appname . '--' . end($latestbuild);
-      $project = '--project-name=' . $projectname;
-    }
-    elseif (isset($reqs) && $reqs == 'Stage') {
-      $projectname = $system_appname . '--' . end($latestbuild);
-      $project = '--project-name=' . $projectname;
-    }
-    else {
-      $project = '';
+    switch ($reqs) {
+      case 'Prod':
+      case 'Stage':
+      $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
+      break;
+      default:
+        $project = '';
     }
 
     if ($fs->exists('docker-compose.yml')) {
-      $dc = 'docker-compose ';
-      return $dc;
+      return 'docker-compose ';
     }
     elseif ($fs->exists('./docker_' . $system_appname . '/docker-compose.yml')) {
-      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose.yml ' . $project . ' ';
-      return $dc;
+      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose.yml : Not Found");
@@ -338,35 +332,42 @@ class Application extends ParentApplication {
   public function getDataComposePath($appname, $io) {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
+    $build =  [];
+    $reqs = '';
+    $fs = new Filesystem();
 
     if ($config = $this->getAppConfig($io)) {
       $reqs = $config['reqs'];
-      $appreqs = $config['reqs'];
       if (is_array($config['builds'])) {
         $build = end($config['builds']);
       }
     }
 
-    $fs = new Filesystem();
+    if (!$build) {
+      $io->error('Build :: Config not found');
+      return;
+    }
 
-    if (isset($reqs) && $reqs == 'Prod') {
-      $project = '--project-name=data';
+    switch ($reqs) {
+      case 'Prod':
+        $project = '--project-name=data';
+        break;
+      case 'Stage':
+        $project = '--project-name=' . $system_appname . '_data';
+        break;
+      default:
+        $project = '';
     }
-    elseif (isset($reqs) && $reqs == 'Stage') {
-      if (!isset($build)) {
-        $io->error('Build :: ' . $build . ' missing.');
-        return;
-      }
-      $project = '--project-name=' . $system_appname . '_data';
-    }
-    else {
+
+    if (!$project) {
+      // @todo: This message needs review.
+      // @see https://github.com/4AllDigital/DockerDrupalCli/issues/91
       $io->error("docker-compose-data.yml : Not Found");
       exit;
     }
 
     if ($fs->exists('./docker_' . $system_appname . '/docker-compose-data.yml')) {
-      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
-      return $dc;
+      return'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose-data.yml : Not Found");
@@ -396,8 +397,7 @@ class Application extends ParentApplication {
     }
 
     if ($fs->exists('./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml')) {
-      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml ' . $project . ' ';
-      return $dc;
+      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose-data.yml : Not Found");
@@ -417,7 +417,6 @@ class Application extends ParentApplication {
     }
     else {
       $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
-      //exit;
     }
 
   }
@@ -562,7 +561,9 @@ class Application extends ParentApplication {
     }
 }';
 
-    if ($reqs == 'Prod') {
+    switch ($reqs) {
+      case 'Prod':
+      case 'Stage':
       file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
 
       $nginxenv = "VIRTUAL_HOST=$apphost
@@ -570,19 +571,9 @@ APPS_PATH=~/app
 VIRTUAL_NETWORK=nginx-proxy";
 
       file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
-
-    }
-    elseif ($reqs == 'Stage') {
-      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
-
-      $nginxenv = "VIRTUAL_HOST=$apphost
-APPS_PATH=~/app
-VIRTUAL_NETWORK=nginx-proxy";
-
-      file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
-    }
-    else {
-      file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
+      break;
+      default:
+        file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
     }
   }
 
@@ -661,8 +652,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    * @return string
    */
   function getOs() {
-    $os = PHP_OS;
-    return $os;
+    return PHP_OS;
   }
 
   function requireUpdate($io) {
@@ -676,7 +666,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    *  Return keys of current required app config.
    */
   function getDDrequirements() {
-    $app_config_reqs = [
+    return [
       'appname',
       'apptype',
       'host',
@@ -684,7 +674,6 @@ VIRTUAL_NETWORK=nginx-proxy";
       'appsrc',
       'repo',
     ];
-    return $app_config_reqs;
   }
 
   /**
