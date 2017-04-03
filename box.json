@@ -2,7 +2,6 @@
   "alias": "dockerdrupal.phar",
   "chmod": "0755",
   "directories": [
-    "bundles",
     "src"
   ],
   "files": [

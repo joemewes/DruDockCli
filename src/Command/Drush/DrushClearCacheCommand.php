@@ -29,29 +29,28 @@ class DrushClearCacheCommand extends Command {
     $application = $this->getApplication();
 
     $io = new DockerDrupalStyle($input, $output);
-
     $config = $application->getAppConfig($io);
 
-    if ($config) {
-      $type = $config['apptype'];
-    }
-
-    if (isset($type) && $type == 'D8') {
-      $cmd = 'cr all';
-    }
-    elseif (isset($type) && $type == 'D7') {
-      $cmd = 'cc all';
-    }
-    else {
-      $io->error('You\'re not currently in an Drupal APP directory');
+    if (!$config) {
+      $io->error('No config found. You\'re not currently in an Drupal APP directory');
       return;
-    };
-
-    $io->section('PHP ::: drush ' . $cmd);
-
-    if ($config = $application->getAppConfig($io)) {
+    } else {
       $appname = $config['appname'];
     }
+
+    switch ($config['apptype']) {
+      case 'D8':
+        $cmd = 'cr all';
+        break;
+      case 'D7':
+        $cmd = 'cc all';
+        break;
+      default:
+        $io->error('You\'re not currently in an Drupal APP directory');
+        return;
+    }
+
+    $io->section('PHP ::: drush ' . $cmd);
 
     if ($application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
