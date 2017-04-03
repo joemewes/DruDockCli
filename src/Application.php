@@ -53,8 +53,7 @@ class Application extends ParentApplication {
    * @return string
    */
   public function getUtilRoot() {
-    $utilRoot = realpath(__DIR__ . '/../') . '/';
-    return $utilRoot;
+    return realpath(__DIR__ . '/../') . '/';
   }
 
   /**
@@ -130,8 +129,7 @@ class Application extends ParentApplication {
    */
   public function getRunningContainerNames() {
     $names = shell_exec("echo $(docker ps --format '{{.Names}}')");
-    $n_array = explode(' ', $names);
-    return $n_array;
+    return explode(' ', $names);
   }
 
   /**
@@ -223,8 +221,7 @@ class Application extends ParentApplication {
     $process = new Process($command);
     $process->setTimeout(2);
     $process->run();
-    $version = $process->getOutput();
-    return $version;
+    return $process->getOutput();
   }
 
   /**
@@ -312,12 +309,10 @@ class Application extends ParentApplication {
     }
 
     if ($fs->exists('docker-compose.yml')) {
-      $dc = 'docker-compose ';
-      return $dc;
+      return 'docker-compose ';
     }
     elseif ($fs->exists('./docker_' . $system_appname . '/docker-compose.yml')) {
-      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose.yml ' . $project . ' ';
-      return $dc;
+      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose.yml : Not Found");
@@ -364,8 +359,7 @@ class Application extends ParentApplication {
     }
 
     if ($fs->exists('./docker_' . $system_appname . '/docker-compose-data.yml')) {
-      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
-      return $dc;
+      return'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose-data.yml : Not Found");
@@ -395,8 +389,7 @@ class Application extends ParentApplication {
     }
 
     if ($fs->exists('./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml')) {
-      $dc = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml ' . $project . ' ';
-      return $dc;
+      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose-data.yml : Not Found");
@@ -416,7 +409,6 @@ class Application extends ParentApplication {
     }
     else {
       $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
-      //exit;
     }
 
   }
@@ -659,8 +651,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    * @return string
    */
   function getOs() {
-    $os = PHP_OS;
-    return $os;
+    return PHP_OS;
   }
 
   function requireUpdate($io) {
@@ -674,7 +665,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    *  Return keys of current required app config.
    */
   function getDDrequirements() {
-    $app_config_reqs = [
+    return [
       'appname',
       'apptype',
       'host',
@@ -682,7 +673,6 @@ VIRTUAL_NETWORK=nginx-proxy";
       'appsrc',
       'repo',
     ];
-    return $app_config_reqs;
   }
 
   /**
