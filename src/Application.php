@@ -290,6 +290,9 @@ class Application extends ParentApplication {
   public function getComposePath($appname, $io) {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
+    $latestbuild =  [];
+    $reqs = '';
+    $fs = new Filesystem();
 
     if ($config = $this->getAppConfig($io)) {
       if (isset($config['reqs'])) {
@@ -300,18 +303,12 @@ class Application extends ParentApplication {
       }
     }
 
-    $fs = new Filesystem();
-
-    if (isset($reqs) && $reqs == 'Prod') {
-      $projectname = $system_appname . '--' . end($latestbuild);
-      $project = '--project-name=' . $projectname;
-    }
-    elseif (isset($reqs) && $reqs == 'Stage') {
-      $projectname = $system_appname . '--' . end($latestbuild);
-      $project = '--project-name=' . $projectname;
-    }
-    else {
-      $project = '';
+    switch ($reqs) {
+      case 'Prod':
+      case 'Stage':
+      $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
+      default:
+        $project = '';
     }
 
     if ($fs->exists('docker-compose.yml')) {
