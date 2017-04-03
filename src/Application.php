@@ -553,7 +553,9 @@ class Application extends ParentApplication {
     }
 }';
 
-    if ($reqs == 'Prod') {
+    switch ($reqs) {
+      case 'Prod':
+      case 'Stage':
       file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
 
       $nginxenv = "VIRTUAL_HOST=$apphost
@@ -561,19 +563,9 @@ APPS_PATH=~/app
 VIRTUAL_NETWORK=nginx-proxy";
 
       file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
-
-    }
-    elseif ($reqs == 'Stage') {
-      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
-
-      $nginxenv = "VIRTUAL_HOST=$apphost
-APPS_PATH=~/app
-VIRTUAL_NETWORK=nginx-proxy";
-
-      file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
-    }
-    else {
-      file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
+      break;
+      default:
+        file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
     }
   }
 
