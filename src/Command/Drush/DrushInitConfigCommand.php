@@ -43,12 +43,12 @@ class DrushInitConfigCommand extends Command {
       $site_config = Yaml::parse(file_get_contents($site_settings));
       $uuid = $site_config['uuid'];
 
-      $drushcmd = 'drush config-set \'system . site\' uuid ' . $uuid . ' -y';
+      $drushcmd = 'drush config-set \'system.site\' uuid ' . $uuid . ' -y';
       $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
       $io->info($drushcmd);
       $application->runcommand($command, $io);
 
-      $drushcmd = 'drush cc all';
+      $drushcmd = 'drush cr all';
       $command = $application->getComposePath($appname, $io) . ' exec -T php ' . $drushcmd;
       $io->info($drushcmd);
       $application->runcommand($command, $io);

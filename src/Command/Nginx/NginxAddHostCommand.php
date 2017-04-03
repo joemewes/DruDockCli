@@ -13,6 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DockerDrupalStyle;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Filesystem\Filesystem;
+use Alchemy\Zippy\Zippy;
+use GuzzleHttp\Client;
 
 /**
  * Class NginxAddHostCommand
@@ -29,6 +32,9 @@ class NginxAddHostCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $fs = new Filesystem();
+    $client = new Client();
+    $zippy = Zippy::load();
 
     $io = new DockerDrupalStyle($input, $output);
     $io->section("Nginx ::: add host");
@@ -48,7 +54,7 @@ class NginxAddHostCommand extends Command {
     $newhost = $helper->ask($input, $output, $question);
 
     if ($application->getOs() == 'Darwin') {
-      $application->addHostConfig($newhost, $io, TRUE);
+      $application->addHostConfig($fs, $client, $zippy, $newhost, $io, TRUE);
     }
 
     if (file_exists('.config.yml')) {

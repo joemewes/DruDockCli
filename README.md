@@ -61,62 +61,65 @@ composer global require dockerdrupal/cli
 ## Initial Commands structure
 ```
      Available commands:
-       about              About DockerDrupal
-       destroy            Disable and delete APP and containers
-       env                Fetch and build DockerDrupal containers
-       exec               Execute bespoke commands at :container
-       help               Displays help for a command
-       init               Fetch and build Drupal apps
-       list               Lists commands
-       restart            Restart current APP containers
-       start              Start current APP containers
-       status             Get current status of all containers
-       stop               Stop current APP containers
-       update             Update current APP containers
+       about                     About DockerDrupal
+       destroy                   Disable and delete APP and containers
+       env                       Fetch and build DockerDrupal containers
+       exec                      Execute bespoke commands at :container
+       help                      Displays help for a command
+       init                      Fetch and build Drupal apps
+       list                      Lists commands
+       restart                   Restart current APP containers
+       start                     Start current APP containers
+       status                    Get current status of all containers
+       stop                      Stop current APP containers
       behat
-       behat:cmd          Run behat commands
-       behat:monitor      Launch behat VNC viewer
-       behat:status       Runs example command against running APP and current config
+       behat:cmd                 Run behat commands
+       behat:monitor             Launch behat VNC viewer
+       behat:status              Runs example command against running APP and current config
       build
-       build:destroy      Disable and delete APP and containers
-       build:init         Fetch and build Drupal apps
+       build:destroy             Disable and delete APP and containers
+       build:init                Fetch and build Drupal apps
       docker
-       docker:exec        Execute bespoke commands at :container
-       docker:restart     Restart current APP containers
-       docker:start       Start current APP containers
-       docker:status      Get current status of all containers
-       docker:stop        Stop current APP containers
-       docker:update      Update current APP containers
+       docker:exec               Execute bespoke commands at :container
+       docker:restart            Restart current APP containers
+       docker:start              Start current APP containers
+       docker:status             Get current status of all containers
+       docker:stop               Stop current APP containers
+       docker:update:config      Update APP config
+       docker:update:containers  Update APP containers
       drush
-       drush:cc           Run drush cache clear 
-       drush:cmd          Run drush commands 
-       drush:dis          Disable/Uninstall Drupal module
-       drush:en           Enable Drupal module
-       drush:init:config  Run drush config init
-       drush:uli          Run Drush ULI
-       drush:updb         Run Drush updb
+       drush:cc                  Run drush cache clear 
+       drush:cmd                 Run drush commands 
+       drush:dis                 Disable/Uninstall Drupal module
+       drush:en                  Enable Drupal module
+       drush:init:config         Run drush config init
+       drush:uli                 Run Drush ULI
+       drush:updb                Run Drush updb
       env
-       env:init           Fetch and build DockerDrupal containers
+       env:init                  Fetch and build DockerDrupal containers
       mysql
-       mysql:export       Export .sql files
-       mysql:import       Import .sql files
-       mysql:log          Monitor mysql activity
+       mysql:export              Export .sql files
+       mysql:import              Import .sql files
+       mysql:log                 Monitor mysql activity
       nginx
-       nginx:addhost      Add nginx host to DD and host OS
-       nginx:flush        Flush nginx cache
-       nginx:log          Monitor nginx activity
-       nginx:reload       Reload nginx activity
+       nginx:addhost             Add nginx host to DD and host OS
+       nginx:flush               Flush nginx cache
+       nginx:log                 Monitor nginx activity
+       nginx:reload              Reload nginx activity
       prod
-       prod:update        Rebuild app and deploy latest code into app containers
+       prod:update               Rebuild app and deploy latest code into app containers
       redis
-       redis:flush        Flush Redis cache
-       redis:info         Get Redis running config information
-       redis:monitor      Montitor redis activity
-       redis:ping         Ping Redis
+       redis:flush               Flush Redis cache
+       redis:info                Get Redis running config information
+       redis:monitor             Montitor redis activity
+       redis:ping                Ping Redis
       self
-       self:about         About DockerDrupal
+       self:about                About DockerDrupal
       sync
-       sync:monitor       Montitor current App sync activity
+       sync:monitor              Montitor current App sync activity
+      up
+       up:cg                     Update APP config
+       up:ct                     Update APP containers
 
        
 ```
@@ -124,25 +127,30 @@ composer global require dockerdrupal/cli
 ## Example Commands
 ```
       --------------
-      $ dockerdrupal env my-great-app -t DEFAULT
-      $ dockerdrupal env my-drupal8-site -t D8
-      $ dockerdrupal env my-drupal7-site -t D7
+      :$ dockerdrupal env my-great-app -t DEFAULT -r Basic -s New -p basic.docker.dev
+      :$ cd my-great-app && dockerdrupal build:init
       --------------
-
-      $ cd my-great-app && dockerdrupal build:init
-      $ cd my-drupal8-site && dockerdrupal build:init
-      $ cd my-drupal7-site && dockerdrupal build:init
-
+```    
+#### DEV Drupal 8  
+```
       --------------
-
+      :$ dockerdrupal env my-drupal8-site -t D8 -r Basic -s New -p d8.docker.dev
+      :$ cd my-drupal8-site && dockerdrupal build:init
+      --------------
+```   
+#### DEV Drupal 7
+```
+      --------------
+      :$ dockerdrupal env my-drupal7-site -t D7 -r Full -s Git -p d7.docker.dev
+      :$ cd my-drupal7-site && dockerdrupal build:init
+      --------------
 ```
 
-# Next step :
+### Next step :
 
  - More utility commands and USER feedback
-
 For more information see [roadmap](https://github.com/4AllDigital/DockerDrupalCli/blob/master/roadmap.md)
 
-# Known issues
+### Known issues
 
-1. Its not finished
+1. Its not finished - still in early -alpha and requires community testing and feedback.

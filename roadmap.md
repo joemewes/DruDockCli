@@ -1,15 +1,22 @@
 # DockerDrupalCli
 
+## GUI
+Initial feedback suggests and Web UI  to monitor and manage environments
+
+- [ ] Build ReactJS frontend for Symphony console app
+
 ## build ENV- docker-compose.yml
 - Dynamic build of docker-compose.yml via Q & A rather than from alternative GIT repo
 
 - [X] DEFAULT [Basic]
 - [X] WITH TESTING SUITE [Full]
-- [ ] READ-ONLY PROD
+- [X] READ-ONLY PROD
 - [ ] CUSTOM
 
-1. -> DEFAULT - [DockerDrupal-lite](https://github.com/4AllDigital/DockerDrupal-lite)  
-2. -> WITH TESTING SUITE - [DockerDrupal](https://github.com/4AllDigital/DockerDrupal)
+1. -> DEFAULT (Basic)
+2. -> WITH TESTING SUITE (Full)
+3. -> PROD (not-production ready) (Prod)
+4. -> STAGE (requires running prod) (Stage)
 
 APPROACH:
 
@@ -19,7 +26,6 @@ APPROACH:
     - download DD from git repo and build env
     - NEW - add DD main commands
     
-' THOUGHTS: should move dd-lite and dd into /CLI repo ?? '
 
 @2017
 3. -> CUSTOM - Q & A
@@ -45,7 +51,6 @@ After merging and update of READ_ONLY prod environment:
 
 - [ ] ADD/GENERATE remote tools -> SSH keys/Drush alias'
 - [ ] Interact with remote /CLI - drush && docker && ??
- 
 
 ## General continued things it must do :                                                                                    
 - init app/dockerdrupal ./config.yaml on manually created app/old version
@@ -66,8 +71,7 @@ DRUSH
 
 PHANTOMCSS
 
-- phantomcss:cmd [Run pahtnomCSS commands/testsuits.js against runnign APP]
-
+- phantomcss:cmd [Run phatnomCSS commands/testsuits.js against runnign APP]
 
 UTIL
 
