@@ -304,6 +304,7 @@ class Application extends ParentApplication {
       case 'Prod':
       case 'Stage':
       $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
+      break;
       default:
         $project = '';
     }
@@ -345,8 +346,10 @@ class Application extends ParentApplication {
     switch ($reqs) {
       case 'Prod':
         $project = '--project-name=data';
+        break;
       case 'Stage':
         $project = '--project-name=' . $system_appname . '_data';
+        break;
       default:
         $project = '';
     }
