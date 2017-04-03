@@ -331,28 +331,34 @@ class Application extends ParentApplication {
   public function getDataComposePath($appname, $io) {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
+    $build =  [];
+    $reqs = '';
+    $fs = new Filesystem();
 
     if ($config = $this->getAppConfig($io)) {
       $reqs = $config['reqs'];
-      $appreqs = $config['reqs'];
       if (is_array($config['builds'])) {
         $build = end($config['builds']);
       }
     }
 
-    $fs = new Filesystem();
+    if (!$build) {
+      $io->error('Build :: Config not found');
+      return;
+    }
 
-    if (isset($reqs) && $reqs == 'Prod') {
-      $project = '--project-name=data';
+    switch ($reqs) {
+      case 'Prod':
+        $project = '--project-name=data';
+      case 'Stage':
+        $project = '--project-name=' . $system_appname . '_data';
+      default:
+        $project = '';
     }
-    elseif (isset($reqs) && $reqs == 'Stage') {
-      if (!isset($build)) {
-        $io->error('Build :: ' . $build . ' missing.');
-        return;
-      }
-      $project = '--project-name=' . $system_appname . '_data';
-    }
-    else {
+
+    if (!$project) {
+      // @todo: This message needs review.
+      // @see https://github.com/4AllDigital/DockerDrupalCli/issues/91
       $io->error("docker-compose-data.yml : Not Found");
       exit;
     }
