@@ -188,7 +188,7 @@ class BuildCommand extends ContainerAwareCommand {
       if (is_dir(TMP_D7) && is_dir($app_dest . REPOSITORY)) {
         $d7files = TMP_D7;
         // Potential repo files.
-        $fs->copy($d7files . ROBOT_TXT, $app_dest . '/repository/robots.txt');
+        $fs->copy($d7files . ROBOTS_TXT, $app_dest . '/repository/robots.txt');
         $fs->copy($d7files . '/settings.php', $app_dest . '/repository/settings.php');
         $fs->copy($d7files . '/project.make.yml', $app_dest . '/repository/project.make.yml');
         $fs->copy($d7files . '/.gitignore', $app_dest . '/repository/.gitignore');
@@ -216,8 +216,8 @@ class BuildCommand extends ContainerAwareCommand {
 
       $rel = $fs->makePathRelative($app_dest . '/repository/', $app_dest . '/' . $buildpath);
 
-      $fs->remove([$app_dest . '/' . $buildpath . ROBOT_TXT]);
-      $fs->symlink($rel . 'robots.txt', $app_dest . '/' . $buildpath . ROBOT_TXT, TRUE);
+      $fs->remove([$app_dest . '/' . $buildpath . ROBOTS_TXT]);
+      $fs->symlink($rel . 'robots.txt', $app_dest . '/' . $buildpath . ROBOTS_TXT, TRUE);
 
       $fs->remove([$app_dest . '/' . $buildpath . SETTINGS]);
       $fs->symlink('../../' . $rel . 'settings.php', $app_dest . '/' . $buildpath . SETTINGS, TRUE);
@@ -301,7 +301,7 @@ class BuildCommand extends ContainerAwareCommand {
         $fs->copy($d8files . '/composer.json', $app_dest . '/composer.json', TRUE);
         $fs->copy($d8files . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
         $fs->copy($d8files . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
-        $fs->copy($d8files . ROBOT_TXT, $app_dest . '/web/robots.txt', TRUE);
+        $fs->copy($d8files . ROBOTS_TXT, $app_dest . '/web/robots.txt', TRUE);
         $fs->copy($d8files . '/settings.php', $app_dest . '/web/sites/default/settings.php', TRUE);
         $fs->copy($d8files . '/settings.local.php', $app_dest . SETTINGS_LOCAL, TRUE);
         $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
