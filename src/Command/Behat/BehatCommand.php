@@ -15,6 +15,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class BehatCommand
@@ -34,6 +35,7 @@ class BehatCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
     $io = new DockerDrupalStyle($input, $output);
 
@@ -59,7 +61,7 @@ class BehatCommand extends Command {
       $tags = $helper->ask($input, $output, $question);
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
 
       $cmd = '--config /root/behat/behat.yml ';
       if (isset($suite) && $suite != NULL) {
@@ -81,7 +83,7 @@ class BehatCommand extends Command {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . 'exec behat behat ' . $cmd;
       $application->runcommand($command, $io);
     }

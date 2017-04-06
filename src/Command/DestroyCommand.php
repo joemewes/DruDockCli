@@ -12,7 +12,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+
 
 /**
  * Class DemoCommand
@@ -31,6 +33,7 @@ class DestroyCommand extends Command {
   protected function execute(InputInterface $input, OutputInterface $output) {
 
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
     $io = new DockerDrupalStyle($input, $output);
     $io->section("REMOVING APP");
@@ -52,14 +55,14 @@ class DestroyCommand extends Command {
     }
 
     if (isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
-      if ($application->checkForAppContainers($appname, $io)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
           $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
           $application->runcommand($command, $io);
       }
     }
 
     if(isset($appreqs) && $appreqs == 'Prod') {
-      if ($application->checkForAppContainers($appname, $io)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
         $application->runcommand($command, $io);
       }
@@ -72,7 +75,7 @@ class DestroyCommand extends Command {
     }
 
     if(isset($appreqs) && $appreqs == 'Stage') {
-      if ($application->checkForAppContainers($appname, $io)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
         $application->runcommand($command, $io);
       }

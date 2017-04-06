@@ -17,6 +17,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DockerDrupalStyle;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
 
@@ -355,6 +356,8 @@ class BuildCommand extends ContainerAwareCommand {
   private function installDrupal8($io, $install_helpers = FALSE) {
 
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
+
     if ($config = $application->getAppConfig($io)) {
       $reqs = $config[REQS];
       $appname = $config[APP_NAME];
@@ -367,7 +370,7 @@ class BuildCommand extends ContainerAwareCommand {
 
     $message = 'Run Drupal Installation.... This may take a few minutes....';
     $io->note($message);
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
 
       if ($reqs == 'Basic' || $reqs == 'Full') {
         $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/';

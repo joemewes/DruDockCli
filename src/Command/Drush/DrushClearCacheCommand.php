@@ -11,6 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class DemoCommand
@@ -27,6 +28,7 @@ class DrushClearCacheCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
     $io = new DockerDrupalStyle($input, $output);
     $config = $application->getAppConfig($io);
@@ -52,7 +54,7 @@ class DrushClearCacheCommand extends Command {
 
     $io->section('PHP ::: drush ' . $cmd);
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
       $application->runcommand($command, $io);
     }

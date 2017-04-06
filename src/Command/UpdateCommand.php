@@ -14,6 +14,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Filesystem;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class DemoCommand
@@ -31,6 +32,7 @@ class UpdateCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
     $io = new DockerDrupalStyle($input, $output);
     $io->section("UPDATING CONTAINERS");
 
@@ -38,7 +40,7 @@ class UpdateCommand extends Command {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
 
       $command = $application->getComposePath($appname, $io) . ' pull 2>&1';
       $application->runcommand($command, $io);

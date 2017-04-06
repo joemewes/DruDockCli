@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Docker\Drupal\Style\DockerDrupalStyle;
 
 /**
@@ -29,6 +30,8 @@ class NginxFlushPagespeedCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
+
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("Nginx ::: flush");
@@ -37,7 +40,7 @@ class NginxFlushPagespeedCommand extends Command {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . 'exec -T nginx bash -c "rm -rf /var/ngx_pagespeed_cache/*" 2>&1';
       $application->runcommand($command, $io);
     }

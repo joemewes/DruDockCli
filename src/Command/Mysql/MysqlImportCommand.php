@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
@@ -31,6 +32,7 @@ class MysqlImportCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
     $io = new DockerDrupalStyle($input, $output);
 
@@ -59,8 +61,7 @@ class MysqlImportCommand extends Command {
 
       if (file_exists($importpath)) {
 
-        //drop database;
-        if ($application->checkForAppContainers($appname, $io)) {
+        if ($container_application->checkForAppContainers($appname, $io)) {
 
           $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
           $application->runcommand($command, $io);

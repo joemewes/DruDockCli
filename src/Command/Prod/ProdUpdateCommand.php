@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class ProdUpdateCommand
@@ -28,6 +29,7 @@ class ProdUpdateCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
     $io = new DockerDrupalStyle($input, $output);
 
     $io->section("PROD ::: Update");
@@ -44,9 +46,9 @@ class ProdUpdateCommand extends Command {
 
     if (isset($appreqs) && $appreqs == 'Prod') {
 
-      if ($application->checkForAppContainers($appname, $io)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
 
-        $date =  date('Y-m-d--H-i-s');
+        $date = date('Y-m-d--H-i-s');
         $system_appname = strtolower(str_replace(' ', '', $appname));
         $projectname = $system_appname . '--' . $date;
 

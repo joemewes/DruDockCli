@@ -397,21 +397,7 @@ class Application extends ParentApplication {
     }
   }
 
-  /**
-   * @return Boolean
-   */
-  public function checkForAppContainers($appname, $io) {
 
-    $system_appname = strtolower(str_replace(' ', '', $appname));
-    // Check for standard app containers
-    if (exec($this->getComposePath($appname, $io) . 'ps | grep ' . preg_replace("/[^A-Za-z0-9 ]/", '', $system_appname))) {
-      return TRUE;
-    }
-    else {
-      $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
-    }
-
-  }
 
   /**
    * @return string

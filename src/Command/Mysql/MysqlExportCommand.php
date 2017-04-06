@@ -15,6 +15,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class MysqlImportExportCommand
@@ -32,6 +33,7 @@ class MysqlExportCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
     $io = new DockerDrupalStyle($input, $output);
     $io->section('MYSQL ::: dump/export database');
@@ -51,7 +53,7 @@ class MysqlExportCommand extends Command {
       $savepath = $helper->ask($input, $output, $question);
     }
 
-    if ($application->checkForAppContainers($appname, $io) && isset($savepath)) {
+    if ($container_application->checkForAppContainers($appname, $io) && isset($savepath)) {
       $command = $application->getComposePath($appname, $io) . 'exec -T db mysqldump -u dev -pDEVPASSWORD dev_db > ' . $savepath;
       $application->runcommand($command, $io);
     }

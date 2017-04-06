@@ -11,6 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class DemoCommand
@@ -28,6 +29,8 @@ class StopCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
+
     $io = new DockerDrupalStyle($input, $output);
 
     if ($config = $application->getAppConfig($io)) {
@@ -36,7 +39,7 @@ class StopCommand extends Command {
 
     $io->section("APP ::: Stopping " . $appname . " containers");
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . ' stop 2>&1';
       $application->runcommand($command, $io);
     }
