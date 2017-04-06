@@ -53,14 +53,13 @@ class ApplicationConfigExtension extends Application {
       }
     }
 
-    var_dump(LOCALHOST);
-    var_dump(DEV_MYSQL_PASS);
-    var_dump($db_name);
-    var_dump($db_port);
-
     while (!@mysqli_connect(LOCALHOST, 'dev', DEV_MYSQL_PASS, $db_name, $db_port)) {
-      sleep(1);
-      echo '.';
+      $phases = array("|", "/", "-", "\\");
+      foreach ($phases AS $phase)
+      {
+        printf('%s%s', chr(8), $phase);
+        usleep(100000); // Replace this with one iteration of doing stuff
+      }
     }
 
     $io->text(' ');
