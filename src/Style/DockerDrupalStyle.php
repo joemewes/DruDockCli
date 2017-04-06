@@ -5,7 +5,6 @@ namespace Docker\Drupal\Style;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 
 class DockerDrupalStyle extends SymfonyStyle

@@ -13,25 +13,17 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Console\Application as ParentApplication;
 
+const DEV_MYSQL_PASS = 'DEVPASSWORD';
+const LOCALHOST = '127.0.0.1';
 
 /**
  * Class Application
  * @package Docker\Drupal
  */
 class Application extends ParentApplication {
-  /**
-   * @var string
-   */
+
   const NAME = 'Docker Drupal';
-
-  /**
-   * @var string
-   */
   const VERSION = '1.3.4-alpha7.2';
-
-  /**
-   * @var string
-   */
   const CDN = 'http://d2w5nr49smktig.cloudfront.net';
 
   /**
@@ -292,7 +284,7 @@ class Application extends ParentApplication {
   public function getComposePath($appname, $io) {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
-    $latestbuild =  [];
+    $latestbuild = [];
     $reqs = '';
     $fs = new Filesystem();
 
@@ -308,8 +300,8 @@ class Application extends ParentApplication {
     switch ($reqs) {
       case 'Prod':
       case 'Stage':
-      $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
-      break;
+        $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
+        break;
       default:
         $project = '';
     }
@@ -332,7 +324,7 @@ class Application extends ParentApplication {
   public function getDataComposePath($appname, $io) {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
-    $build =  [];
+    $build = [];
     $reqs = '';
     $fs = new Filesystem();
 
@@ -367,7 +359,7 @@ class Application extends ParentApplication {
     }
 
     if ($fs->exists('./docker_' . $system_appname . '/docker-compose-data.yml')) {
-      return'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
+      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose-data.yml : Not Found");
@@ -564,14 +556,14 @@ class Application extends ParentApplication {
     switch ($reqs) {
       case 'Prod':
       case 'Stage':
-      file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
+        file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
 
-      $nginxenv = "VIRTUAL_HOST=$apphost
+        $nginxenv = "VIRTUAL_HOST=$apphost
 APPS_PATH=~/app
 VIRTUAL_NETWORK=nginx-proxy";
 
-      file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
-      break;
+        file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
+        break;
       default:
         file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
     }
@@ -585,7 +577,7 @@ VIRTUAL_NETWORK=nginx-proxy";
     // Add initial entry to hosts file.
     // OSX @TODO update as command for all systems and OS's.
 
-    $ip = '127.0.0.1';
+    $ip = LOCALHOST;
 
     if ($update && $config = $this->getAppConfig($io)) {
       $apphost = $config['host'];
@@ -703,7 +695,12 @@ VIRTUAL_NETWORK=nginx-proxy";
   }
 
   /**
-   * Download remote bundle for temp usage
+   * Download remote bundle for temp usage.
+   *
+   * @param $fs
+   * @param $client
+   * @param $zippy
+   * @param $file
    */
   function tmpRemoteBundle($fs, $client, $zippy, $file) {
     $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
