@@ -18,3 +18,9 @@ EOF
 echo -e "${GREEN}DEMO TEST${NC}"
 
 ./bin/dockerdrupal about
+
+./bin/dockerdrupal --version
+
+./bin/dockerdrupal env travisapp --type D8 --reqs Basic --appsrc New --apphost docker.dev && \
+cd travisapp && \
+./bin/dockerdrupal build:init
