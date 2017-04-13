@@ -18,12 +18,15 @@ const LOCALHOST = '127.0.0.1';
 
 /**
  * Class Application
+ *
  * @package Docker\Drupal
  */
 class Application extends ParentApplication {
 
   const NAME = 'Docker Drupal';
+
   const VERSION = '1.3.4-alpha7.2';
+
   const CDN = 'http://d2w5nr49smktig.cloudfront.net';
 
   /**
@@ -178,7 +181,7 @@ class Application extends ParentApplication {
     $commands[] = new Command\Nginx\NginxMonitorCommand();
     $commands[] = new Command\Nginx\NginxReloadCommand();
     $commands[] = new Command\Nginx\NginxFlushPagespeedCommand();
-    $commands[] = new Command\Nginx\NginxAddHostCommand();
+    $commands[] = new Command\Nginx\NginxSetHostCommand();
 
 
     $commands[] = new Command\Drush\DrushCommand();
@@ -225,39 +228,42 @@ class Application extends ParentApplication {
    * @return array
    */
 
-  public function getAppConfig($io, $skip_checks = FALSE) {
+  public function getAppConfig($io, $appname = '', $skip_checks = FALSE) {
     if (file_exists('.config.yml')) {
       $config = Yaml::parse(file_get_contents('.config.yml'));
-      $config_keys = array_keys($config);
-      $requirements = $this->getDDrequirements();
-
-      if (!$skip_checks) {
-        $missing_reqs = [];
-        foreach ($requirements as $req) {
-          if (!in_array($req, $config_keys)) {
-            $missing_reqs[] = $req;
-          }
-        }
-
-        if (count($missing_reqs) > 0) {
-          $io->info('Your app is missing the following config, please run [dockerdrupal docker:update:config] : ');
-          foreach ($missing_reqs as $req) {
-            $io->warning($req);
-          }
-          exit;
-        }
-      }
-
-      if (substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)) {
-        $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
-      }
-
-      return $config;
     }
-    else {
+    if (file_exists($appname . '/.config.yml')) {
+      $config = Yaml::parse(file_get_contents($appname . '/.config.yml'));
+    }
+    if (!isset($config)) {
       $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');
       exit;
     }
+    $config_keys = array_keys($config);
+    $requirements = $this->getDDrequirements();
+
+    if (!$skip_checks) {
+      $missing_reqs = [];
+      foreach ($requirements as $req) {
+        if (!in_array($req, $config_keys)) {
+          $missing_reqs[] = $req;
+        }
+      }
+
+      if (count($missing_reqs) > 0) {
+        $io->info('Your app is missing the following config, please run [dockerdrupal docker:update:config] : ');
+        foreach ($missing_reqs as $req) {
+          $io->warning($req);
+        }
+        exit;
+      }
+    }
+
+    if (substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)) {
+      $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
+    }
+
+    return $config;
   }
 
   /**
@@ -396,7 +402,6 @@ class Application extends ParentApplication {
       exit;
     }
   }
-
 
 
   /**
@@ -559,13 +564,13 @@ VIRTUAL_NETWORK=nginx-proxy";
    * @param $application
    * @param $io
    */
-  public function addHostConfig($fs, $client, $zippy, $newhost, $io, $update = FALSE) {
+  public function addHostConfig($fs, $client, $zippy, $newhost, $io, $appname) {
     // Add initial entry to hosts file.
     // OSX @TODO update as command for all systems and OS's.
 
     $ip = LOCALHOST;
 
-    if ($update && $config = $this->getAppConfig($io)) {
+    if ($config = $this->getAppConfig($io, $appname)) {
       $apphost = $config['host'];
       $appname = $config['appname'];
       $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -574,29 +579,21 @@ VIRTUAL_NETWORK=nginx-proxy";
       $apphost = 'docker.dev';
     }
 
-    if ($update) {
-      $hosts_file = '/etc/hosts';
-      $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
-      $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
-      $hosts_file_contents = file_get_contents($hosts_file);
+    $hosts_file = '/etc/hosts';
+    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
+    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
+    $hosts_file_contents = file_get_contents($hosts_file);
 
-      if (!strpos($hosts_file_contents, $app_host_config)) {
-        // Add new.
-        $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
-        $this->runcommand($command, $io, TRUE);
-      }
-      else {
-        // Replace existing.
-        $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
-        $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
-        exec($command);
-      }
+    if (!strpos($hosts_file_contents, $app_host_config)) {
+      // Add new.
+      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
+      $this->runcommand($command, $io, TRUE);
     }
     else {
-      $hosts_file = '/etc/hosts';
-      $apphost = 'docker.dev';
-      $command = sprintf("echo '%s %s' | sudo tee -a %s >/dev/null", $ip, $apphost, $hosts_file);
-      $this->runcommand($command, $io, TRUE);
+      // Replace existing.
+      $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
+      $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
+      exec($command);
     }
 
     if (!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {

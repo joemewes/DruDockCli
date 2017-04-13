@@ -19,14 +19,14 @@ use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
 
 /**
- * Class NginxAddHostCommand
+ * Class NginxSetHostCommand
  * @package Docker\Drupal\Command\Nginx
  */
-class NginxAddHostCommand extends Command {
+class NginxSetHostCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('nginx:addhost')
+      ->setName('nginx:sethost')
       ->setDescription('Add nginx host to DD and host OS')
       ->setHelp("This command will add a host server_name & reload NGINX config.");
   }

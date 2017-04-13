@@ -22,32 +22,14 @@ docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docke
 dockerdrupal drush:cmd -c " -l http://docker.dev uli" -> ADAPT into shortcut ??
 
 
-# open mailcatcher
-python -mwebbrowser http://localhost:1080
-
-# launch ??
-python -mwebbrowser http://docker.dev
-
-# behat commands
-## get PORT
-docker inspect --format '{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).HostPort }}' $(docker ps --format {{.Names}} | grep firefox)
-
-## open debug VNC server viewer
-open vnc://:secret@localhost:$(docker inspect --format '{{ (index (index .NetworkSettings.Ports "5900/tcp") 0).HostPort }}' $(docker ps --format {{.Names}} | grep firefox))
-
-example - 1
-    docker exec -it $(docker ps --format {{.Names}} | grep behat) behat --config /app/www/tests/behat.yml --suite global_features --profile local --tags about
-example - 2
-    docker exec -it $(docker ps --format {{.Names}} | grep behat) behat --config /docker/drupal_docker/repository/tests/behat.yml --suite global_features --profile local --tags login
-
-
 # SCREEN into HYVE
 screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
 
 # backup before restore
 cd project_folder && dockerdrupal start && docker exec -i $(docker ps --format {{.Names}} | grep db) mysqldump -u root -ppassword dev_db > dev_db.sql && dockerdrupal stop && cd ../
 
-
 ## DRUPAL 8
 dockerdrupal drush -c "config-export sync --skip-modules=devel,devel_generate,webprofiler,kint -y"
 
+## BOX BUILD
+/usr/local/bin/box build -v

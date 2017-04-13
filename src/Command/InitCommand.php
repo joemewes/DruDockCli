@@ -23,13 +23,14 @@ use GuzzleHttp\Client;
 
 /**
  * Class DemoCommand
+ *
  * @package Docker\Drupal\ContainerAwareCommand
  */
 class InitCommand extends ContainerAwareCommand {
+
   protected function configure() {
     $this
       ->setName('env:init')
-      ->setAliases(['env'])
       ->setDescription('Fetch and build DockerDrupal containers')
       ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
@@ -53,15 +54,6 @@ class InitCommand extends ContainerAwareCommand {
     if (file_exists('.config.yml')) {
       $io->error('You\'re currently in an APP directory');
       return;
-    }
-
-    if ($application->getOs() == 'Darwin') {
-
-      $message = "If prompted, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
-      $io->info(' ');
-      $io->info($message);
-      $io->info(' ');
-      $application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io);
     }
 
     // GET AND SET APPNAME.
@@ -212,11 +204,11 @@ class InitCommand extends ContainerAwareCommand {
         // set proxy network name
         $proxynet = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml'));
         $proxynet['services']['nginx-proxy']['networks'] = [
-          $system_appname . '_proxy'
+          $system_appname . '_proxy',
         ];
         unset($proxynet['networks']['nginx']);
         $proxynet['networks'][$system_appname . '_proxy'] = [
-          'driver' => 'bridge'
+          'driver' => 'bridge',
         ];
 
         $proxynetconfig = Yaml::dump($proxynet);
@@ -227,7 +219,7 @@ class InitCommand extends ContainerAwareCommand {
 
         unset($database['networks']['data']);
         $database['networks'][$system_appname . '_data'] = [
-          'driver' => 'bridge'
+          'driver' => 'bridge',
         ];
 
         $database['services']['db']['networks'] = [$system_appname . '_data'];
@@ -282,7 +274,7 @@ class InitCommand extends ContainerAwareCommand {
 
         unset($database['networks']['data']);
         $database['networks'][$system_appname . '_data'] = [
-          'driver' => 'bridge'
+          'driver' => 'bridge',
         ];
 
         $database['services']['db']['networks'] = [$system_appname . '_data'];
@@ -318,12 +310,21 @@ class InitCommand extends ContainerAwareCommand {
       ],
       'dockerdrupal' => [
         'version' => $application->getVersion(),
-        'date' => $date
+        'date' => $date,
       ],
     ];
 
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
+
+    if ($application->getOs() == 'Darwin' && isset($appname)) {
+
+      $message = "If prompted, please type admin password to add app localhost details \n and COPY ifconfig alias.plist to /Library/LaunchDaemons/";
+      $io->info(' ');
+      $io->info($message);
+      $io->info(' ');
+      $application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io, $appname);
+    }
 
     $message = 'Fetching DockerDrupal v' . $application->getVersion();
     $io->info(' ');
