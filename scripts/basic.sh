@@ -21,6 +21,6 @@ echo -e "${GREEN}DEMO TEST${NC}"
 
 ./bin/drudock --version
 
-./bin/drudock env travisapp --type D8 --reqs Basic --appsrc New --apphost docker.dev && \
+./bin/drudock env:init travisapp --type D8 --dist Basic --appsrc New --apphost docker.dev && \
 cd travisapp && \
 ../bin/drudock build:init
