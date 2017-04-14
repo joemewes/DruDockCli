@@ -17,10 +17,10 @@ EOF
 
 echo -e "${GREEN}DEMO TEST${NC}"
 
-./bin/dockerdrupal about
+./bin/drudock about
 
-./bin/dockerdrupal --version
+./bin/drudock --version
 
-./bin/dockerdrupal env travisapp --type D8 --reqs Basic --appsrc New --apphost docker.dev && \
+./bin/drudock env travisapp --type D8 --reqs Basic --appsrc New --apphost docker.dev && \
 cd travisapp && \
-../bin/dockerdrupal build:init
+../bin/drudock build:init

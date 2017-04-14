@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
@@ -24,13 +24,13 @@ class ProdUpdateCommand extends Command {
     $this
       ->setName('prod:update')
       ->setDescription('Rebuild app and deploy latest code into app containers')
-      ->setHelp("Deploy host /app code into new/latest build [dockerdrupal prod:update]");
+      ->setHelp("Deploy host /app code into new/latest build [drudock prod:update]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $container_application = new ApplicationContainerExtension();
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     $io->section("PROD ::: Update");
 

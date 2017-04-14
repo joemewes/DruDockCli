@@ -1,4 +1,4 @@
-# DockerDrupalCli
+# DruDockCli
 
 ## GUI
 Initial feedback suggests and Web UI  to monitor and manage environments
@@ -53,7 +53,7 @@ After merging and update of READ_ONLY prod environment:
 - [ ] Interact with remote /CLI - drush && docker && ??
 
 ## General continued things it must do :                                                                                    
-- init app/dockerdrupal ./config.yaml on manually created app/old version
+- init app/drudock ./config.yaml on manually created app/old version
 - the use of Port :80 will prevent multiple apps/services running concurrently
 - ADD PhantomCSS support for running testsuite.js
 - with services running

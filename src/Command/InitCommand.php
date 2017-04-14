@@ -15,7 +15,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Yaml\Yaml;
 use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
@@ -39,8 +39,8 @@ class InitCommand extends ContainerAwareCommand {
   protected function configure() {
     $this
       ->setName('env:init')
-      ->setDescription('Fetch and build DockerDrupal containers')
-      ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
+      ->setDescription('Fetch and build DruDock containers')
+      ->setHelp('This command will fetch the specified DruDock config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
       ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod,Stage,Feature]')
@@ -52,7 +52,7 @@ class InitCommand extends ContainerAwareCommand {
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
     $fs = new Filesystem();
     $client = new Client();
     $zippy = Zippy::load();
@@ -69,7 +69,7 @@ class InitCommand extends ContainerAwareCommand {
     if (!isset($appname)) {
       $io->title("SET APP NAME");
       $helper = $this->getHelper(QUESTION);
-      $question = new Question('Enter App name [dockerdrupal_app_' . $date . '] : ', 'my-app-' . $date);
+      $question = new Question('Enter App name [drudock_app_' . $date . '] : ', 'my-app-' . $date);
       $appname = $helper->ask($input, $output, $question);
     }
 
@@ -171,7 +171,7 @@ class InitCommand extends ContainerAwareCommand {
 
     switch ($dist) {
       case 'Basic':
-        $file = 'dockerdrupal-lite';
+        $file = 'drudock-lite';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
 
         if (!$apphost) {
@@ -181,7 +181,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Full':
-        $file = 'dockerdrupal';
+        $file = 'drudock';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.dev';
@@ -190,7 +190,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Prod':
-        $file = 'dockerdrupal-prod';
+        $file = 'drudock-prod';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.prod';
@@ -238,7 +238,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Stage':
-        $file = 'dockerdrupal-stage';
+        $file = 'drudock-stage';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.stage';
@@ -293,7 +293,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       default:
-        $file = 'dockerdrupal-lite';
+        $file = 'drudock-lite';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
 
         if (!$apphost) {
@@ -314,7 +314,7 @@ class InitCommand extends ContainerAwareCommand {
       'builds' => [
         $date = date('Y-m-d--H-i-s'),
       ],
-      'dockerdrupal' => [
+      'drudock' => [
         'version' => $application->getVersion(),
         'date' => $date,
       ],
@@ -332,15 +332,15 @@ class InitCommand extends ContainerAwareCommand {
       $application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io, $appname);
     }
 
-    $message = 'Fetching DockerDrupal v' . $application->getVersion();
+    $message = 'Fetching DruDock v' . $application->getVersion();
     $io->info(' ');
     $io->note($message);
 
-    $this->getDockerDrupal($application, $io, $system_appname);
+    $this->getDruDock($application, $io, $system_appname);
 
     $io->info(' ');
-    $io->section("DockerDrupal ::: Ready");
-    $info = 'Go to app directory [cd ' . $system_appname . '] and run [dockerdrupal build:init]';
+    $io->section("DruDock ::: Ready");
+    $info = 'Go to app directory [cd ' . $system_appname . '] and run [drudock build:init]';
     $io->info($info);
     $io->info(' ');
   }
@@ -350,9 +350,9 @@ class InitCommand extends ContainerAwareCommand {
    * @param $io
    * @param $appname
    */
-  private function getDockerDrupal($application, $io, $appname) {
+  private function getDruDock($application, $io, $appname) {
 
-    $message = 'Download and configure DockerDrupal.... This may take a few minutes....';
+    $message = 'Download and configure DruDock.... This may take a few minutes....';
     $io->note($message);
 
     $dockerlogs = 'docker-compose -f ' . $appname . '/docker_' . $appname . '/docker-compose.yml logs -f';

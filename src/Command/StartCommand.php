@@ -11,7 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -28,14 +28,14 @@ class StartCommand extends Command {
       ->setName('docker:start')
       ->setAliases(['start'])
       ->setDescription('Start current APP containers')
-      ->setHelp("Example : [dockerdrupal start]");
+      ->setHelp("Example : [drudock start]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
@@ -46,7 +46,7 @@ class StartCommand extends Command {
       if(exec($command) > 0){
         $io->info(' ');
         $io->section("You have running containers for your current App.");
-        $io->info("Try one of the following is you are experiencing issues :: \n\n[dockerdrupal docker:stop]\n\n[dockerdrupal docker:restart]\n\n[dockerdrupal up:ct]\n");
+        $io->info("Try one of the following is you are experiencing issues :: \n\n[drudock docker:stop]\n\n[drudock docker:restart]\n\n[drudock up:ct]\n");
         return;
       }
     }

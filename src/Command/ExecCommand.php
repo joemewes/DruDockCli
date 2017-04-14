@@ -16,7 +16,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
@@ -42,7 +42,7 @@ class ExecCommand extends Command {
     $cmd = $input->getOption('cmd');
     $service = $input->getOption('service');
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
     $io->section("EXEC CMD");
 
     $running_containers = $application->getRunningContainerNames();

@@ -1,6 +1,6 @@
-![Drupal Docker Logo](https://raw.githubusercontent.com/4alldigital/drupaldev-docker/master/docs/images/drupal-docker-logo-monochrome.png)
+![DruDock Logo](https://raw.githubusercontent.com/4alldigital/drupaldev-docker/master/docs/images/drupal-docker-logo-monochrome.png)
 
-[DrupalDocker/CLI](https://www.4alldigital.io/dockerdrupal-cli) is Symfony console based command line utility to aid local development [DrupalDocker-lite] based websites.
+[DruDock/CLI](https://www.4alldigital.io/drudock-cli) is Symfony console based command line utility to aid local development [DruDock] based websites.
 
 # Inside the box
 
@@ -8,7 +8,7 @@
 
 ### System Requirements
 
-Currently DrupalDocker is aimed at web development using MAC OSX:
+Currently DruDock is aimed at web development using MAC OSX:
   - Docker for Mac
   - Intel Core processor
   - 4+ GB RAM

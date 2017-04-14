@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 
 /**
  * Class NginxFlushPagespeedCommand
@@ -32,7 +32,7 @@ class NginxFlushPagespeedCommand extends Command {
     $application = $this->getApplication();
     $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     $io->section("Nginx ::: flush");
 

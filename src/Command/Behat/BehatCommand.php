@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
@@ -27,7 +27,7 @@ class BehatCommand extends Command {
     $this
       ->setName('behat:cmd')
       ->setDescription('Run behat commands')
-      ->setHelp("Example : [dockerdrupal behat:cmd --suite=global_features --profile=local --tags=about]")
+      ->setHelp("Example : [drudock behat:cmd --suite=global_features --profile=local --tags=about]")
       ->addOption('suite', '-s', InputOption::VALUE_OPTIONAL, 'Suite of features to test [global_features]')
       ->addOption('profile', '-p', InputOption::VALUE_OPTIONAL, 'Profile to test [local]')
       ->addOption('tags', '-t', InputOption::VALUE_OPTIONAL, 'Tags to test [about]');
@@ -37,7 +37,7 @@ class BehatCommand extends Command {
     $application = $this->getApplication();
     $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];

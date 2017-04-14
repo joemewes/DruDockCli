@@ -29,7 +29,7 @@ class ApplicationContainerExtension extends Application {
       return TRUE;
     }
     else {
-      $io->warning("APP has no containers, try running `dockerdrupal build:init --help`");
+      $io->warning("APP has no containers, try running `drudock build:init --help`");
     }
   }
 }

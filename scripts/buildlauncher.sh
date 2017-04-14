@@ -17,4 +17,4 @@ EOF
 
 /usr/local/bin/box build -v
 
-/usr/local/bin/aws s3 cp dockerdrupal.phar s3://dockerdrupal/dockerdrupal.phar --region=eu-west-2
+/usr/local/bin/aws s3 cp drudock.phar s3://drudock/drudock.phar --region=eu-west-1

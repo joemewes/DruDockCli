@@ -251,7 +251,7 @@ class Application extends ParentApplication {
       }
 
       if (count($missing_reqs) > 0) {
-        $io->info('Your app is missing the following config, please run [dockerdrupal docker:update:config] : ');
+        $io->info('Your app is missing the following config, please run [drudock docker:update:config] : ');
         foreach ($missing_reqs as $req) {
           $io->warning($req);
         }
@@ -259,8 +259,8 @@ class Application extends ParentApplication {
       }
     }
 
-    if (substr($this->getVersion(), 0, 1) != substr($config['dockerdrupal']['version'], 0, 1)) {
-      $io->warning('You\'re installed DockerDrupal version is different to setup app version and may not work');
+    if (substr($this->getVersion(), 0, 1) != substr($config['drudock']['version'], 0, 1)) {
+      $io->warning('You\'re installed DruDock version is different to setup app version and may not work');
     }
 
     return $config;
@@ -359,7 +359,7 @@ class Application extends ParentApplication {
 
     if (!$project) {
       // @todo: This message needs review.
-      // @see https://github.com/4AllDigital/DockerDrupalCli/issues/91
+      // @see https://github.com/4AllDigital/DruDockCli/issues/91
       $io->error("docker-compose-data.yml : Not Found");
       exit;
     }
@@ -596,9 +596,9 @@ VIRTUAL_NETWORK=nginx-proxy";
       exec($command);
     }
 
-    if (!file_exists('/Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist')) {
+    if (!file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
       $this->tmpRemoteBundle($fs, $client, $zippy, 'osx');
-      $command = 'sudo cp -R /tmp/osx/com.4alldigital.dockerdrupal.plist /Library/LaunchDaemons/com.4alldigital.dockerdrupal.plist';
+      $command = 'sudo cp -R /tmp/osx/com.4alldigital.drudock.plist /Library/LaunchDaemons/com.4alldigital.drudock.plist';
       $this->runcommand($command, $io, TRUE);
     }
   }
@@ -632,7 +632,7 @@ VIRTUAL_NETWORK=nginx-proxy";
 
   function requireUpdate($io) {
 
-    $io->warning('This app .config.yml is out of date and missing data. Please run [dockerdrupal up:config].');
+    $io->warning('This app .config.yml is out of date and missing data. Please run [drudock up:config].');
     exit;
   }
 

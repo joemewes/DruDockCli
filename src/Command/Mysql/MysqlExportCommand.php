@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
@@ -27,7 +27,7 @@ class MysqlExportCommand extends Command {
     $this
       ->setName('mysql:export')
       ->setDescription('Export .sql files')
-      ->setHelp("Use this to dump .sql files to the current running APPs dev_db. eg. [dockerdrupal mysql:export -p ./latest.sql]")
+      ->setHelp("Use this to dump .sql files to the current running APPs dev_db. eg. [drudock mysql:export -p ./latest.sql]")
       ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify export file path including filename [./latest.sql]');
   }
 
@@ -35,7 +35,7 @@ class MysqlExportCommand extends Command {
     $application = $this->getApplication();
     $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
     $io->section('MYSQL ::: dump/export database');
 
     if ($config = $application->getAppConfig($io)) {

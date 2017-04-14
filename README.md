@@ -1,15 +1,15 @@
-![DockerDrupal Logo](https://raw.githubusercontent.com/4alldigital/DockerDrupal/master/docs/images/dd-logo.png)
+![DruDock Logo](https://raw.githubusercontent.com/4alldigital/DruDock/master/docs/images/dd-logo.png)
 
-[DockerDrupal](https://www.4alldigital.io/docker-drupal) is Docker based development environment for local Drupal websites, Wordpress websites or PHP apps. Useful for debugging and developing your projects, with a possible intention of hosting sites using [DockerDrupal Prod](https://github.com/4alldigital/drupalprod-docker) (A read-only production environment).
+[DruDock](https://www.4alldigital.io/drudock) is Docker based development, staging and production environment for Drupal websites or PHP apps.
 
-[![Latest Stable Version](https://poser.pugx.org/dockerdrupal/cli/v/stable)](https://packagist.org/packages/dockerdrupal/cli)
-[![Build Status](https://travis-ci.org/4AllDigital/DockerDrupalCli.svg?branch=master)](https://travis-ci.org/4AllDigital/DockerDrupalCli)
-[![License](https://poser.pugx.org/dockerdrupal/cli/license)](https://github.com/4AllDigital/DockerDrupalCli/blob/master/LICENSE.txt)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DockerDrupalCli/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Latest Stable Version](https://poser.pugx.org/drudock/cli/v/stable)](https://packagist.org/packages/drudock/cli)
+[![Build Status](https://travis-ci.org/4AllDigital/DruDockCli.svg?branch=master)](https://travis-ci.org/4AllDigital/DruDockCli)
+[![License](https://poser.pugx.org/drudock/cli/license)](https://github.com/4AllDigital/DruDockCli/blob/master/LICENSE.txt)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DruDockCli/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 
-# DockerDrupal-Cli - BETA
-### CLI utility for DockerDrupal
+# DruDock-Cli - BETA
+### CLI utility for DruDock
 
 Install and setup Docker
   
@@ -30,7 +30,7 @@ Install and setup Docker
   Ping me on [Twitter](http://twitter.com/@4alldigital)
   
 ### DOCS - @TODO
-  Read more - http://dockerdrupalcli.readthedocs.io/en/latest/
+  Read more - http://drudockcli.readthedocs.io/en/latest/
   
 ### Example experience
    - video 1 (Installation and setup) - https://www.youtube.com/watch?v=XfmN47xdrgY
@@ -40,10 +40,10 @@ Install and setup Docker
   - Install Composer [Globally](https://getcomposer.org/doc/00-intro.md#globally) 
   - Make sure you add composers vendor directory to your $PATH:
     - add `export PATH="~/.composer/vendor/bin:$PATH"` to your ~/.bash_profile
-  - Install DockerDrupal globally.
+  - Install DruDock globally.
 
 ```
-composer global require dockerdrupal/cli
+composer global require drudock/cli
 ```
 
 - Note : drupal/console and drush/drush have complex dependencies and may cause conflicts with this utility. You should be able to resolve this by adding the following to your global/project composer.json file, and then running 'composer global update' :
@@ -51,7 +51,7 @@ composer global require dockerdrupal/cli
 ```
 {
     "require": {
-        "dockerdrupal/cli": "@stable"
+        "drudock/cli": "@stable"
     }
 }
 ```
@@ -61,9 +61,9 @@ composer global require dockerdrupal/cli
 ## Initial Commands structure
 ```
      Available commands:
-       about                     About DockerDrupal
+       about                     About DruDock
        destroy                   Disable and delete APP and containers
-       env                       Fetch and build DockerDrupal containers
+       env                       Fetch and build DruDock containers
        exec                      Execute bespoke commands at :container
        help                      Displays help for a command
        init                      Fetch and build Drupal apps
@@ -96,7 +96,7 @@ composer global require dockerdrupal/cli
        drush:uli                 Run Drush ULI
        drush:updb                Run Drush updb
       env
-       env:init                  Fetch and build DockerDrupal containers
+       env:init                  Fetch and build DruDock containers
       mysql
        mysql:export              Export .sql files
        mysql:import              Import .sql files
@@ -114,7 +114,7 @@ composer global require dockerdrupal/cli
        redis:monitor             Montitor redis activity
        redis:ping                Ping Redis
       self
-       self:about                About DockerDrupal
+       self:about                About DruDock
       sync
        sync:monitor              Montitor current App sync activity
       up
@@ -127,29 +127,29 @@ composer global require dockerdrupal/cli
 ## Example Commands
 ```
       --------------
-      :$ dockerdrupal env my-great-app -t DEFAULT -r Basic -s New -p basic.docker.dev
-      :$ cd my-great-app && dockerdrupal build:init
+      :$ drudock env my-great-app -t DEFAULT -r Basic -s New -p basic.docker.dev
+      :$ cd my-great-app && drudock build:init
       --------------
 ```    
 #### DEV Drupal 8  
 ```
       --------------
-      :$ dockerdrupal env my-drupal8-site -t D8 -r Basic -s New -p d8.docker.dev
-      :$ cd my-drupal8-site && dockerdrupal build:init
+      :$ drudock env my-drupal8-site -t D8 -r Basic -s New -p d8.docker.dev
+      :$ cd my-drupal8-site && drudock build:init
       --------------
 ```   
 #### DEV Drupal 7
 ```
       --------------
-      :$ dockerdrupal env my-drupal7-site -t D7 -r Full -s Git -p d7.docker.dev
-      :$ cd my-drupal7-site && dockerdrupal build:init
+      :$ drudock env my-drupal7-site -t D7 -r Full -s Git -p d7.docker.dev
+      :$ cd my-drupal7-site && drudock build:init
       --------------
 ```
 
 ### Next step :
 
  - More utility commands and USER feedback
-For more information see [roadmap](https://github.com/4AllDigital/DockerDrupalCli/blob/master/roadmap.md)
+For more information see [roadmap](https://github.com/4AllDigital/DruDockCli/blob/master/roadmap.md)
 
 ### Known issues
 

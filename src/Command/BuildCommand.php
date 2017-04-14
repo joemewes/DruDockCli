@@ -15,7 +15,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Alchemy\Zippy\Zippy;
@@ -68,7 +68,7 @@ class BuildCommand extends ContainerAwareCommand {
     $application = $this->getApplication();
     $config_application = new ApplicationConfigExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     // check if this folder is has APP config
     if (!file_exists('.config.yml')) {
@@ -293,7 +293,7 @@ class BuildCommand extends ContainerAwareCommand {
         $files_dir = 'd8';
       }
 
-      // Move DockerDrupal Drupal 8 config files into install
+      // Move DruDock Drupal 8 config files into install
       $application->tmpRemoteBundle($fs, $client, $zippy, $files_dir);
       if (is_dir(TMP . $files_dir) && is_dir($app_dest)) {
         $d8files = TMP . $files_dir;
@@ -376,15 +376,15 @@ class BuildCommand extends ContainerAwareCommand {
         $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/';
         $application->runcommand($command, $io);
 
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
         $application->runcommand($command, $io);
       }
       if ($reqs == 'Prod') {
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
         $application->runcommand($command, $io);
       }
       if ($reqs == 'Stage') {
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=stage --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=stage --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
         $application->runcommand($command, $io);
       }
 
@@ -417,7 +417,7 @@ class BuildCommand extends ContainerAwareCommand {
     $message = 'Run Drupal Installation.... This may take a few minutes....';
     $io->note($message);
 
-    $command = $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DockerDrupal --site-mail=drupalD7@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db -y';
+    $command = $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD7@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db -y';
     $application->runcommand($command, $io);
   }
 
@@ -426,7 +426,7 @@ class BuildCommand extends ContainerAwareCommand {
     $application = $this->getApplication();
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
-    $message = 'Creating and configure DockerDrupal containers.... This may take a moment....';
+    $message = 'Creating and configure DruDock containers.... This may take a moment....';
     $io->note($message);
 
     if ($config = $application->getAppConfig($io)) {
@@ -438,7 +438,7 @@ class BuildCommand extends ContainerAwareCommand {
 
     if (isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
       // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
-      // When 'Synchronization complete' kill this temp run container and start DockerDrupal.
+      // When 'Synchronization complete' kill this temp run container and start DruDock.
       $command = 'until ' . $application->getComposePath($appname, $io) .
         'run app 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
         'docker kill $(docker ps -q) 2>&1; ' . $application->getComposePath($appname, $io) . 'up -d';

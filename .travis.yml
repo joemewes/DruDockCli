@@ -24,7 +24,7 @@ notifications:
   email: false
 addons:
   sonarqube:
-    organization: dockerdrupal
+    organization: drudock
     branches:
     - master
     - development

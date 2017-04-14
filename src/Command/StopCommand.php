@@ -10,7 +10,7 @@ namespace Docker\Drupal\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
@@ -24,14 +24,14 @@ class StopCommand extends Command {
       ->setName('docker:stop')
       ->setAliases(['stop'])
       ->setDescription('Stop current APP containers')
-      ->setHelp("Example : [dockerdrupal stop]");
+      ->setHelp("Example : [drudock stop]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
     $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];

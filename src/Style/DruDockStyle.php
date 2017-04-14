@@ -7,7 +7,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 
-class DockerDrupalStyle extends SymfonyStyle
+class DruDockStyle extends SymfonyStyle
 {
     /**
      * @var InputInterface
