@@ -414,7 +414,7 @@ class Application extends ParentApplication {
 
     $process = new Process($command);
     $process->setTimeout(3600);
-    $process->setTty(TRUE);
+    $process->setTty(FALSE);
     $process->run(function ($type, $buffer) {
       global $output;
       if ($output) {

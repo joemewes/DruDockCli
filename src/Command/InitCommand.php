@@ -21,8 +21,16 @@ use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
 
 
+
 /**
- * Class DemoCommand
+ * Define constants
+ */
+
+// Config constants.
+const QUESTION = 'question';
+
+/**
+ * Class InitCommand
  *
  * @package Docker\Drupal\ContainerAwareCommand
  */
@@ -35,7 +43,7 @@ class InitCommand extends ContainerAwareCommand {
       ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
-      ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod,Stage]')
+      ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod,Stage,Feature]')
       ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('git', 'g', InputOption::VALUE_OPTIONAL, 'Git repository URL')
       ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]');
@@ -60,7 +68,7 @@ class InitCommand extends ContainerAwareCommand {
     $appname = $input->getArgument('appname');
     if (!isset($appname)) {
       $io->title("SET APP NAME");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Enter App name [dockerdrupal_app_' . $date . '] : ', 'my-app-' . $date);
       $appname = $helper->ask($input, $output, $question);
     }
@@ -77,7 +85,7 @@ class InitCommand extends ContainerAwareCommand {
     if (!isset($src)) {
       $io->info(' ');
       $io->title("SET APP SOURCE");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new ChoiceQuestion(
         'Is this app a new build or loaded from a remote GIT repository [New, Git] : ',
         $available_src,
@@ -88,37 +96,35 @@ class InitCommand extends ContainerAwareCommand {
 
     // GET AND SET APP SOURCE.
     $gitrepo = $input->getOption('git');
-
     if ($src == 'New') {
       $gitrepo = '';
     }
-
     if (!isset($gitrepo)) {
       $io->title("SET APP GIT URL");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
       $gitrepo = $helper->ask($input, $output, $question);
     }
 
     // GET AND SET APP REQUIREMENTS.
-    $reqs = $input->getOption('reqs');
-    $available_reqs = ['Basic', 'Full', 'Prod', 'Stage'];
+    $dist = $input->getOption('dist');
+    $available_dist = ['Basic', 'Full', 'Prod', 'Stage'];
 
-    if ($reqs && !in_array($reqs, $available_reqs)) {
-      $io->warning('REQS : ' . $reqs . ' not allowed.');
-      $reqs = NULL;
+    if ($dist && !in_array($dist, $available_dist)) {
+      $io->warning('REQS : ' . $dist . ' not allowed.');
+      $dist = NULL;
     }
 
-    if (!$reqs) {
+    if (!$dist) {
       $io->info(' ');
       $io->title("SET APP REQS");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new ChoiceQuestion(
-        'Select your APP reqs [basic] : ',
-        $available_reqs,
+        'Select your APP dist [basic] : ',
+        $available_dist,
         'basic'
       );
-      $reqs = $helper->ask($input, $output, $question);
+      $dist = $helper->ask($input, $output, $question);
     }
 
     // GET AND SET APP TYPE.
@@ -133,7 +139,7 @@ class InitCommand extends ContainerAwareCommand {
     if (!$type) {
       $io->info(' ');
       $io->title("SET APP TYPE");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new ChoiceQuestion(
         'Select your APP type [0] : ',
         $available_types,
@@ -148,7 +154,7 @@ class InitCommand extends ContainerAwareCommand {
     if (!$apphost) {
       $io->info(' ');
       $io->title("SET APP HOSTNAME");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Enter preferred app hostname [docker.dev] : ');
       $apphost = $helper->ask($input, $output, $question);
     }
@@ -163,7 +169,7 @@ class InitCommand extends ContainerAwareCommand {
       return;
     }
 
-    switch ($reqs) {
+    switch ($dist) {
       case 'Basic':
         $file = 'dockerdrupal-lite';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
@@ -301,7 +307,7 @@ class InitCommand extends ContainerAwareCommand {
       'appname' => $appname,
       'apptype' => $type,
       'host' => $apphost,
-      'reqs' => $reqs,
+      'dist' => $dist,
       'appsrc' => $src,
       'repo' => $gitrepo ? $gitrepo : '',
       'created' => $date = date('Y-m-d--H-i-s'),
