@@ -1,9 +1,8 @@
-![DruDock Logo](https://raw.githubusercontent.com/4alldigital/DruDock/master/docs/images/dd-logo.png)
+![DruDock Logo](https://s3.eu-west-2.amazonaws.com/drudock/DruDockLogo.jpg)
 
 [DruDock](https://www.4alldigital.io/drudock) is Docker based development, staging and production environment for Drupal websites or PHP apps.
 
 [![Latest Stable Version](https://poser.pugx.org/drudock/cli/v/stable)](https://packagist.org/packages/drudock/cli)
-[![Latest Unstable Version](https://poser.pugx.org/drudock/cli/v/unstable)](https://packagist.org/packages/drudock/cli)
 [![License](https://poser.pugx.org/drudock/cli/license)](https://packagist.org/packages/drudock/cli)
 [![composer.lock](https://poser.pugx.org/drudock/cli/composerlock)](https://packagist.org/packages/drudock/cli)
 
