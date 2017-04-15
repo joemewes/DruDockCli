@@ -29,7 +29,7 @@ use GuzzleHttp\Client;
 const APP_NAME = 'appname';
 const APPSRC = 'appsrc';
 const REPO = 'repo';
-const REQS = 'reqs';
+const REQS = 'dist';
 const BUILDS = 'builds';
 
 // general constants
@@ -149,7 +149,7 @@ class BuildCommand extends ContainerAwareCommand {
     if ($config) {
       $appsrc = $config[APPSRC];
       $apprepo = $config[REPO];
-      $reqs = $config[REQS];
+      $dist = $config[REQS];
     }
 
     if (isset($appsrc) && $appsrc == 'Git' && !$fs->exists($app_dest)) {
@@ -197,7 +197,7 @@ class BuildCommand extends ContainerAwareCommand {
         $fs->copy($d7files . '/settings.local.php', $app_dest . '/shared/settings.local.php');
         $fs->remove(TMP_D7);
 
-        if (isset($reqs) && $reqs == 'Full') {
+        if (isset($dist) && $dist == 'Full') {
           $application->tmpRemoteBundle($fs, $client, $zippy, 'behat');
           $fs->mirror(TMP_BEHAT, $app_dest . '/behat/');
           $fs->remove(TMP_BEHAT);
@@ -247,7 +247,7 @@ class BuildCommand extends ContainerAwareCommand {
       $appname = $config[APP_NAME];
       $appsrc = $config[APPSRC];
       $apprepo = $config[REPO];
-      $reqs = $config[REQS];
+      $dist = $config[REQS];
     }
 
     if (isset($appsrc) && $appsrc == 'Git' && !$fs->exists($app_dest)) {
@@ -286,7 +286,7 @@ class BuildCommand extends ContainerAwareCommand {
         $io->error(sprintf(ERR_MSG . $e->getPath()));
       }
 
-      if ($reqs == 'Prod') {
+      if ($dist == 'Prod') {
         $files_dir = 'd8prod';
       }
       else {
@@ -307,7 +307,7 @@ class BuildCommand extends ContainerAwareCommand {
         $fs->copy($d8files . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
 
         $fs->remove(TMP . $files_dir);
-        if (isset($reqs) && $reqs == 'Full') {
+        if (isset($dist) && $dist == 'Full') {
           $application->tmpRemoteBundle($fs, $client, $zippy, 'behat');
           $fs->mirror(TMP_BEHAT, $app_dest . '/behat/');
           $fs->remove(TMP_BEHAT);
@@ -359,11 +359,11 @@ class BuildCommand extends ContainerAwareCommand {
     $container_application = new ApplicationContainerExtension();
 
     if ($config = $application->getAppConfig($io)) {
-      $reqs = $config[REQS];
+      $dist = $config[REQS];
       $appname = $config[APP_NAME];
     }
 
-    if (isset($reqs) && $reqs == 'Full') {
+    if (isset($dist) && $dist == 'Full') {
       $command = $application->getComposePath($appname, $io) . 'exec -T behat composer update';
       $application->runcommand($command, $io);
     }
@@ -372,18 +372,18 @@ class BuildCommand extends ContainerAwareCommand {
     $io->note($message);
     if ($container_application->checkForAppContainers($appname, $io)) {
 
-      if ($reqs == 'Basic' || $reqs == 'Full') {
+      if ($dist == 'Basic' || $dist == 'Full') {
         $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/';
         $application->runcommand($command, $io);
 
         $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@db:3306/dev_db --quiet -y';
         $application->runcommand($command, $io);
       }
-      if ($reqs == 'Prod') {
+      if ($dist == 'Prod') {
         $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
         $application->runcommand($command, $io);
       }
-      if ($reqs == 'Stage') {
+      if ($dist == 'Stage') {
         $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=stage --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@db:3306/prod --quiet -y';
         $application->runcommand($command, $io);
       }
@@ -430,13 +430,13 @@ class BuildCommand extends ContainerAwareCommand {
     $io->note($message);
 
     if ($config = $application->getAppConfig($io)) {
-      $appreqs = $config[REQS];
+      $appdist = $config[REQS];
       if (is_array($config[BUILDS])) {
         $build = end($config[BUILDS]);
       }
     }
 
-    if (isset($appreqs) && ($appreqs == 'Basic' || $appreqs == 'Full')) {
+    if (isset($appdist) && ($appdist == 'Basic' || $appdist == 'Full')) {
       // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
       // When 'Synchronization complete' kill this temp run container and start DruDock.
       $command = 'until ' . $application->getComposePath($appname, $io) .
@@ -448,7 +448,7 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     // Production option specific build.
-    if (isset($appreqs) && $appreqs == 'Prod') {
+    if (isset($appdist) && $appdist == 'Prod') {
 
       $io->section("Docker ::: Build prod environment");
 
@@ -477,7 +477,7 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     // Production option specific build.
-    if (isset($appreqs) && $appreqs == 'Stage') {
+    if (isset($appdist) && $appdist == 'Stage') {
       $io->section("Docker ::: Build staging environment");
 
       // Setup data service.

@@ -59,18 +59,18 @@ class UpdateConfigCommand extends Command {
           $config[$req] = $apphost;
         }
 
-        if ($req == 'reqs') {
-          $available_reqs = ['Basic', 'Full', 'Prod'];
+        if ($req == 'dist') {
+          $available_dist = ['Basic', 'Full', 'Prod'];
           $io->info(' ');
           $io->title("SET APP REQS");
           $helper = $this->getHelper('question');
           $question = new ChoiceQuestion(
-            'Select your APP reqs [basic] : ',
-            $available_reqs,
+            'Select your APP dist [basic] : ',
+            $available_dist,
             'basic'
           );
-          $reqs = $helper->ask($input, $output, $question);
-          $config[$req] = $reqs;
+          $dist = $helper->ask($input, $output, $question);
+          $config[$req] = $dist;
         }
 
         if ($req == 'appsrc') {

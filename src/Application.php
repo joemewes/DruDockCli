@@ -243,16 +243,16 @@ class Application extends ParentApplication {
     $requirements = $this->getDDrequirements();
 
     if (!$skip_checks) {
-      $missing_reqs = [];
+      $missing_dist = [];
       foreach ($requirements as $req) {
         if (!in_array($req, $config_keys)) {
-          $missing_reqs[] = $req;
+          $missing_dist[] = $req;
         }
       }
 
-      if (count($missing_reqs) > 0) {
+      if (count($missing_dist) > 0) {
         $io->info('Your app is missing the following config, please run [drudock docker:update:config] : ');
-        foreach ($missing_reqs as $req) {
+        foreach ($missing_dist as $req) {
           $io->warning($req);
         }
         exit;
@@ -291,19 +291,19 @@ class Application extends ParentApplication {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
     $latestbuild = [];
-    $reqs = '';
+    $dist = '';
     $fs = new Filesystem();
 
     if ($config = $this->getAppConfig($io)) {
-      if (isset($config['reqs'])) {
-        $reqs = $config['reqs'];
+      if (isset($config['dist'])) {
+        $dist = $config['dist'];
       }
       if (isset($config['builds'])) {
         $latestbuild = $config['builds'];
       }
     }
 
-    switch ($reqs) {
+    switch ($dist) {
       case 'Prod':
       case 'Stage':
         $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
@@ -331,11 +331,11 @@ class Application extends ParentApplication {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
     $build = [];
-    $reqs = '';
+    $dist = '';
     $fs = new Filesystem();
 
     if ($config = $this->getAppConfig($io)) {
-      $reqs = $config['reqs'];
+      $dist = $config['dist'];
       if (is_array($config['builds'])) {
         $build = end($config['builds']);
       }
@@ -346,7 +346,7 @@ class Application extends ParentApplication {
       return;
     }
 
-    switch ($reqs) {
+    switch ($dist) {
       case 'Prod':
         $project = '--project-name=data';
         break;
@@ -381,12 +381,12 @@ class Application extends ParentApplication {
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
     if ($config = $this->getAppConfig($io)) {
-      $reqs = $config['reqs'];
+      $dist = $config['dist'];
     }
 
     $fs = new Filesystem();
 
-    if (isset($reqs) && $reqs == 'Prod') {
+    if (isset($dist) && $dist == 'Prod') {
       $project = '--project-name=proxy';
     }
     else {
@@ -437,7 +437,7 @@ class Application extends ParentApplication {
     if ($config = $this->getAppConfig($io)) {
       $appname = $config['appname'];
       $apphost = $config['host'];
-      $reqs = $config['reqs'];
+      $dist = $config['dist'];
     }
 
     if (!isset($apphost)) {
@@ -544,7 +544,7 @@ class Application extends ParentApplication {
     }
 }';
 
-    switch ($reqs) {
+    switch ($dist) {
       case 'Prod':
       case 'Stage':
         file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
@@ -645,7 +645,7 @@ VIRTUAL_NETWORK=nginx-proxy";
       'appname',
       'apptype',
       'host',
-      'reqs',
+      'dist',
       'appsrc',
       'repo',
     ];
@@ -687,6 +687,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    */
   function tmpRemoteBundle($fs, $client, $zippy, $file) {
     $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
+    echo $remote_file_path;
     $destination = '/tmp/' . $file . '.tar.gz';
     $client->get($remote_file_path, ['save_to' => $destination]);
     $archive = $zippy->open($destination);
