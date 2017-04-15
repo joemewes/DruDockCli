@@ -12,7 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class WatchCommand
@@ -24,7 +25,7 @@ class AppSyncMonitorCommand extends Command {
     $this
       ->setName('sync:monitor')
       ->setDescription('Montitor current App sync activity')
-      ->setHelp("This command will output App Sync activity. [dockerdrupal sync:monitor]");
+      ->setHelp("This command will output App Sync activity. [drudock sync:monitor]");
   }
 
   /**
@@ -33,7 +34,8 @@ class AppSyncMonitorCommand extends Command {
    */
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
+    $container_application = new ApplicationContainerExtension();
+    $io = new DruDockStyle($input, $output);
 
     $io->section("SYNC ::: Monitor");
 
@@ -41,7 +43,7 @@ class AppSyncMonitorCommand extends Command {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . 'logs -f app  2>&1';
       $application->runcommand($command, $io);
     }

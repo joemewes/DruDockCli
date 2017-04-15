@@ -14,7 +14,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class MysqlImportExportCommand
@@ -26,14 +27,15 @@ class MysqlExportCommand extends Command {
     $this
       ->setName('mysql:export')
       ->setDescription('Export .sql files')
-      ->setHelp("Use this to dump .sql files to the current running APPs dev_db. eg. [dockerdrupal mysql:export -p ./latest.sql]")
+      ->setHelp("Use this to dump .sql files to the current running APPs dev_db. eg. [drudock mysql:export -p ./latest.sql]")
       ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify export file path including filename [./latest.sql]');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
     $io->section('MYSQL ::: dump/export database');
 
     if ($config = $application->getAppConfig($io)) {
@@ -51,7 +53,7 @@ class MysqlExportCommand extends Command {
       $savepath = $helper->ask($input, $output, $question);
     }
 
-    if ($application->checkForAppContainers($appname, $io) && isset($savepath)) {
+    if ($container_application->checkForAppContainers($appname, $io) && isset($savepath)) {
       $command = $application->getComposePath($appname, $io) . 'exec -T db mysqldump -u dev -pDEVPASSWORD dev_db > ' . $savepath;
       $application->runcommand($command, $io);
     }

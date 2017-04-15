@@ -10,7 +10,7 @@ namespace Docker\Drupal\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
@@ -27,12 +27,12 @@ class UpdateConfigCommand extends Command {
       ->setName('docker:update:config')
       ->setAliases(['up:cg'])
       ->setDescription('Update APP config')
-      ->setHelp("This command will update all .config.yaml to include current dockerdrupal config requirements.");
+      ->setHelp("This command will update all .config.yaml to include current drudock config requirements.");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
     $io->section("APP ::: UPDATING CONFIG");
 
     $config = $application->getAppConfig($io, TRUE);
@@ -45,7 +45,7 @@ class UpdateConfigCommand extends Command {
         if ($req == 'appname') {
           $io->title("SET APP NAME");
           $helper = $this->getHelper('question');
-          $question = new Question('Enter App name [dockerdrupal_app_' . $date . '] : ', 'my-app-' . $date);
+          $question = new Question('Enter App name [drudock_app_' . $date . '] : ', 'my-app-' . $date);
           $appname = $helper->ask($input, $output, $question);
           $config[$req] = $appname;
         }

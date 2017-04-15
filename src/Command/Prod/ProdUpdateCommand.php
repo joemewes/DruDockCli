@@ -12,7 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class ProdUpdateCommand
@@ -23,12 +24,13 @@ class ProdUpdateCommand extends Command {
     $this
       ->setName('prod:update')
       ->setDescription('Rebuild app and deploy latest code into app containers')
-      ->setHelp("Deploy host /app code into new/latest build [dockerdrupal prod:update]");
+      ->setHelp("Deploy host /app code into new/latest build [drudock prod:update]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
+    $container_application = new ApplicationContainerExtension();
+    $io = new DruDockStyle($input, $output);
 
     $io->section("PROD ::: Update");
 
@@ -44,9 +46,9 @@ class ProdUpdateCommand extends Command {
 
     if (isset($appreqs) && $appreqs == 'Prod') {
 
-      if ($application->checkForAppContainers($appname, $io)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
 
-        $date =  date('Y-m-d--H-i-s');
+        $date = date('Y-m-d--H-i-s');
         $system_appname = strtolower(str_replace(' ', '', $appname));
         $projectname = $system_appname . '--' . $date;
 

@@ -12,7 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\Question;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class DemoCommand
@@ -24,14 +25,15 @@ class DrushModuleDisableCommand extends Command {
     $this
       ->setName('drush:dis')
       ->setDescription('Disable/Uninstall Drupal module')
-      ->setHelp("This command will disable (D7) or uninstall (D8) Drupal  contrib modules. [dockerdrupal drush:dis myModule]")
+      ->setHelp("This command will disable (D7) or uninstall (D8) Drupal  contrib modules. [drudock drush:dis myModule]")
       ->addArgument('modulename', InputArgument::OPTIONAL, 'Specify NAME of module');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     $modulename = $input->getArgument('modulename');
     if (!$modulename) {
@@ -65,7 +67,7 @@ class DrushModuleDisableCommand extends Command {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
       $application->runcommand($command, $io);
     }

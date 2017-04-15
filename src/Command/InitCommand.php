@@ -15,26 +15,35 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Yaml\Yaml;
 use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
 
 
+
 /**
- * Class DemoCommand
+ * Define constants
+ */
+
+// Config constants.
+const QUESTION = 'question';
+
+/**
+ * Class InitCommand
+ *
  * @package Docker\Drupal\ContainerAwareCommand
  */
 class InitCommand extends ContainerAwareCommand {
+
   protected function configure() {
     $this
       ->setName('env:init')
-      ->setAliases(['env'])
-      ->setDescription('Fetch and build DockerDrupal containers')
-      ->setHelp('This command will fetch the specified DockerDrupal config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
+      ->setDescription('Fetch and build DruDock containers')
+      ->setHelp('This command will fetch the specified DruDock config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
-      ->addOption('reqs', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod,Stage]')
+      ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod,Stage,Feature]')
       ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('git', 'g', InputOption::VALUE_OPTIONAL, 'Git repository URL')
       ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]');
@@ -43,7 +52,7 @@ class InitCommand extends ContainerAwareCommand {
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
     $fs = new Filesystem();
     $client = new Client();
     $zippy = Zippy::load();
@@ -55,21 +64,12 @@ class InitCommand extends ContainerAwareCommand {
       return;
     }
 
-    if ($application->getOs() == 'Darwin') {
-
-      $message = "If prompted, please type admin password to add '127.0.0.1 docker.dev' to /etc/hosts \n && COPY ifconfig alias.plist to /Library/LaunchDaemons/";
-      $io->info(' ');
-      $io->info($message);
-      $io->info(' ');
-      $application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io);
-    }
-
     // GET AND SET APPNAME.
     $appname = $input->getArgument('appname');
     if (!isset($appname)) {
       $io->title("SET APP NAME");
-      $helper = $this->getHelper('question');
-      $question = new Question('Enter App name [dockerdrupal_app_' . $date . '] : ', 'my-app-' . $date);
+      $helper = $this->getHelper(QUESTION);
+      $question = new Question('Enter App name [drudock_app_' . $date . '] : ', 'my-app-' . $date);
       $appname = $helper->ask($input, $output, $question);
     }
 
@@ -85,7 +85,7 @@ class InitCommand extends ContainerAwareCommand {
     if (!isset($src)) {
       $io->info(' ');
       $io->title("SET APP SOURCE");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new ChoiceQuestion(
         'Is this app a new build or loaded from a remote GIT repository [New, Git] : ',
         $available_src,
@@ -96,37 +96,35 @@ class InitCommand extends ContainerAwareCommand {
 
     // GET AND SET APP SOURCE.
     $gitrepo = $input->getOption('git');
-
     if ($src == 'New') {
       $gitrepo = '';
     }
-
     if (!isset($gitrepo)) {
       $io->title("SET APP GIT URL");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
       $gitrepo = $helper->ask($input, $output, $question);
     }
 
     // GET AND SET APP REQUIREMENTS.
-    $reqs = $input->getOption('reqs');
-    $available_reqs = ['Basic', 'Full', 'Prod', 'Stage'];
+    $dist = $input->getOption('dist');
+    $available_dist = ['Basic', 'Full', 'Prod', 'Stage'];
 
-    if ($reqs && !in_array($reqs, $available_reqs)) {
-      $io->warning('REQS : ' . $reqs . ' not allowed.');
-      $reqs = NULL;
+    if ($dist && !in_array($dist, $available_dist)) {
+      $io->warning('REQS : ' . $dist . ' not allowed.');
+      $dist = NULL;
     }
 
-    if (!$reqs) {
+    if (!$dist) {
       $io->info(' ');
       $io->title("SET APP REQS");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new ChoiceQuestion(
-        'Select your APP reqs [basic] : ',
-        $available_reqs,
+        'Select your APP dist [basic] : ',
+        $available_dist,
         'basic'
       );
-      $reqs = $helper->ask($input, $output, $question);
+      $dist = $helper->ask($input, $output, $question);
     }
 
     // GET AND SET APP TYPE.
@@ -141,7 +139,7 @@ class InitCommand extends ContainerAwareCommand {
     if (!$type) {
       $io->info(' ');
       $io->title("SET APP TYPE");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new ChoiceQuestion(
         'Select your APP type [0] : ',
         $available_types,
@@ -156,7 +154,7 @@ class InitCommand extends ContainerAwareCommand {
     if (!$apphost) {
       $io->info(' ');
       $io->title("SET APP HOSTNAME");
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Enter preferred app hostname [docker.dev] : ');
       $apphost = $helper->ask($input, $output, $question);
     }
@@ -171,9 +169,9 @@ class InitCommand extends ContainerAwareCommand {
       return;
     }
 
-    switch ($reqs) {
+    switch ($dist) {
       case 'Basic':
-        $file = 'dockerdrupal-lite';
+        $file = 'drudock-lite';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
 
         if (!$apphost) {
@@ -183,7 +181,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Full':
-        $file = 'dockerdrupal';
+        $file = 'drudock';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.dev';
@@ -192,7 +190,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Prod':
-        $file = 'dockerdrupal-prod';
+        $file = 'drudock-prod';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.prod';
@@ -212,11 +210,11 @@ class InitCommand extends ContainerAwareCommand {
         // set proxy network name
         $proxynet = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml'));
         $proxynet['services']['nginx-proxy']['networks'] = [
-          $system_appname . '_proxy'
+          $system_appname . '_proxy',
         ];
         unset($proxynet['networks']['nginx']);
         $proxynet['networks'][$system_appname . '_proxy'] = [
-          'driver' => 'bridge'
+          'driver' => 'bridge',
         ];
 
         $proxynetconfig = Yaml::dump($proxynet);
@@ -227,7 +225,7 @@ class InitCommand extends ContainerAwareCommand {
 
         unset($database['networks']['data']);
         $database['networks'][$system_appname . '_data'] = [
-          'driver' => 'bridge'
+          'driver' => 'bridge',
         ];
 
         $database['services']['db']['networks'] = [$system_appname . '_data'];
@@ -240,7 +238,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       case 'Stage':
-        $file = 'dockerdrupal-stage';
+        $file = 'drudock-stage';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
         if (!$apphost) {
           $apphost = 'docker.stage';
@@ -282,7 +280,7 @@ class InitCommand extends ContainerAwareCommand {
 
         unset($database['networks']['data']);
         $database['networks'][$system_appname . '_data'] = [
-          'driver' => 'bridge'
+          'driver' => 'bridge',
         ];
 
         $database['services']['db']['networks'] = [$system_appname . '_data'];
@@ -295,7 +293,7 @@ class InitCommand extends ContainerAwareCommand {
         break;
 
       default:
-        $file = 'dockerdrupal-lite';
+        $file = 'drudock-lite';
         $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
 
         if (!$apphost) {
@@ -309,31 +307,40 @@ class InitCommand extends ContainerAwareCommand {
       'appname' => $appname,
       'apptype' => $type,
       'host' => $apphost,
-      'reqs' => $reqs,
+      'dist' => $dist,
       'appsrc' => $src,
       'repo' => $gitrepo ? $gitrepo : '',
       'created' => $date = date('Y-m-d--H-i-s'),
       'builds' => [
         $date = date('Y-m-d--H-i-s'),
       ],
-      'dockerdrupal' => [
+      'drudock' => [
         'version' => $application->getVersion(),
-        'date' => $date
+        'date' => $date,
       ],
     ];
 
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
 
-    $message = 'Fetching DockerDrupal v' . $application->getVersion();
+    if ($application->getOs() == 'Darwin' && isset($appname)) {
+
+      $message = "If prompted, please type admin password to add app localhost details \n and COPY ifconfig alias.plist to /Library/LaunchDaemons/";
+      $io->info(' ');
+      $io->info($message);
+      $io->info(' ');
+      $application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io, $appname);
+    }
+
+    $message = 'Fetching DruDock v' . $application->getVersion();
     $io->info(' ');
     $io->note($message);
 
-    $this->getDockerDrupal($application, $io, $system_appname);
+    $this->getDruDock($application, $io, $system_appname);
 
     $io->info(' ');
-    $io->section("DockerDrupal ::: Ready");
-    $info = 'Go to app directory [cd ' . $system_appname . '] and run [dockerdrupal build:init]';
+    $io->section("DruDock ::: Ready");
+    $info = 'Go to app directory [cd ' . $system_appname . '] and run [drudock build:init]';
     $io->info($info);
     $io->info(' ');
   }
@@ -343,9 +350,9 @@ class InitCommand extends ContainerAwareCommand {
    * @param $io
    * @param $appname
    */
-  private function getDockerDrupal($application, $io, $appname) {
+  private function getDruDock($application, $io, $appname) {
 
-    $message = 'Download and configure DockerDrupal.... This may take a few minutes....';
+    $message = 'Download and configure DruDock.... This may take a few minutes....';
     $io->note($message);
 
     $dockerlogs = 'docker-compose -f ' . $appname . '/docker_' . $appname . '/docker-compose.yml logs -f';

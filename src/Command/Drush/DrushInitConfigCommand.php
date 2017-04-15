@@ -10,7 +10,8 @@ namespace Docker\Drupal\Command\Drush;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -29,15 +30,16 @@ class DrushInitConfigCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
     $io->section("PHP ::: drush config init");
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
 
       $site_settings = './app/config/sync/system.site.yml';
       $site_config = Yaml::parse(file_get_contents($site_settings));
