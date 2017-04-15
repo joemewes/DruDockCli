@@ -19,17 +19,17 @@ docker exec -it $(docker ps --format {{.Names}} | grep php) bash
 
 # multisite drush -> args :multi
 docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://docker.dev uli 1
-dockerdrupal drush:cmd -c " -l http://docker.dev uli" -> ADAPT into shortcut ??
+drudock drush:cmd -c " -l http://docker.dev uli" -> ADAPT into shortcut ??
 
 
 # SCREEN into HYVE
 screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
 
 # backup before restore
-cd project_folder && dockerdrupal start && docker exec -i $(docker ps --format {{.Names}} | grep db) mysqldump -u root -ppassword dev_db > dev_db.sql && dockerdrupal stop && cd ../
+cd project_folder && drudock start && docker exec -i $(docker ps --format {{.Names}} | grep db) mysqldump -u root -ppassword dev_db > dev_db.sql && drudock stop && cd ../
 
 ## DRUPAL 8
-dockerdrupal drush -c "config-export sync --skip-modules=devel,devel_generate,webprofiler,kint -y"
+drudock drush -c "config-export sync --skip-modules=devel,devel_generate,webprofiler,kint -y"
 
 ## BOX BUILD
 /usr/local/bin/box build -v

@@ -1,12 +1,12 @@
 {
-  "alias": "dockerdrupal.phar",
+  "alias": "drudock.phar",
   "chmod": "0755",
   "directories": [
     "src"
   ],
   "files": [
     "LICENSE.txt",
-    "bin/dockerdrupal.php",
+    "bin/drudock.php",
     "vendor/autoload.php"
   ],
   "finder": [
@@ -17,7 +17,7 @@
     }
   ],
   "git-version": "package_version",
-  "main": "bin/dockerdrupal",
-  "output": "dockerdrupal.phar",
+  "main": "bin/drudock",
+  "output": "drudock.phar",
   "stub": true
 }

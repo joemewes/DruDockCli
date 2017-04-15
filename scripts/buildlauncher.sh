@@ -17,4 +17,4 @@ EOF
 
 /usr/local/bin/box build -v
 
-/usr/local/bin/aws s3 cp drudock.phar s3://drudock/drudock.phar --region=eu-west-1
+/usr/local/bin/aws s3 cp drudock.phar s3://drudock/drudock.phar --region=eu-west-2
