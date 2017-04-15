@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/drudock/cli/v/stable)](https://packagist.org/packages/drudock/cli)
 [![Build Status](https://travis-ci.org/4AllDigital/DruDockCli.svg?branch=master)](https://travis-ci.org/4AllDigital/DruDockCli)
-[![License](https://poser.pugx.org/drudock/cli/license)](https://github.com/4AllDigital/DruDockCli/blob/master/LICENSE.txt)
+[![License](https://poser.pugx.org/drudock/cli/license)](https://packagist.org/packages/drudock/cli)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DruDockCli/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 
