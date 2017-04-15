@@ -12,7 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class WatchCommand
@@ -29,7 +30,8 @@ class MysqlMonitorCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
+    $container_application = new ApplicationContainerExtension();
+    $io = new DruDockStyle($input, $output);
 
     $io->section("MySQL ::: Monitor");
 
@@ -37,7 +39,7 @@ class MysqlMonitorCommand extends Command {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . 'exec -T db tail -f /var/log/mysql/mysql.log  2>&1';
       $application->runcommand($command, $io);
     }

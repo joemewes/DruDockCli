@@ -13,7 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Filesystem;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class DemoCommand
@@ -31,14 +32,15 @@ class UpdateCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
+    $container_application = new ApplicationContainerExtension();
+    $io = new DruDockStyle($input, $output);
     $io->section("UPDATING CONTAINERS");
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
 
       $command = $application->getComposePath($appname, $io) . ' pull 2>&1';
       $application->runcommand($command, $io);

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Filesystem;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
 
 /**
  * Class DemoCommand
@@ -25,13 +25,13 @@ class AboutCommand extends Command {
     $this
       ->setName('self:about')
       ->setAliases(['about'])
-      ->setDescription('About DockerDrupal')
+      ->setDescription('About DruDock')
       ->setHelp("Output general INFO");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
 
     if ($dockerversion = $application->getDockerVersion()) {
@@ -42,7 +42,7 @@ class AboutCommand extends Command {
     }
 
     $io->info(' ');
-    $io->title('DockerDrupal [cli] - ' . $application->getVersion() . ' ::: Create and manage Drupal projects with Docker ::: ' . $dv);
+    $io->title('DruDock [cli] - ' . $application->getVersion() . ' ::: Create and manage Drupal projects with Docker ::: ' . $dv);
 
     $io->info(' ');
     $io->section(' Docker status ');
@@ -67,22 +67,22 @@ class AboutCommand extends Command {
 
     $io->simple('SETUP DOCKER ENVIRONMENT');
     $io->info(' ');
-    $io->info('     dockerdrupal env:init');
+    $io->info('     drudock env:init');
     $io->info(' ');
 
     $io->simple('BUILD DRUPAL 8 APP');
     $io->info(' ');
-    $io->info('     dockerdrupal env my-app --type D8 --reqs Basic --appsrc New --apphost docker.dev');
+    $io->info('     drudock env my-app --type D8 --reqs Basic --appsrc New --apphost docker.dev');
     $io->info(' ');
 
     $io->simple('BUILD DRUPAL 7 APP WITH FULL SELENIUM/BEHAT TEST SUITE');
     $io->info(' ');
-    $io->info('     dockerdrupal env my-app --type D7 --reqs Basic --appsrc New --apphost docker.dev');
+    $io->info('     drudock env my-app --type D7 --reqs Basic --appsrc New --apphost docker.dev');
     $io->info(' ');
 
     $io->simple('AVAILABLE COMMANDS');
     $io->info(' ');
-    $io->info('dockerdrupal list');
+    $io->info('drudock list');
     $io->info(' ');
 
   }

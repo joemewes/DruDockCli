@@ -1,6 +1,6 @@
 {
-  "name": "dockerdrupal/cli",
-  "description": "DockerDrupal CLI",
+  "name": "drudock/cli",
+  "description": "DruDock Cli",
   "keywords": ["Drupal", "Docker", "Console", "Development", "Symfony"],
   "homepage": "https://www.4alldigital.io/docker-drupal/",
   "license": "MIT",
@@ -38,7 +38,7 @@
       "name": "Joe Mewes"
     }
   ],
-  "bin": ["bin/dockerdrupal"],
+  "bin": ["bin/drudock"],
   "minimum-stability": "dev",
   "prefer-stable": true,
   "autoload": {

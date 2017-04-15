@@ -11,7 +11,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Filesystem\Filesystem;
 
 
@@ -27,24 +28,25 @@ class StartCommand extends Command {
       ->setName('docker:start')
       ->setAliases(['start'])
       ->setDescription('Start current APP containers')
-      ->setHelp("Example : [dockerdrupal start]");
+      ->setHelp("Example : [drudock start]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
-    $io = new DockerDrupalStyle($input, $output);
+    $container_application = new ApplicationContainerExtension();
+
+    $io = new DruDockStyle($input, $output);
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
-      //$appreqs = $config['reqs'];
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $command = $application->getComposePath($appname, $io) . "ps | awk '{print $3}' | grep 'Up' | wc -l";
       if(exec($command) > 0){
         $io->info(' ');
         $io->section("You have running containers for your current App.");
-        $io->info("Try one of the following is you are experiencing issues :: \n\n[dockerdrupal docker:stop]\n\n[dockerdrupal docker:restart]\n\n[dockerdrupal up:ct]\n");
+        $io->info("Try one of the following is you are experiencing issues :: \n\n[drudock docker:stop]\n\n[drudock docker:restart]\n\n[drudock up:ct]\n");
         return;
       }
     }
@@ -62,19 +64,19 @@ class StartCommand extends Command {
         $application->runcommand($command, $io);
       }
 
-      if ($application->checkForAppContainers($appname, $io)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $application->getComposePath($appname, $io) . ' start 2>&1';
         $application->runcommand($command, $io);
       }
     }
     else {
-      if ($application->checkForAppContainers($appname, $io)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $application->getComposePath($appname, $io) . ' start 2>&1';
         $application->runcommand($command, $io);
       }
     }
 
-    if ($application->checkForAppContainers($appname, $io)) {
+    if ($container_application->checkForAppContainers($appname, $io)) {
       $system_appname = strtolower(str_replace(' ', '', $appname));
       $fs = new Filesystem();
       // If Prod app start networks.

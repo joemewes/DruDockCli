@@ -24,10 +24,12 @@ notifications:
   email: false
 addons:
   sonarqube:
-    organization: dockerdrupal
+    organization: drudock
     branches:
-    - dev
     - master
+    - development
+    - jm
+    - ah
 jdk:
 - oraclejdk8
 cache:

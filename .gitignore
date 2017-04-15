@@ -6,3 +6,5 @@ vendor/*
 .phpintel
 .phpintel/*
 
+.phar
+dockerdrupal.phar

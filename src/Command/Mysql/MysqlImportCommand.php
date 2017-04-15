@@ -12,7 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Docker\Drupal\Style\DockerDrupalStyle;
+use Docker\Drupal\Style\DruDockStyle;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
@@ -25,14 +26,15 @@ class MysqlImportCommand extends Command {
     $this
       ->setName('mysql:import')
       ->setDescription('Import .sql files')
-      ->setHelp("Use this to import .sql files to the current running APPs dev_db. [dockerdrupal mysql:import -p ./latest.sql]")
+      ->setHelp("Use this to import .sql files to the current running APPs dev_db. [drudock mysql:import -p ./latest.sql]")
       ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify import file path including filename');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $container_application = new ApplicationContainerExtension();
 
-    $io = new DockerDrupalStyle($input, $output);
+    $io = new DruDockStyle($input, $output);
 
     $io->section("MYSQL ::: import database");
 
@@ -59,8 +61,7 @@ class MysqlImportCommand extends Command {
 
       if (file_exists($importpath)) {
 
-        //drop database;
-        if ($application->checkForAppContainers($appname, $io)) {
+        if ($container_application->checkForAppContainers($appname, $io)) {
 
           $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
           $application->runcommand($command, $io);
