@@ -129,21 +129,21 @@ composer global require drudock/cli
 ## Example Commands
 ```
       --------------
-      :$ drudock env my-great-app -t DEFAULT -r Basic -s New -p basic.docker.dev
+      :$ drudock env my-great-app -t DEFAULT -r Basic -s New -p basic.drudock.dev
       :$ cd my-great-app && drudock build:init
       --------------
 ```    
 #### DEV Drupal 8  
 ```
       --------------
-      :$ drudock env my-drupal8-site -t D8 -r Basic -s New -p d8.docker.dev
+      :$ drudock env my-drupal8-site -t D8 -r Basic -s New -p d8.drudock.dev
       :$ cd my-drupal8-site && drudock build:init
       --------------
 ```   
 #### DEV Drupal 7
 ```
       --------------
-      :$ drudock env my-drupal7-site -t D7 -r Full -s Git -p d7.docker.dev
+      :$ drudock env my-drupal7-site -t D7 -r Full -s Git -p d7.drudock.dev
       :$ cd my-drupal7-site && drudock build:init
       --------------
 ```

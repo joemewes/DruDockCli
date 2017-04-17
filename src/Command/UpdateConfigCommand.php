@@ -54,7 +54,7 @@ class UpdateConfigCommand extends Command {
           $io->info(' ');
           $io->title("SET APP HOSTNAME");
           $helper = $this->getHelper('question');
-          $question = new Question('Enter preferred app hostname [docker.dev] : ');
+          $question = new Question('Enter preferred app hostname [drudock.dev] : ');
           $apphost = $helper->ask($input, $output, $question);
           $config[$req] = $apphost;
         }

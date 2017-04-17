@@ -109,7 +109,7 @@ class BuildCommand extends ContainerAwareCommand {
     $system_appname = strtolower(str_replace(' ', '', $appname));
     $application->setNginxHost($io);
     if ($application->getOs() == 'Darwin') {
-      $config_application->addHostConfig($fs, $client, $zippy, $apphost, $io, TRUE);
+      $config_application->setHostConfig($fs, $client, $zippy, $apphost, $io, TRUE);
     }
 
     /**
@@ -183,7 +183,7 @@ class BuildCommand extends ContainerAwareCommand {
       }
 
 
-      $config_application->tmpRemoteBundle($fs, $client, $zippy, 'd7');
+      $config_application->tmpRemoteBundle('d7');
       // Build repo content.
       if (is_dir(TMP_D7) && is_dir($app_dest . REPOSITORY)) {
         $d7files = TMP_D7;
@@ -198,7 +198,7 @@ class BuildCommand extends ContainerAwareCommand {
         $fs->remove(TMP_D7);
 
         if (isset($dist) && $dist == 'Full') {
-          $config_application->tmpRemoteBundle($fs, $client, $zippy, 'behat');
+          $config_application->tmpRemoteBundle('behat');
           $fs->mirror(TMP_BEHAT, $app_dest . '/behat/');
           $fs->remove(TMP_BEHAT);
         }
@@ -309,7 +309,7 @@ class BuildCommand extends ContainerAwareCommand {
 
         $fs->remove(TMP . $files_dir);
         if (isset($dist) && $dist == 'Full') {
-          $config_application->tmpRemoteBundle($fs, $client, $zippy, 'behat');
+          $config_application->tmpRemoteBundle('behat');
           $fs->mirror(TMP_BEHAT, $app_dest . '/behat/');
           $fs->remove(TMP_BEHAT);
         }
@@ -340,7 +340,7 @@ class BuildCommand extends ContainerAwareCommand {
     $message = 'Setting up Example app';
     $io->section($message);
 
-    $config_application->tmpRemoteBundle($fs, $client, $zippy, 'default');
+    $config_application->tmpRemoteBundle('default');
     if (is_dir(TMP_DEFAULT)) {
       $app_src = TMP_DEFAULT;
       try {
@@ -378,7 +378,7 @@ class BuildCommand extends ContainerAwareCommand {
         $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/';
         $application->runcommand($command, $io);
 
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.dev --db-url=mysql://dev:DEVPASSWORD@mysql:3306/dev_db --quiet -y';
+        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD8@drudock.dev --db-url=mysql://dev:DEVPASSWORD@mysql:3306/dev_db --quiet -y';
         $application->runcommand($command, $io);
       }
       if ($dist == 'Production') {
@@ -421,7 +421,7 @@ class BuildCommand extends ContainerAwareCommand {
     $message = 'Run Drupal Installation.... This may take a few minutes....';
     $io->note($message);
 
-    $command = $command = $container_application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD7@docker.dev --db-url=mysql://dev:DEVPASSWORD@mysql:3306/dev_db -y';
+    $command = $command = $container_application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD7@drudock.dev --db-url=mysql://dev:DEVPASSWORD@mysql:3306/dev_db -y';
     $application->runcommand($command, $io);
   }
 

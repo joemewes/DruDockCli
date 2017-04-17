@@ -72,12 +72,12 @@ class AboutCommand extends Command {
 
     $io->simple('BUILD DRUPAL 8 APP');
     $io->info(' ');
-    $io->info('     drudock env my-app --type D8 --dist Basic --appsrc New --apphost docker.dev');
+    $io->info('     drudock env my-app --type D8 --dist Basic --appsrc New --apphost drudock.dev');
     $io->info(' ');
 
     $io->simple('BUILD DRUPAL 7 APP WITH FULL SELENIUM/BEHAT TEST SUITE');
     $io->info(' ');
-    $io->info('     drudock env my-app --type D7 --dist Basic --appsrc New --apphost docker.dev');
+    $io->info('     drudock env my-app --type D7 --dist Basic --appsrc New --apphost drudock.dev');
     $io->info(' ');
 
     $io->simple('AVAILABLE COMMANDS');

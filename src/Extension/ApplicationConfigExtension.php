@@ -31,6 +31,8 @@ const APPNAME = 'appname';
 const SERVICES = 'services';
 const VOLUMES = 'volumes';
 const NETWORKS = 'networks';
+const DATE_FORMAT = 'Y-m-d--H-i-s';
+
 
 /**
  * Class ApplicationConfigExtension
@@ -44,14 +46,17 @@ class ApplicationConfigExtension extends Application {
    *
    * @param $io
    * @param $input
+   * @param $output
+   * @param $cmd
    *
    * @return mixed
    */
-  function getSetAppname($io, $input) {
+  function getSetAppname($io, $input, $output, $cmd) {
     $appname = $input->getArgument(APPNAME);
+    $date = date(DATE_FORMAT);
     if (!isset($appname)) {
       $io->title("SET APP NAME");
-      $helper = $this->getHelper(QUESTION);
+      $helper = $cmd->getHelper(QUESTION);
       $question = new Question('Enter App name [drudock_app_' . $date . '] : ', 'my-app-' . $date);
       $appname = $helper->ask($input, $output, $question);
     }
@@ -63,10 +68,12 @@ class ApplicationConfigExtension extends Application {
    *
    * @param $io
    * @param $input
+   * @param $output
+   * @param $cmd
    *
    * @return mixed
    */
-  function getSetSource($io, $input) {
+  function getSetSource($io, $input, $output, $cmd) {
     $src = $input->getOption('src');
     $available_src = ['New', 'Git'];
 
@@ -78,7 +85,7 @@ class ApplicationConfigExtension extends Application {
     if (!isset($src)) {
       $io->info(' ');
       $io->title("SET APP SOURCE");
-      $helper = $this->getHelper(QUESTION);
+      $helper = $cmd->getHelper(QUESTION);
       $question = new ChoiceQuestion(
         'Is this app a new build or loaded from a remote GIT repository [New, Git] : ',
         $available_src,
@@ -94,18 +101,20 @@ class ApplicationConfigExtension extends Application {
    *
    * @param $io
    * @param $input
+   * @param $output
    * @param $src
+   * @param $cmd
    *
    * @return string
    */
-  function getSetSCMSource($io, $input, $src) {
+  function getSetSCMSource($io, $input, $output, $src, $cmd) {
     $gitrepo = $input->getOption('git');
     if ($src == 'New') {
       $gitrepo = '';
     }
     if (!isset($gitrepo)) {
       $io->title("SET APP GIT URL");
-      $helper = $this->getHelper(QUESTION);
+      $helper = $cmd->getHelper(QUESTION);
       $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
       $gitrepo = $helper->ask($input, $output, $question);
     }
@@ -117,10 +126,12 @@ class ApplicationConfigExtension extends Application {
    *
    * @param $io
    * @param $input
+   * @param $output
+   * @param $cmd
    *
    * @return null
    */
-  function getSetDistribution($io, $input) {
+  function getSetDistribution($io, $input, $output, $cmd) {
     $dist = $input->getOption('dist');
     $available_dist = ['Development', 'Production', 'Feature'];
 
@@ -132,7 +143,7 @@ class ApplicationConfigExtension extends Application {
     if (!$dist) {
       $io->info(' ');
       $io->title("SET APP DIST");
-      $helper = $this->getHelper(QUESTION);
+      $helper = $cmd->getHelper(QUESTION);
       $question = new ChoiceQuestion(
         'Select your APP distribution : ',
         $available_dist,
@@ -148,10 +159,12 @@ class ApplicationConfigExtension extends Application {
    *
    * @param $io
    * @param $input
+   * @param $output
+   * @param $cmd
    *
    * @return null
    */
-  function getSetType($io, $input) {
+  function getSetType($io, $input, $output, $cmd) {
     $type = $input->getOption('type');
     $available_types = ['DEFAULT', 'D7', 'D8'];
 
@@ -163,7 +176,7 @@ class ApplicationConfigExtension extends Application {
     if (!$type) {
       $io->info(' ');
       $io->title("SET APP TYPE");
-      $helper = $this->getHelper(QUESTION);
+      $helper = $cmd->getHelper(QUESTION);
       $question = new ChoiceQuestion(
         'Select your APP type [0] : ',
         $available_types,
@@ -179,17 +192,19 @@ class ApplicationConfigExtension extends Application {
    *
    * @param $io
    * @param $input
+   * @param $output
+   * @param $cmd
    *
    * @return mixed
    */
-  function getSetHost($io, $input) {
+  function getSetHost($io, $input, $output, $cmd) {
     $apphost = $input->getOption('apphost');
 
     if (!$apphost) {
       $io->info(' ');
       $io->title("SET APP HOSTNAME");
-      $helper = $this->getHelper(QUESTION);
-      $question = new Question('Enter preferred app hostname [docker.dev] : ');
+      $helper = $cmd->getHelper(QUESTION);
+      $question = new Question('Enter preferred app hostname [drudock.dev] : ', 'drudock.dev');
       $apphost = $helper->ask($input, $output, $question);
     }
     return $apphost;
@@ -200,6 +215,8 @@ class ApplicationConfigExtension extends Application {
    *
    * @param $io
    * @param $input
+   * @param $output
+   * @param $cmd
    *
    * @return null
    */
@@ -295,7 +312,7 @@ class ApplicationConfigExtension extends Application {
    * @param $io
    * @param $appname
    */
-  public function addHostConfig($fs, $client, $zippy, $newhost, $io, $appname) {
+  public function setHostConfig($fs, $client, $zippy, $newhost, $io, $appname) {
     // Add initial entry to hosts file.
     // OSX @TODO update as command for all systems and OS's.
 
@@ -307,7 +324,7 @@ class ApplicationConfigExtension extends Application {
       $system_appname = strtolower(str_replace(' ', '', $appname));
     }
     else {
-      $apphost = 'docker.dev';
+      $apphost = 'drudock.dev';
     }
 
     $hosts_file = '/etc/hosts';
@@ -320,7 +337,7 @@ class ApplicationConfigExtension extends Application {
       $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
       $this->runcommand($command, $io, TRUE);
     }
-    else {
+    else if($app_host_config !== $new_host_config) {
       // Replace existing.
       $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
       $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
@@ -421,7 +438,7 @@ class ApplicationConfigExtension extends Application {
   }
 
   public function applyAppServices($base_compose, $config, $dist_path) {
-    $services = explode(',', $config[SERVICES]);
+    $services = $config[SERVICES];
     foreach ($services as $service) {
       $service_name = strtolower($service);
       $service_yaml = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/services/' . $service_name . '.yml');

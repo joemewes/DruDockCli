@@ -48,7 +48,7 @@ class InitCommand extends ContainerAwareCommand {
       ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Development,Production,Feature]')
       ->addOption('src', 'g', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('git', 'gs', InputOption::VALUE_OPTIONAL, 'Git repository URL')
-      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]')
+      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [drudock.dev]')
       ->addOption('services', 's', InputOption::VALUE_OPTIONAL, 'Select app services [UNISON, PHP, NGINX, MYSQL, SOLR, REDIS, MAILCATCHER]');
   }
 
@@ -60,7 +60,6 @@ class InitCommand extends ContainerAwareCommand {
     $fs = new Filesystem();
     $client = new Client();
     $zippy = Zippy::load();
-    $date = date(DATE_FORMAT);
 
     // Check if this folder is has APP config.
     if (file_exists('.config.yml')) {
@@ -69,14 +68,14 @@ class InitCommand extends ContainerAwareCommand {
     }
 
     // Setup app config.
-    $appname = $config_application->getSetAppname($io, $input);
-    $src = $config_application->getSetSource($io, $input);
+    $appname = $config_application->getSetAppname($io, $input, $output, $this);
+    $src = $config_application->getSetSource($io, $input, $output, $this);
     if($src){
-      $gitrepo = $config_application->getSetSCMSource($io, $input, $src);
+      $gitrepo = $config_application->getSetSCMSource($io, $input, $output, $src, $this);
     }
-    $dist = $config_application->getSetDistribution($io, $input);
-    $type = $config_application->getSetType($io, $input);
-    $apphost = $config_application->getSetHost($io, $input);
+    $dist = $config_application->getSetDistribution($io, $input, $output, $this);
+    $type = $config_application->getSetType($io, $input, $output, $this);
+    $apphost = $config_application->getSetHost($io, $input, $output, $this);
     $service_types = $config_application->getSetServices($io, $input, $output, $this);
 
     // Setup app initial folder structure.
@@ -119,7 +118,7 @@ class InitCommand extends ContainerAwareCommand {
       $io->info(' ');
       $io->info($message);
       $io->info(' ');
-      $config_application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io, $appname);
+      $config_application->setHostConfig($fs, $client, $zippy, 'drudock.dev', $io, $appname);
     }
 
     $message = 'Fetching DruDock v' . $application->getVersion();

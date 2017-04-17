@@ -7,11 +7,11 @@ volumes_from:
   - unison:rw
 environment:
   XDEBUG_CONFIG: "remote_host=10.254.254.254"
-  PHP_IDE_CONFIG: "serverName=docker.dev"
+  PHP_IDE_CONFIG: "serverName=drudock.dev"
   HOST_IP: "10.254.254.254"
 dns:
   - 8.8.8.8
   - 8.8.4.4
 hostname: php
 extra_hosts:
- - "docker.dev:10.254.254.254"
+ - "drudock.dev:10.254.254.254"

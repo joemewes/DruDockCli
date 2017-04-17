@@ -320,7 +320,7 @@ class Application extends ParentApplication {
     }
 
     if (!isset($apphost)) {
-      $apphost = 'docker.dev';
+      $apphost = 'drudock.dev';
     }
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -435,7 +435,7 @@ VIRTUAL_NETWORK=nginx-proxy";
         file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
         break;
       default:
-        file_put_contents('./docker_' . $system_appname . '/config/nginx/docker.dev', $nginxconfig);
+        file_put_contents('./docker_' . $system_appname . '/config/nginx/drudock.dev', $nginxconfig);
     }
   }
 
