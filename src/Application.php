@@ -11,6 +11,8 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Filesystem\Exception\IOException;
+
 use Symfony\Component\Console\Application as ParentApplication;
 
 const DEV_MYSQL_PASS = 'DEVPASSWORD';
@@ -107,32 +109,6 @@ class Application extends ParentApplication {
   }
 
   /**
-   * @output status table
-   */
-  public function dockerHealthCheck($io) {
-    $names = shell_exec("echo $(docker ps --format '{{.Names}}|{{.Status}}:')");
-    $n_array = explode(':', $names);
-    $rows = [];
-    foreach ($n_array as $i => $n) {
-      $c = explode('|', $n);
-      if ($c[0] && $c[1]) {
-        $rows[$i]['Name'] = str_replace(' ', '', $c[0]);
-        $rows[$i]['Status'] = $c[1];
-      }
-    }
-    $headers = ['Container Name', 'Status'];
-    $io->table($headers, $rows);
-  }
-
-  /**
-   * @return array
-   */
-  public function getRunningContainerNames() {
-    $names = shell_exec("echo $(docker ps --format '{{.Names}}')");
-    return explode(' ', $names);
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function getDefaultInputDefinition() {
@@ -172,17 +148,14 @@ class Application extends ParentApplication {
     $commands[] = new Command\UpdateCommand();
     $commands[] = new Command\UpdateConfigCommand();
 
-
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();
     $commands[] = new Command\Mysql\MysqlMonitorCommand();
-
 
     $commands[] = new Command\Nginx\NginxMonitorCommand();
     $commands[] = new Command\Nginx\NginxReloadCommand();
     $commands[] = new Command\Nginx\NginxFlushPagespeedCommand();
     $commands[] = new Command\Nginx\NginxSetHostCommand();
-
 
     $commands[] = new Command\Drush\DrushCommand();
     $commands[] = new Command\Drush\DrushClearCacheCommand();
@@ -192,23 +165,18 @@ class Application extends ParentApplication {
     $commands[] = new Command\Drush\DrushUpDbCommand();
     $commands[] = new Command\Drush\DrushInitConfigCommand();
 
-
     $commands[] = new Command\Redis\RedisMonitorCommand();
     $commands[] = new Command\Redis\RedisPingCommand();
     $commands[] = new Command\Redis\RedisFlushCommand();
     $commands[] = new Command\Redis\RedisInfoCommand();
 
-
     $commands[] = new Command\Behat\BehatStatusCommand();
     $commands[] = new Command\Behat\BehatMonitorCommand();
     $commands[] = new Command\Behat\BehatCommand();
 
-
     $commands[] = new Command\Sync\AppSyncMonitorCommand();
 
-
     $commands[] = new Command\Prod\ProdUpdateCommand();
-
 
     return $commands;
   }
@@ -243,16 +211,16 @@ class Application extends ParentApplication {
     $requirements = $this->getDDrequirements();
 
     if (!$skip_checks) {
-      $missing_reqs = [];
+      $missing_dist = [];
       foreach ($requirements as $req) {
         if (!in_array($req, $config_keys)) {
-          $missing_reqs[] = $req;
+          $missing_dist[] = $req;
         }
       }
 
-      if (count($missing_reqs) > 0) {
+      if (count($missing_dist) > 0) {
         $io->info('Your app is missing the following config, please run [drudock docker:update:config] : ');
-        foreach ($missing_reqs as $req) {
+        foreach ($missing_dist as $req) {
           $io->warning($req);
         }
         exit;
@@ -287,106 +255,17 @@ class Application extends ParentApplication {
   /**
    * @return string
    */
-  public function getComposePath($appname, $io) {
-
-    $system_appname = strtolower(str_replace(' ', '', $appname));
-    $latestbuild = [];
-    $reqs = '';
-    $fs = new Filesystem();
-
-    if ($config = $this->getAppConfig($io)) {
-      if (isset($config['reqs'])) {
-        $reqs = $config['reqs'];
-      }
-      if (isset($config['builds'])) {
-        $latestbuild = $config['builds'];
-      }
-    }
-
-    switch ($reqs) {
-      case 'Prod':
-      case 'Stage':
-        $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
-        break;
-      default:
-        $project = '';
-    }
-
-    if ($fs->exists('docker-compose.yml')) {
-      return 'docker-compose ';
-    }
-    elseif ($fs->exists('./docker_' . $system_appname . '/docker-compose.yml')) {
-      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose.yml ' . $project . ' ';
-    }
-    else {
-      $io->error("docker-compose.yml : Not Found");
-      exit;
-    }
-  }
-
-  /**
-   * @return string
-   */
-  public function getDataComposePath($appname, $io) {
-
-    $system_appname = strtolower(str_replace(' ', '', $appname));
-    $build = [];
-    $reqs = '';
-    $fs = new Filesystem();
-
-    if ($config = $this->getAppConfig($io)) {
-      $reqs = $config['reqs'];
-      if (is_array($config['builds'])) {
-        $build = end($config['builds']);
-      }
-    }
-
-    if (!$build) {
-      $io->error('Build :: Config not found');
-      return;
-    }
-
-    switch ($reqs) {
-      case 'Prod':
-        $project = '--project-name=data';
-        break;
-      case 'Stage':
-        $project = '--project-name=' . $system_appname . '_data';
-        break;
-      default:
-        $project = '';
-    }
-
-    if (!$project) {
-      // @todo: This message needs review.
-      // @see https://github.com/4AllDigital/DruDockCli/issues/91
-      $io->error("docker-compose-data.yml : Not Found");
-      exit;
-    }
-
-    if ($fs->exists('./docker_' . $system_appname . '/docker-compose-data.yml')) {
-      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-data.yml ' . $project . ' ';
-    }
-    else {
-      $io->error("docker-compose-data.yml : Not Found");
-      exit;
-    }
-  }
-
-  /**
-   * @return string
-   */
   public function getProxyComposePath($appname, $io) {
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
     if ($config = $this->getAppConfig($io)) {
-      $reqs = $config['reqs'];
+      $dist = $config['dist'];
     }
 
     $fs = new Filesystem();
 
-    if (isset($reqs) && $reqs == 'Prod') {
+    if (isset($dist) && $dist == 'Prod') {
       $project = '--project-name=proxy';
     }
     else {
@@ -432,16 +311,16 @@ class Application extends ParentApplication {
   /**
    * @return string
    */
-  function setNginxHost($io) {
+  public function setNginxHost($io) {
 
     if ($config = $this->getAppConfig($io)) {
       $appname = $config['appname'];
       $apphost = $config['host'];
-      $reqs = $config['reqs'];
+      $dist = $config['dist'];
     }
 
     if (!isset($apphost)) {
-      $apphost = 'docker.dev';
+      $apphost = 'drudock.dev';
     }
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -544,10 +423,10 @@ class Application extends ParentApplication {
     }
 }';
 
-    switch ($reqs) {
+    switch ($dist) {
       case 'Prod':
       case 'Stage':
-        file_put_contents('./docker_' . $system_appname . '/mounts/sites-enabled/' . $apphost, $nginxconfig);
+        file_put_contents('./docker_' . $system_appname . '/config/nginx/' . $apphost, $nginxconfig);
 
         $nginxenv = "VIRTUAL_HOST=$apphost
 APPS_PATH=~/app
@@ -556,52 +435,10 @@ VIRTUAL_NETWORK=nginx-proxy";
         file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
         break;
       default:
-        file_put_contents('./docker_' . $system_appname . '/sites-enabled/docker.dev', $nginxconfig);
+        file_put_contents('./docker_' . $system_appname . '/config/nginx/drudock.dev', $nginxconfig);
     }
   }
 
-  /**
-   * @param $application
-   * @param $io
-   */
-  public function addHostConfig($fs, $client, $zippy, $newhost, $io, $appname) {
-    // Add initial entry to hosts file.
-    // OSX @TODO update as command for all systems and OS's.
-
-    $ip = LOCALHOST;
-
-    if ($config = $this->getAppConfig($io, $appname)) {
-      $apphost = $config['host'];
-      $appname = $config['appname'];
-      $system_appname = strtolower(str_replace(' ', '', $appname));
-    }
-    else {
-      $apphost = 'docker.dev';
-    }
-
-    $hosts_file = '/etc/hosts';
-    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
-    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
-    $hosts_file_contents = file_get_contents($hosts_file);
-
-    if (!strpos($hosts_file_contents, $app_host_config)) {
-      // Add new.
-      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
-      $this->runcommand($command, $io, TRUE);
-    }
-    else {
-      // Replace existing.
-      $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
-      $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
-      exec($command);
-    }
-
-    if (!file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
-      $this->tmpRemoteBundle($fs, $client, $zippy, 'osx');
-      $command = 'sudo cp -R /tmp/osx/com.4alldigital.drudock.plist /Library/LaunchDaemons/com.4alldigital.drudock.plist';
-      $this->runcommand($command, $io, TRUE);
-    }
-  }
 
   /**
    * @return string
@@ -626,11 +463,14 @@ VIRTUAL_NETWORK=nginx-proxy";
   /**
    * @return string
    */
-  function getOs() {
+  public function getOs() {
     return PHP_OS;
   }
 
-  function requireUpdate($io) {
+  /**
+   * @param $io
+   */
+  public function requireUpdate($io) {
 
     $io->warning('This app .config.yml is out of date and missing data. Please run [drudock up:config].');
     exit;
@@ -640,13 +480,13 @@ VIRTUAL_NETWORK=nginx-proxy";
    * @return array
    *  Return keys of current required app config.
    */
-  function getDDrequirements() {
+  public function getDDrequirements() {
     return [
       'appname',
       'apptype',
       'host',
-      'reqs',
-      'appsrc',
+      'dist',
+      'src',
       'repo',
     ];
   }
@@ -654,43 +494,26 @@ VIRTUAL_NETWORK=nginx-proxy";
   /**
    * Set currently assigned config into yaml format and file.
    */
-  function setConfig($config) {
+  public function setConfig($config) {
     $yaml = Yaml::dump($config);
     file_put_contents('.config.yml', $yaml);
   }
 
   /**
-   * Download remote bundle
-   */
-  function getRemoteBundle($io, $fs, $client, $zippy, $file, $folder_name) {
-
-    $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
-    $destination = sys_get_temp_dir() . '/' . $file . '.tar.gz';
-    $client->get($remote_file_path, ['save_to' => $destination]);
-    $archive = $zippy->open($destination);
-    $archive->extract('./');
-    try {
-      $fs->mirror($file, $folder_name);
-      $fs->remove($file);
-    } catch (IOExceptionInterface $e) {
-      $io->warning('Error renaming folder');
-    }
-  }
-
-  /**
-   * Download remote bundle for temp usage.
+   * @param $target
+   * @param $content
    *
-   * @param $fs
-   * @param $client
-   * @param $zippy
-   * @param $file
+   * @throws \Exception
    */
-  function tmpRemoteBundle($fs, $client, $zippy, $file) {
-    $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
-    $destination = '/tmp/' . $file . '.tar.gz';
-    $client->get($remote_file_path, ['save_to' => $destination]);
-    $archive = $zippy->open($destination);
-    $archive->extract('/tmp/');
-    $fs->remove($destination);
+  public function renderFile($target, $content) {
+    $filesystem = new Filesystem();
+    try {
+      $filesystem->dumpFile(
+        $target,
+        $content
+      );
+    } catch (IOException $e) {
+      throw $e;
+    }
   }
 }

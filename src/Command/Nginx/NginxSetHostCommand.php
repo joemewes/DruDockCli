@@ -47,7 +47,7 @@ class NginxSetHostCommand extends Command {
     }
 
     if (!isset($apphost)) {
-      $apphost = 'docker.dev';
+      $apphost = 'drudock.dev';
     }
 
     $currenthost = $apphost;
@@ -56,7 +56,7 @@ class NginxSetHostCommand extends Command {
     $newhost = $helper->ask($input, $output, $question);
 
     if ($application->getOs() == 'Darwin') {
-      $application->addHostConfig($fs, $client, $zippy, $newhost, $io, TRUE);
+      $application->setHostConfig($fs, $client, $zippy, $newhost, $io, TRUE);
     }
 
     if (file_exists('.config.yml')) {

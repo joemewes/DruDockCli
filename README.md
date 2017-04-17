@@ -1,10 +1,12 @@
-![DruDock Logo](https://raw.githubusercontent.com/4alldigital/DruDock/master/docs/images/dd-logo.png)
+![DruDock Logo](https://s3.eu-west-2.amazonaws.com/drudock/DruDockLogo.jpg)
 
 [DruDock](https://www.4alldigital.io/drudock) is Docker based development, staging and production environment for Drupal websites or PHP apps.
 
 [![Latest Stable Version](https://poser.pugx.org/drudock/cli/v/stable)](https://packagist.org/packages/drudock/cli)
+[![License](https://poser.pugx.org/drudock/cli/license)](https://packagist.org/packages/drudock/cli)
+[![composer.lock](https://poser.pugx.org/drudock/cli/composerlock)](https://packagist.org/packages/drudock/cli)
+
 [![Build Status](https://travis-ci.org/4AllDigital/DruDockCli.svg?branch=master)](https://travis-ci.org/4AllDigital/DruDockCli)
-[![License](https://poser.pugx.org/drudock/cli/license)](https://github.com/4AllDigital/DruDockCli/blob/master/LICENSE.txt)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DruDockCli/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 
@@ -127,21 +129,21 @@ composer global require drudock/cli
 ## Example Commands
 ```
       --------------
-      :$ drudock env my-great-app -t DEFAULT -r Basic -s New -p basic.docker.dev
+      :$ drudock env my-great-app -t DEFAULT -r Basic -s New -p basic.drudock.dev
       :$ cd my-great-app && drudock build:init
       --------------
 ```    
 #### DEV Drupal 8  
 ```
       --------------
-      :$ drudock env my-drupal8-site -t D8 -r Basic -s New -p d8.docker.dev
+      :$ drudock env my-drupal8-site -t D8 -r Basic -s New -p d8.drudock.dev
       :$ cd my-drupal8-site && drudock build:init
       --------------
 ```   
 #### DEV Drupal 7
 ```
       --------------
-      :$ drudock env my-drupal7-site -t D7 -r Full -s Git -p d7.docker.dev
+      :$ drudock env my-drupal7-site -t D7 -r Full -s Git -p d7.drudock.dev
       :$ cd my-drupal7-site && drudock build:init
       --------------
 ```

@@ -1,0 +1,26 @@
+image : 4alldigital/drudock-nginx
+volumes :
+  - ./config/nginx:/etc/nginx/sites-enabled
+  - app-data:/app:ro
+  - ../app/www/sites/default/files:/app/www/sites/default/files:rw
+env_file: nginx.env
+hostname: nginx
+restart: always
+read_only: true
+tmpfs:
+  - /run
+  - /tmp
+  - /var/lib/nginx
+  - /var/log/nginx
+  - /var/log/supervisor
+  - /var/log/pagespeed
+  - /var/ngx_pagespeed_cache
+  - /etc/nginx/client_body_temp
+  - /etc/nginx/proxy_temp
+  - /etc/nginx/fastcgi_temp
+  - /etc/nginx/uwsgi_temp
+  - /etc/nginx/scgi_temp
+networks:
+  - default
+  - proxy
+  - database

@@ -19,8 +19,6 @@ class DatabaseConfigExtension extends Extension
     public function load( array $configs, ContainerBuilder $container )
     {
     $configuration = new Configuration();
-        var_dump($configuration);
-        die();
     $processedConfig = $this->processConfiguration( $configuration, $configs );
 
     // Do not add a paramater now, just continue reading the services.
