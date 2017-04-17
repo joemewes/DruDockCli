@@ -1,0 +1,17 @@
+image : 4alldigital/drudock-php:7.1
+ports :
+  - "8022:22"
+volumes :
+  - ../app/www/sites/default/files:/app/www/sites/default/files
+volumes_from:
+  - unison:rw
+environment:
+  XDEBUG_CONFIG: "remote_host=10.254.254.254"
+  PHP_IDE_CONFIG: "serverName=docker.dev"
+  HOST_IP: "10.254.254.254"
+dns:
+  - 8.8.8.8
+  - 8.8.4.4
+hostname: php
+extra_hosts:
+ - "docker.dev:10.254.254.254"

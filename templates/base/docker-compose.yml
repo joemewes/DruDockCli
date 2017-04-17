@@ -1,0 +1,16 @@
+version: "2"
+#
+# [ services definitions ]
+#
+services:
+
+#
+# [ volumes definition ]
+#
+volumes:
+
+#
+# [ networks definition ]
+#
+networks:
+

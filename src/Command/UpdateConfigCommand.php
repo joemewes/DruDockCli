@@ -73,7 +73,7 @@ class UpdateConfigCommand extends Command {
           $config[$req] = $dist;
         }
 
-        if ($req == 'appsrc') {
+        if ($req == 'src') {
 
           $available_src = ['New', 'Git'];
 

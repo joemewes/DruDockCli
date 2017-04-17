@@ -6,11 +6,10 @@
  */
 
 namespace Docker\Drupal\Command;
-
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -32,7 +31,7 @@ class DestroyCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
 
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     $io = new DruDockStyle($input, $output);
@@ -51,36 +50,36 @@ class DestroyCommand extends Command {
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
-      $appdist = $config['dist'];
+      $dist = $config['dist'];
     }
 
-    if (isset($appdist) && ($appdist == 'Basic' || $appdist == 'Full')) {
+    if (isset($dist) && ($dist == 'Development')) {
       if ($container_application->checkForAppContainers($appname, $io)) {
-          $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
+          $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
           $application->runcommand($command, $io);
       }
     }
 
-    if(isset($appdist) && $appdist == 'Prod') {
+    if(isset($dist) && $dist == 'Production') {
       if ($container_application->checkForAppContainers($appname, $io)) {
-        $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
+        $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
         $application->runcommand($command, $io);
       }
 
-      $command = $application->getDataComposePath($appname, $io) . ' down -v 2>&1';
+      $command = $container_application->getDataComposePath($appname, $io) . ' down -v 2>&1';
       $application->runcommand($command, $io);
 
       $command = $application->getProxyComposePath($appname, $io) . ' down -v 2>&1';
       $application->runcommand($command, $io);
     }
 
-    if(isset($appdist) && $appdist == 'Stage') {
+    if(isset($dist) && $dist == 'Feature') {
       if ($container_application->checkForAppContainers($appname, $io)) {
-        $command = $application->getComposePath($appname, $io) . ' down -v 2>&1';
+        $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
         $application->runcommand($command, $io);
       }
 
-      $command = $application->getDataComposePath($appname, $io) . ' down -v 2>&1';
+      $command = $container_application->getDataComposePath($appname, $io) . ' down -v 2>&1';
       $application->runcommand($command, $io);
     }
 

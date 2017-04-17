@@ -1,0 +1,9 @@
+image : 4alldigital/drudock-nginx:latest
+ports :
+  - "80:80"
+volumes :
+  - ./config/nginx:/etc/nginx/sites-enabled
+  - ../app/www/sites/default/files:/app/www/sites/default/files
+volumes_from:
+  - unison:rw
+hostname: nginx

@@ -1,0 +1,14 @@
+image : 4alldigital/drudock-redis
+hostname: redis
+container_name: redis
+restart: always
+mem_limit: 1000000000
+memswap_limit: 2000000000
+read_only: true
+tmpfs:
+  - /run
+  - /tmp
+  - /tmp/redis
+  - /var/log/redis
+networks:
+  - data

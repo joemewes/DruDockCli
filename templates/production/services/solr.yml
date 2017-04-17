@@ -1,0 +1,8 @@
+image : 4alldigital/drudock-solr:4.10.1
+ports :
+  - "8983"
+hostname: solr
+restart: always
+container_name: solr
+networks:
+  - data

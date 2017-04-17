@@ -1,0 +1,5 @@
+image : 4alldigital/drudock-unison
+volumes :
+  - ../app:/code
+  - app-sync:/app
+hostname : app

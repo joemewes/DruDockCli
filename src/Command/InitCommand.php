@@ -19,7 +19,8 @@ use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Yaml\Yaml;
 use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
-
+use Docker\Drupal\Extension\ApplicationConfigExtension;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 
 /**
@@ -28,6 +29,7 @@ use GuzzleHttp\Client;
 
 // Config constants.
 const QUESTION = 'question';
+const DATE_FORMAT = 'Y-m-d--H-i-s';
 
 /**
  * Class InitCommand
@@ -43,20 +45,22 @@ class InitCommand extends ContainerAwareCommand {
       ->setHelp('This command will fetch the specified DruDock config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
-      ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Basic,Full,Prod,Stage,Feature]')
-      ->addOption('appsrc', 's', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
-      ->addOption('git', 'g', InputOption::VALUE_OPTIONAL, 'Git repository URL')
-      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]');
+      ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Development,Production,Feature]')
+      ->addOption('src', 'g', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
+      ->addOption('git', 'gs', InputOption::VALUE_OPTIONAL, 'Git repository URL')
+      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [docker.dev]')
+      ->addOption('services', 's', InputOption::VALUE_OPTIONAL, 'Select app services [UNISON, PHP, NGINX, MYSQL, SOLR, REDIS, MAILCATCHER]');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = $this->getApplication();
+    $config_application = new ApplicationConfigExtension();
 
     $io = new DruDockStyle($input, $output);
     $fs = new Filesystem();
     $client = new Client();
     $zippy = Zippy::load();
-    $date = date('Y-m-d--H-i-s');
+    $date = date(DATE_FORMAT);
 
     // Check if this folder is has APP config.
     if (file_exists('.config.yml')) {
@@ -64,103 +68,19 @@ class InitCommand extends ContainerAwareCommand {
       return;
     }
 
-    // GET AND SET APPNAME.
-    $appname = $input->getArgument('appname');
-    if (!isset($appname)) {
-      $io->title("SET APP NAME");
-      $helper = $this->getHelper(QUESTION);
-      $question = new Question('Enter App name [drudock_app_' . $date . '] : ', 'my-app-' . $date);
-      $appname = $helper->ask($input, $output, $question);
+    // Setup app config.
+    $appname = $config_application->getSetAppname($io, $input);
+    $src = $config_application->getSetSource($io, $input);
+    if($src){
+      $gitrepo = $config_application->getSetSCMSource($io, $input, $src);
     }
+    $dist = $config_application->getSetDistribution($io, $input);
+    $type = $config_application->getSetType($io, $input);
+    $apphost = $config_application->getSetHost($io, $input);
+    $service_types = $config_application->getSetServices($io, $input, $output, $this);
 
-    // GET AND SET APP SOURCE.
-    $src = $input->getOption('appsrc');
-    $available_src = ['New', 'Git'];
-
-    if ($src && !in_array($src, $available_src)) {
-      $io->warning('APP SRC : ' . $src . ' not allowed.');
-      $src = NULL;
-    }
-
-    if (!isset($src)) {
-      $io->info(' ');
-      $io->title("SET APP SOURCE");
-      $helper = $this->getHelper(QUESTION);
-      $question = new ChoiceQuestion(
-        'Is this app a new build or loaded from a remote GIT repository [New, Git] : ',
-        $available_src,
-        'New'
-      );
-      $src = $helper->ask($input, $output, $question);
-    }
-
-    // GET AND SET APP SOURCE.
-    $gitrepo = $input->getOption('git');
-    if ($src == 'New') {
-      $gitrepo = '';
-    }
-    if (!isset($gitrepo)) {
-      $io->title("SET APP GIT URL");
-      $helper = $this->getHelper(QUESTION);
-      $question = new Question('Enter remote GIT url [https://github.com/<me>/<myapp>.git] : ');
-      $gitrepo = $helper->ask($input, $output, $question);
-    }
-
-    // GET AND SET APP REQUIREMENTS.
-    $dist = $input->getOption('dist');
-    $available_dist = ['Basic', 'Full', 'Prod', 'Stage'];
-
-    if ($dist && !in_array($dist, $available_dist)) {
-      $io->warning('REQS : ' . $dist . ' not allowed.');
-      $dist = NULL;
-    }
-
-    if (!$dist) {
-      $io->info(' ');
-      $io->title("SET APP REQS");
-      $helper = $this->getHelper(QUESTION);
-      $question = new ChoiceQuestion(
-        'Select your APP dist [basic] : ',
-        $available_dist,
-        'basic'
-      );
-      $dist = $helper->ask($input, $output, $question);
-    }
-
-    // GET AND SET APP TYPE.
-    $type = $input->getOption('type');
-    $available_types = ['DEFAULT', 'D7', 'D8'];
-
-    if ($type && !in_array($type, $available_types)) {
-      $io->warning('TYPE : ' . $type . ' not allowed.');
-      $type = NULL;
-    }
-
-    if (!$type) {
-      $io->info(' ');
-      $io->title("SET APP TYPE");
-      $helper = $this->getHelper(QUESTION);
-      $question = new ChoiceQuestion(
-        'Select your APP type [0] : ',
-        $available_types,
-        '0'
-      );
-      $type = $helper->ask($input, $output, $question);
-    }
-
-    // GET AND SET APP PREFERRED HOST.
-    $apphost = $input->getOption('apphost');
-
-    if (!$apphost) {
-      $io->info(' ');
-      $io->title("SET APP HOSTNAME");
-      $helper = $this->getHelper(QUESTION);
-      $question = new Question('Enter preferred app hostname [docker.dev] : ');
-      $apphost = $helper->ask($input, $output, $question);
-    }
-
+    // Setup app initial folder structure.
     $system_appname = strtolower(str_replace(' ', '', $appname));
-
     if (!$fs->exists($system_appname)) {
       $fs->mkdir($system_appname, 0755);
     }
@@ -169,156 +89,26 @@ class InitCommand extends ContainerAwareCommand {
       return;
     }
 
-    switch ($dist) {
-      case 'Basic':
-        $file = 'drudock-lite';
-        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
-
-        if (!$apphost) {
-          $apphost = 'docker.dev';
-        }
-
-        break;
-
-      case 'Full':
-        $file = 'drudock';
-        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
-        if (!$apphost) {
-          $apphost = 'docker.dev';
-        }
-
-        break;
-
-      case 'Prod':
-        $file = 'drudock-prod';
-        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
-        if (!$apphost) {
-          $apphost = 'docker.prod';
-        }
-
-        // Set build path.
-        $composebuild = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose.yml'));
-        $composebuild['services']['app']['build']['dockerfile'] = './docker_' . $system_appname . '/build/Dockerfile';
-
-        $composebuild['networks']['proxy']['external']['name'] = 'proxy_' . $system_appname . '_proxy';
-        $composebuild['networks']['database']['external']['name'] = 'data_' . $system_appname . '_data';
-
-
-        $composeconfig = Yaml::dump($composebuild);
-        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose.yml', $composeconfig);
-
-        // set proxy network name
-        $proxynet = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml'));
-        $proxynet['services']['nginx-proxy']['networks'] = [
-          $system_appname . '_proxy',
-        ];
-        unset($proxynet['networks']['nginx']);
-        $proxynet['networks'][$system_appname . '_proxy'] = [
-          'driver' => 'bridge',
-        ];
-
-        $proxynetconfig = Yaml::dump($proxynet);
-        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml', $proxynetconfig);
-
-        // Set database name.
-        $database = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml'));
-
-        unset($database['networks']['data']);
-        $database['networks'][$system_appname . '_data'] = [
-          'driver' => 'bridge',
-        ];
-
-        $database['services']['db']['networks'] = [$system_appname . '_data'];
-        $database['services']['solr']['networks'] = [$system_appname . '_data'];
-        $database['services']['redis']['networks'] = [$system_appname . '_data'];
-
-        $databaseconfig = Yaml::dump($database);
-        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml', $databaseconfig);
-
-        break;
-
-      case 'Stage':
-        $file = 'drudock-stage';
-        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
-        if (!$apphost) {
-          $apphost = 'docker.stage';
-        }
-
-        // Get Prod app proxy network ID.
-        $proxy_container = exec('docker ps --format {{.Names}} | grep nginx-proxy');
-        if (!$proxy_container) {
-          $io->error("Nginx-Proxy Container not found. You must be running a Prod app on this system to use a staging app.");
-          return;
-        }
-
-        $cmd = "docker inspect --format='{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' " . $proxy_container;
-        $networkid = exec($cmd);
-        if (!$networkid) {
-          $io->error("There has been an error detecting the Proxy Network ID.  Please report issue in the Github issue queue.");
-          return;
-        }
-
-        $cmd = "docker inspect --format='{{ .Name }}' " . $networkid;
-        $network_name = exec($cmd);
-        if (!$network_name) {
-          $io->error("There has been an error detecting the Proxy container name.  Please report issue in the Github issue queue.");
-          return;
-        }
-
-        // Set build path.
-        $composebuild = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose.yml'));
-        $composebuild['services']['app']['build']['dockerfile'] = './docker_' . $system_appname . '/build/Dockerfile';
-
-        $composebuild['networks']['proxy']['external']['name'] = $network_name;
-        $composebuild['networks']['database']['external']['name'] = $system_appname . 'data_' . $system_appname . '_data';
-
-        $composeconfig = Yaml::dump($composebuild);
-        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose.yml', $composeconfig);
-
-        // Set database name.
-        $database = Yaml::parse(file_get_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml'));
-
-        unset($database['networks']['data']);
-        $database['networks'][$system_appname . '_data'] = [
-          'driver' => 'bridge',
-        ];
-
-        $database['services']['db']['networks'] = [$system_appname . '_data'];
-        $database['services']['solr']['networks'] = [$system_appname . '_data'];
-        $database['services']['redis']['networks'] = [$system_appname . '_data'];
-
-        $databaseconfig = Yaml::dump($database);
-        file_put_contents($system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml', $databaseconfig);
-
-        break;
-
-      default:
-        $file = 'drudock-lite';
-        $application->getRemoteBundle($io, $fs, $client, $zippy, $file, $system_appname . '/docker_' . $system_appname);
-
-        if (!$apphost) {
-          $apphost = 'docker.dev';
-        }
-        break;
-    }
-
     // SETUP APP CONFIG FILE.
     $config = [
       'appname' => $appname,
       'apptype' => $type,
       'host' => $apphost,
       'dist' => $dist,
-      'appsrc' => $src,
+      'src' => $src,
+      'services' => $service_types,
       'repo' => $gitrepo ? $gitrepo : '',
-      'created' => $date = date('Y-m-d--H-i-s'),
+      'created' => $date = date(DATE_FORMAT),
       'builds' => [
-        $date = date('Y-m-d--H-i-s'),
+        $date = date(DATE_FORMAT),
       ],
       'drudock' => [
         'version' => $application->getVersion(),
         'date' => $date,
       ],
     ];
+
+    $config_application->writeDockerComposeConfig($io, $config);
 
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
@@ -329,7 +119,7 @@ class InitCommand extends ContainerAwareCommand {
       $io->info(' ');
       $io->info($message);
       $io->info(' ');
-      $application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io, $appname);
+      $config_application->addHostConfig($fs, $client, $zippy, 'docker.dev', $io, $appname);
     }
 
     $message = 'Fetching DruDock v' . $application->getVersion();
