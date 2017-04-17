@@ -36,15 +36,15 @@ class ProdUpdateCommand extends Command {
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
-      $appreqs = $config['reqs'];
+      $appdist = $config['dist'];
     }
 
-    if (isset($appreqs) && !$appreqs == 'Prod') {
+    if (isset($appdist) && !$appdist == 'Prod') {
       $io->warning("This is not a production app.");
       return;
     }
 
-    if (isset($appreqs) && $appreqs == 'Prod') {
+    if (isset($appdist) && $appdist == 'Prod') {
 
       if ($container_application->checkForAppContainers($appname, $io)) {
 

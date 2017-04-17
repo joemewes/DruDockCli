@@ -1,0 +1,11 @@
+build:
+  context: ../
+  dockerfile: ./build/Dockerfile
+volumes :
+  - app-data:/app:ro
+hostname : app
+read_only: true
+networks:
+  - default
+  - proxy
+  - database

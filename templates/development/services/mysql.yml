@@ -1,0 +1,12 @@
+image : mariadb:10.1.11
+ports :
+  - "3306:3306"
+volumes :
+  - mysql-data:/var/lib/mysql
+  - ./config/mysql:/etc/mysql/conf.d
+environment:
+  MYSQL_ROOT_PASSWORD: password
+  MYSQL_USER: dev
+  MYSQL_PASSWORD: DEVPASSWORD
+  MYSQL_DATABASE: dev_db
+hostname: db
