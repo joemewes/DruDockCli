@@ -29,7 +29,7 @@ class Application extends ParentApplication {
 
   const VERSION = '1.3.4-alpha7.2';
 
-  const CDN = 'http://d2w5nr49smktig.cloudfront.net';
+  const CDN = 'http://d1gem705zq3obi.cloudfront.net';
 
   /**
    * @var string
@@ -239,8 +239,6 @@ class Application extends ParentApplication {
    */
 
   public function setAppConfig($config, $appname, $io) {
-    $system_appname = strtolower(str_replace(' ', '', $appname));
-
     if (file_exists('.config.yml')) {
       $yaml = Yaml::dump($config);
       file_put_contents('.config.yml', $yaml);

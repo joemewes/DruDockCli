@@ -70,7 +70,7 @@ class InitCommand extends ContainerAwareCommand {
     // Setup app config.
     $appname = $config_application->getSetAppname($io, $input, $output, $this);
     $src = $config_application->getSetSource($io, $input, $output, $this);
-    if($src){
+    if ($src) {
       $gitrepo = $config_application->getSetSCMSource($io, $input, $output, $src, $this);
     }
     $dist = $config_application->getSetDistribution($io, $input, $output, $this);
@@ -96,7 +96,7 @@ class InitCommand extends ContainerAwareCommand {
       'dist' => $dist,
       'src' => $src,
       'services' => $service_types,
-      'repo' => $gitrepo ? $gitrepo : '',
+      'repo' => isset($gitrepo) ? $gitrepo : '',
       'created' => $date = date(DATE_FORMAT),
       'builds' => [
         $date = date(DATE_FORMAT),

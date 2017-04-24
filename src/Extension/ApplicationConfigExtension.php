@@ -232,9 +232,14 @@ class ApplicationConfigExtension extends Application {
       'MAILCATCHER',
     ];
 
-    if ($service_types) {
-      $service_types_list = explode(',', $service_types);
-      foreach ($service_types_list as $st) {
+    // Inline Services entry as comma separated string.
+    if(is_string($service_types)){
+      $service_types = explode(',',$service_types);
+    }
+
+    // Confirm valid service entry.
+    if ($service_types && is_array($service_types)) {
+      foreach ($service_types as $st) {
         if (!in_array($st, $available_services)) {
           $io->warning('SERVICES : ' . $service_types . DISALLOWED_MSG);
           $service_types = NULL;
@@ -242,6 +247,7 @@ class ApplicationConfigExtension extends Application {
       }
     }
 
+    // Get/Set Services manually.
     if (!$service_types) {
       $io->info(' ');
       $io->title("SET APP SERVICES");
@@ -372,7 +378,7 @@ class ApplicationConfigExtension extends Application {
         if (isset($base_yaml)) {
           $base_compose = Yaml::parse($base_yaml);
         }
-        $base_compose = $this->applyAppServices($base_compose, $config, $dist_path);
+        $base_compose = $this->applyAppServices($io, $base_compose, $config, $dist_path);
         $app_yaml = Yaml::dump($base_compose, 8, 2);
         $this->renderFile($services_compose_dest, $app_yaml);
 
@@ -437,8 +443,17 @@ class ApplicationConfigExtension extends Application {
     }
   }
 
-  public function applyAppServices($base_compose, $config, $dist_path) {
-    $services = $config[SERVICES];
+  public function applyAppServices($io, $base_compose, $config, $dist_path) {
+
+    if(is_string($config[SERVICES])){
+      $services = explode(',',$config[SERVICES]);
+    }elseif(is_array($config[SERVICES])){
+      $services = $config[SERVICES];
+    }else{
+      $io->error('Invalid services options.');
+      exit;
+    }
+
     foreach ($services as $service) {
       $service_name = strtolower($service);
       $service_yaml = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/services/' . $service_name . '.yml');

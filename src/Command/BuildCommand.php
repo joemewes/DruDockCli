@@ -287,7 +287,7 @@ class BuildCommand extends ContainerAwareCommand {
         $io->error(sprintf(ERR_MSG . $e->getPath()));
       }
 
-      if ($dist == 'Prod') {
+      if ($dist === 'Production') {
         $files_dir = 'd8prod';
       }
       else {
@@ -362,7 +362,7 @@ class BuildCommand extends ContainerAwareCommand {
     if ($config = $application->getAppConfig($io)) {
       $dist = $config[DIST];
       $appname = $config[APP_NAME];
-      $services = explode(',', $config[SERVICES]);
+      $services = $config[SERVICES];
     }
 
     if (isset($services) && in_array('BEHAT', $services)) {
