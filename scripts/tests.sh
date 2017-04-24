@@ -18,7 +18,7 @@ EOF
 echo -e "${GREEN}DEMO TEST${NC}"
 cd /Users/joe/dev/playground && \
 rm -rf testdev && \
-~/dd env:init testdev --type D8 --dist Development --src New --apphost drudock.dev --services "UNISON,PHP,NGINX,MYSQL" && \
+./bin/drudock env:init testdev --type D8 --dist Development --src New --apphost drudock.dev --services "UNISON,PHP,NGINX,MYSQL" && \
 cd testdev && \
-~/dd build:init && \
+./bin/drudock build:init && \
 curl -O http://localhost
