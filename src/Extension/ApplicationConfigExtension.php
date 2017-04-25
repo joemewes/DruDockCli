@@ -285,7 +285,7 @@ class ApplicationConfigExtension extends Application {
           break;
 
         case 'stage':
-          $command = "docker-compose -f docker_" . $system_appname . "/docker-compose-data.yml --project-name=" . $system_appname . "_data port db 3306";
+          $command = "docker-compose -f docker_" . $system_appname . "/docker-compose-data.yml --project-name=" . $system_appname . "_data port mysql 3306";
           $port_info = exec($command);
           $port = explode(':', $port_info);
           $db_port = $port[1];
@@ -293,7 +293,10 @@ class ApplicationConfigExtension extends Application {
           break;
 
         default:
-          $db_port = '3306';
+          $command = "docker-compose -f docker_" . $system_appname . "/docker-compose.yml port mysql 3306";
+          $port_info = exec($command);
+          $port = explode(':', $port_info);
+          $db_port = $port[1];
           $db_name = 'dev_db';
       }
     }
