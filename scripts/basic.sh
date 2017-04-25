@@ -25,4 +25,4 @@ cd travisapp && \
 ../bin/drudock build:init && \
 which docker && \
 docker ps && \
-curl -O http://localhost
+curl http://localhost > ./logs/travis-sample.html

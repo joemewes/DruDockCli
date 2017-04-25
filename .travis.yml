@@ -31,7 +31,7 @@ addons:
     - jm
     - ah
   artifacts:
-    s3_region: "eu-west-2"
+    s3_region: eu-west-2
     paths:
       - logs
     debug: true
