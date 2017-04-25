@@ -7,6 +7,7 @@
 
 namespace Docker\Drupal\Command;
 
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,9 +16,9 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 
-
 /**
  * Class UpdateConfigCommand
+ *
  * @package Docker\Drupal\Command
  */
 class UpdateConfigCommand extends Command {
@@ -31,16 +32,16 @@ class UpdateConfigCommand extends Command {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $io = new DruDockStyle($input, $output);
     $io->section("APP ::: UPDATING CONFIG");
 
     $config = $application->getAppConfig($io, TRUE);
     $requirements = $application->getDDrequirements();
 
-    foreach($requirements as $req) {
+    foreach ($requirements as $req) {
 
-      if(!isset($config[$req])) {
+      if (!isset($config[$req])) {
 
         if ($req == 'appname') {
           $io->title("SET APP NAME");

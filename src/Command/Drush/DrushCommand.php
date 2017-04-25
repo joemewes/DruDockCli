@@ -7,16 +7,18 @@
 
 namespace Docker\Drupal\Command\Drush;
 
+use Docker\Drupal\Application;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Docker\Drupal\Style\DruDockStyle;
-use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
- * Class DemoCommand
+ * Class DrushCommand
+ *
  * @package Docker\Drupal\Command
  */
 class DrushCommand extends Command {
@@ -30,7 +32,7 @@ class DrushCommand extends Command {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     $cmd = $input->getOption('cmd');
@@ -47,9 +49,12 @@ class DrushCommand extends Command {
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
+    else {
+      $appname = 'app';
+    }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
+      $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
       $application->runcommand($command, $io);
     }
   }

@@ -7,6 +7,7 @@
 
 namespace Docker\Drupal\Command\Mysql;
 
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,7 +32,7 @@ class MysqlImportCommand extends Command {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     $io = new DruDockStyle($input, $output);
@@ -63,16 +64,16 @@ class MysqlImportCommand extends Command {
 
         if ($container_application->checkForAppContainers($appname, $io)) {
 
-          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
+          $command = $container_application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
           $application->runcommand($command, $io);
 
           // recreate dev_db
-          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
+          $command = $container_application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
           $application->runcommand($command, $io);
 
           // import new .sql file
           // @todo resolve and update - https://github.com/docker/compose/issues/4290
-          //$command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
+          // $command = $container_application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
           $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
           $application->runcommand($command, $io);
 

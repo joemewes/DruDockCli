@@ -356,7 +356,7 @@ class BuildCommand extends ContainerAwareCommand {
 
   private function installDrupal8($io, $install_helpers = FALSE) {
 
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     if ($config = $application->getAppConfig($io)) {
@@ -366,7 +366,7 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     if (isset($services) && in_array('BEHAT', $services)) {
-      $command = $application->getComposePath($appname, $io) . 'exec -T behat composer update';
+      $command = $container_application->getComposePath($appname, $io) . 'exec -T behat composer update';
       $application->runcommand($command, $io);
     }
 
@@ -375,18 +375,18 @@ class BuildCommand extends ContainerAwareCommand {
     if ($container_application->checkForAppContainers($appname, $io)) {
 
       if ($dist == 'Development') {
-        $command = $application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/';
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T php chmod -R 777 ../vendor/';
         $application->runcommand($command, $io);
 
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD8@drudock.dev --db-url=mysql://dev:DEVPASSWORD@mysql:3306/dev_db --quiet -y';
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD8@drudock.dev --db-url=mysql://dev:DEVPASSWORD@mysql:3306/dev_db --quiet -y';
         $application->runcommand($command, $io);
       }
       if ($dist == 'Production') {
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@mysql:3306/prod --quiet -y';
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=prod --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.prod --db-url=mysql://dev:DRUPALPASSENV@mysql:3306/prod --quiet -y';
         $application->runcommand($command, $io);
       }
       if ($dist == 'Feature') {
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=feature --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.feature --db-url=mysql://dev:DRUPALPASSENV@mysql:3306/prod --quiet -y';
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=feature --account-pass=admin --site-name=DruDock --site-mail=drupalD8@docker.feature --db-url=mysql://dev:DRUPALPASSENV@mysql:3306/prod --quiet -y';
         $application->runcommand($command, $io);
       }
 
@@ -394,16 +394,16 @@ class BuildCommand extends ContainerAwareCommand {
         $message = 'Run APP composer update';
         $io->note($message);
 
-        $command = $application->getComposePath($appname, $io) . 'exec -T php composer update';
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T php composer update';
         $application->runcommand($command, $io);
 
         $message = 'Enable useful starter contrib modules';
         $io->note($message);
 
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush en admin_toolbar ctools redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T php drush en admin_toolbar ctools redis token adminimal_admin_toolbar devel pathauto webprofiler -y';
         $application->runcommand($command, $io);
 
-        $command = $application->getComposePath($appname, $io) . 'exec -T php drush entity-updates -y';
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T php drush entity-updates -y';
         $application->runcommand($command, $io);
       }
     }

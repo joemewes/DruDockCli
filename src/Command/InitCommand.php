@@ -7,13 +7,12 @@
 
 namespace Docker\Drupal\Command;
 
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Yaml\Yaml;
@@ -53,7 +52,7 @@ class InitCommand extends ContainerAwareCommand {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $config_application = new ApplicationConfigExtension();
 
     $io = new DruDockStyle($input, $output);

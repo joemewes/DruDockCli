@@ -7,6 +7,7 @@
 
 namespace Docker\Drupal\Command\Nginx;
 
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,6 +21,7 @@ use GuzzleHttp\Client;
 
 /**
  * Class NginxSetHostCommand
+ *
  * @package Docker\Drupal\Command\Nginx
  */
 class NginxSetHostCommand extends Command {
@@ -32,7 +34,7 @@ class NginxSetHostCommand extends Command {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
     $fs = new Filesystem();
     $client = new Client();
@@ -83,7 +85,7 @@ class NginxSetHostCommand extends Command {
     $application->setNginxHost($io);
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
+      $command = $container_application->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
       $application->runcommand($command, $io);
     }
   }

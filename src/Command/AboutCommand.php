@@ -7,12 +7,10 @@
 
 namespace Docker\Drupal\Command;
 
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Filesystem\Filesystem;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
@@ -30,7 +28,7 @@ class AboutCommand extends Command {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $io = new DruDockStyle($input, $output);
 
 

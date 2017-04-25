@@ -6,6 +6,7 @@
  */
 
 namespace Docker\Drupal\Command;
+
 use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

@@ -14,6 +14,7 @@ const BUILDS = 'builds';
 
 /**
  * Class ApplicationContainerExtension
+ *
  * @package Docker\Drupal\Extension
  */
 class ApplicationContainerExtension extends Application {
