@@ -18,6 +18,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Class DemoCommand
+ *
  * @package Docker\Drupal\Command
  */
 class DestroyCommand extends Command {
@@ -56,12 +57,12 @@ class DestroyCommand extends Command {
 
     if (isset($dist) && ($dist == 'Development')) {
       if ($container_application->checkForAppContainers($appname, $io)) {
-          $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
-          $application->runcommand($command, $io);
+        $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
+        $application->runcommand($command, $io);
       }
     }
 
-    if(isset($dist) && $dist == 'Production') {
+    if (isset($dist) && $dist == 'Production') {
       if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
         $application->runcommand($command, $io);
@@ -74,7 +75,7 @@ class DestroyCommand extends Command {
       $application->runcommand($command, $io);
     }
 
-    if(isset($dist) && $dist == 'Feature') {
+    if (isset($dist) && $dist == 'Feature') {
       if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
         $application->runcommand($command, $io);

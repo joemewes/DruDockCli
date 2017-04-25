@@ -17,6 +17,8 @@ use Symfony\Component\Console\Application as ParentApplication;
 
 const DEV_MYSQL_PASS = 'DEVPASSWORD';
 const LOCALHOST = '127.0.0.1';
+const CONFIG_PATH = '.config.yml';
+const PATH_PREFIX = 'docker_';
 
 /**
  * Class Application
@@ -27,7 +29,7 @@ class Application extends ParentApplication {
 
   const NAME = 'Docker Drupal';
 
-  const VERSION = '1.3.4-alpha7.2';
+  const VERSION = '1.4-alpha1.0';
 
   const CDN = 'http://d1gem705zq3obi.cloudfront.net';
 
@@ -192,19 +194,23 @@ class Application extends ParentApplication {
     return $process->getOutput();
   }
 
-  /**
-   * @return array
-   */
 
+  /**
+   * @param $io
+   * @param string $appname
+   * @param bool $skip_checks
+   *
+   * @return mixed
+   */
   public function getAppConfig($io, $appname = '', $skip_checks = FALSE) {
-    if (file_exists('.config.yml')) {
-      $config = Yaml::parse(file_get_contents('.config.yml'));
+    if (file_exists(CONFIG_PATH)) {
+      $config = Yaml::parse(file_get_contents(CONFIG_PATH));
     }
-    if (file_exists($appname . '/.config.yml')) {
-      $config = Yaml::parse(file_get_contents($appname . '/.config.yml'));
+    if (file_exists($appname . '/' . CONFIG_PATH)) {
+      $config = Yaml::parse(file_get_contents($appname . '/' . CONFIG_PATH));
     }
     if (!isset($config)) {
-      $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');
+      $io->error('You\'re not currently in an APP directory. APP ' . CONFIG_PATH . ' not found.');
       exit;
     }
     $config_keys = array_keys($config);
@@ -239,9 +245,9 @@ class Application extends ParentApplication {
    */
 
   public function setAppConfig($config, $appname, $io) {
-    if (file_exists('.config.yml')) {
+    if (file_exists(CONFIG_PATH)) {
       $yaml = Yaml::dump($config);
-      file_put_contents('.config.yml', $yaml);
+      file_put_contents(CONFIG_PATH, $yaml);
       return TRUE;
     }
     else {
@@ -271,8 +277,8 @@ class Application extends ParentApplication {
       exit;
     }
 
-    if ($fs->exists('./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml')) {
-      return 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml ' . $project . ' ';
+    if ($fs->exists('./' . PATH_PREFIX . $system_appname . '/docker-compose-nginx-proxy.yml')) {
+      return 'docker-compose -f ./' . PATH_PREFIX . $system_appname . '/docker-compose-nginx-proxy.yml ' . $project . ' ';
     }
     else {
       $io->error("docker-compose-data.yml : Not Found");
@@ -295,6 +301,7 @@ class Application extends ParentApplication {
     $process->run(function ($type, $buffer) {
       global $output;
       if ($output) {
+        $type = null;
         $output->info($buffer);
       }
     });
@@ -424,16 +431,16 @@ class Application extends ParentApplication {
     switch ($dist) {
       case 'Prod':
       case 'Stage':
-        file_put_contents('./docker_' . $system_appname . '/config/nginx/' . $apphost, $nginxconfig);
+        file_put_contents('./' . PATH_PREFIX . $system_appname . '/config/nginx/' . $apphost, $nginxconfig);
 
         $nginxenv = "VIRTUAL_HOST=$apphost
 APPS_PATH=~/app
 VIRTUAL_NETWORK=nginx-proxy";
 
-        file_put_contents('./docker_' . $system_appname . '/nginx.env', $nginxenv);
+        file_put_contents('./' . PATH_PREFIX . $system_appname . '/nginx.env', $nginxenv);
         break;
       default:
-        file_put_contents('./docker_' . $system_appname . '/config/nginx/drudock.dev', $nginxconfig);
+        file_put_contents('./' . PATH_PREFIX . $system_appname . '/config/nginx/drudock.dev', $nginxconfig);
     }
   }
 
@@ -441,21 +448,15 @@ VIRTUAL_NETWORK=nginx-proxy";
   /**
    * @return string
    */
-  public function checkDocker($io) {
+  public function checkDocker() {
     $command = 'docker info';
     $process = new Process($command);
     $process->setTimeout(2);
     $process->run();
     if (!$process->isSuccessful()) {
-      if ($showoutput) {
-        $out = 'Can\'t connect to Docker. Is it running?';
-        $io->warning($out);
-      }
       return FALSE;
     }
-    else {
-      return TRUE;
-    }
+    return TRUE;
   }
 
   /**
@@ -494,7 +495,7 @@ VIRTUAL_NETWORK=nginx-proxy";
    */
   public function setConfig($config) {
     $yaml = Yaml::dump($config);
-    file_put_contents('.config.yml', $yaml);
+    file_put_contents(CONFIG_PATH, $yaml);
   }
 
   /**
