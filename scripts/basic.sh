@@ -20,8 +20,9 @@ echo -e "${GREEN}DEMO TEST${NC}"
 ./bin/drudock about
 
 ./bin/drudock --version
-
 ./bin/drudock env:init travisapp --type D8 --dist Development --src New --apphost drudock.dev --services "UNISON,PHP,NGINX,MYSQL" && \
 cd travisapp && \
 ../bin/drudock build:init && \
+which docker && \
+docker ps && \
 curl -O http://localhost

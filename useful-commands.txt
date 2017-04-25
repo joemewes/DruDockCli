@@ -33,3 +33,6 @@ drudock drush -c "config-export sync --skip-modules=devel,devel_generate,webprof
 
 ## BOX BUILD
 /usr/local/bin/box build -v
+
+## uplopad drodcoerk.phar to S£
+aws s3 cp drudock.phar s3://drudock --region=eu-west-2 --acl=public-read
