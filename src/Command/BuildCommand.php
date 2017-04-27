@@ -55,7 +55,7 @@ const TMP_DEFAULT = '/tmp/default';
 
 
 /**
- * Class DemoCommand
+ * Class BuildCommand
  *
  * @package Docker\Drupal\ContainerAwareCommand
  */
@@ -94,7 +94,7 @@ class BuildCommand extends ContainerAwareCommand {
     $system_appname = strtolower(str_replace(' ', '', $appname));
     $application->setNginxHost($io);
     if ($application->getOs() == 'Darwin') {
-      $config_application->setHostConfig($fs, $client, $zippy, $apphost, $io, TRUE);
+      $config_application->setHostConfig($apphost, $io, $system_appname);
     }
 
     /**

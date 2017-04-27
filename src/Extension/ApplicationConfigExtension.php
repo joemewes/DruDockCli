@@ -32,7 +32,8 @@ const SERVICES = 'services';
 const VOLUMES = 'volumes';
 const NETWORKS = 'networks';
 const DATE_FORMAT = 'Y-m-d--H-i-s';
-
+const TAR = '.tar.gz';
+const TPLS_PATH = '/../../templates/';
 
 /**
  * Class ApplicationConfigExtension
@@ -63,6 +64,8 @@ class ApplicationConfigExtension extends Application {
     return $appname;
   }
 
+
+
   /**
    * GET AND SET APP SOURCE.
    *
@@ -74,7 +77,10 @@ class ApplicationConfigExtension extends Application {
    * @return mixed
    */
   function getSetSource($io, $input, $output, $cmd) {
-    $src = $input->getOption('src');
+    $options = $input->getOptions();
+    if(in_array('src', $options)) {
+      $src = $input->getOption('src');
+    }
     $available_src = ['New', 'Git'];
 
     if ($src && !in_array($src, $available_src)) {
@@ -108,7 +114,10 @@ class ApplicationConfigExtension extends Application {
    * @return string
    */
   function getSetSCMSource($io, $input, $output, $src, $cmd) {
-    $gitrepo = $input->getOption('git');
+    $options = $input->getOptions();
+    if(in_array('git', $options)) {
+      $gitrepo = $input->getOption('git');
+    }
     if ($src == 'New') {
       $gitrepo = '';
     }
@@ -132,10 +141,13 @@ class ApplicationConfigExtension extends Application {
    * @return null
    */
   function getSetDistribution($io, $input, $output, $cmd) {
-    $dist = $input->getOption('dist');
+    $options = $input->getOptions();
+    if(in_array('dist', $options)) {
+      $dist = $input->getOption('dist');
+    }
     $available_dist = ['Development', 'Production', 'Feature'];
 
-    if ($dist && !in_array($dist, $available_dist)) {
+    if (isset($dist) && !in_array($dist, $available_dist)) {
       $io->warning('DIST : ' . $dist . DISALLOWED_MSG);
       $dist = NULL;
     }
@@ -321,13 +333,13 @@ class ApplicationConfigExtension extends Application {
    * @param $io
    * @param $appname
    */
-  public function setHostConfig($fs, $client, $zippy, $newhost, $io, $appname) {
+  public function setHostConfig($newhost, $io, $sys_appname) {
     // Add initial entry to hosts file.
-    // OSX @TODO update as command for all systems and OS's.
+    // @TODO update as command for Windows too.
 
     $ip = LOCALHOST;
 
-    if ($config = $this->getAppConfig($io, $appname)) {
+    if ($config = $this->getAppConfig($io, $sys_appname)) {
       $apphost = $config['host'];
       $appname = $config[APPNAME];
       $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -412,8 +424,8 @@ class ApplicationConfigExtension extends Application {
     $client = new Client();
     $zippy = Zippy::load();
 
-    $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
-    $destination = '/tmp/' . $file . '.tar.gz';
+    $remote_file_path = $this::CDN . '/' . $file . TAR;
+    $destination = '/tmp/' . $file . TAR;
     $client->get($remote_file_path, ['save_to' => $destination]);
     $archive = $zippy->open($destination);
     $archive->extract('/tmp/');
@@ -433,8 +445,8 @@ class ApplicationConfigExtension extends Application {
     $client = new Client();
     $zippy = Zippy::load();
 
-    $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
-    $destination = sys_get_temp_dir() . '/' . $file . '.tar.gz';
+    $remote_file_path = $this::CDN . '/' . $file . TAR;
+    $destination = sys_get_temp_dir() . '/' . $file . TAR;
     $client->get($remote_file_path, ['save_to' => $destination]);
     $archive = $zippy->open($destination);
     $archive->extract('./');
@@ -459,22 +471,22 @@ class ApplicationConfigExtension extends Application {
 
     foreach ($services as $service) {
       $service_name = strtolower($service);
-      $service_yaml = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/services/' . $service_name . '.yml');
+      $service_yaml = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/services/' . $service_name . '.yml');
       $service_compose = Yaml::parse($service_yaml);
       $base_compose[SERVICES][$service_name] = $service_compose;
 
       if ($service === 'UNISON') {
-        $vol = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/' . VOLUMES . '/app-sync.yml');
+        $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . VOLUMES . '/app-sync.yml');
         $vol_compose = Yaml::parse($vol);
         $base_compose[VOLUMES]['app-sync'] = $vol_compose;
       }
       if ($service === 'MYSQL') {
-        $vol = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/'. VOLUMES . '/mysql-data.yml');
+        $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/'. VOLUMES . '/mysql-data.yml');
         $vol_compose = Yaml::parse($vol);
         $base_compose[VOLUMES]['mysql-data'] = $vol_compose;
       }
 
-      $net = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/' . NETWORKS . '/default.yml');
+      $net = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . NETWORKS . '/default.yml');
       $net_compose = Yaml::parse($net);
       $base_compose[NETWORKS]['default'] = $net_compose;
     }

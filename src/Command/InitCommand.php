@@ -117,7 +117,7 @@ class InitCommand extends ContainerAwareCommand {
       $io->info(' ');
       $io->info($message);
       $io->info(' ');
-      $config_application->setHostConfig($fs, $client, $zippy, 'drudock.dev', $io, $appname);
+      $config_application->setHostConfig('drudock.dev', $io, $system_appname);
     }
 
     $message = 'Fetching DruDock v' . $application->getVersion();

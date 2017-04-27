@@ -486,7 +486,6 @@ VIRTUAL_NETWORK=nginx-proxy";
       'host',
       'dist',
       'src',
-      'repo',
     ];
   }
 
