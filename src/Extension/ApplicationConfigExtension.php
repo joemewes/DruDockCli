@@ -78,7 +78,7 @@ class ApplicationConfigExtension extends Application {
    */
   function getSetSource($io, $input, $output, $cmd) {
     $options = $input->getOptions();
-    if(in_array('src', $options)) {
+    if(array_key_exists('src', $options)) {
       $src = $input->getOption('src');
     }
     $available_src = ['New', 'Git'];
@@ -115,7 +115,7 @@ class ApplicationConfigExtension extends Application {
    */
   function getSetSCMSource($io, $input, $output, $src, $cmd) {
     $options = $input->getOptions();
-    if(in_array('git', $options)) {
+    if(array_key_exists('git', $options)) {
       $gitrepo = $input->getOption('git');
     }
     if ($src == 'New') {
@@ -142,7 +142,7 @@ class ApplicationConfigExtension extends Application {
    */
   function getSetDistribution($io, $input, $output, $cmd) {
     $options = $input->getOptions();
-    if(in_array('dist', $options)) {
+    if(array_key_exists('dist', $options)) {
       $dist = $input->getOption('dist');
     }
     $available_dist = ['Development', 'Production', 'Feature'];
@@ -210,7 +210,10 @@ class ApplicationConfigExtension extends Application {
    * @return mixed
    */
   function getSetHost($io, $input, $output, $cmd) {
-    $apphost = $input->getOption('apphost');
+    $options = $input->getOptions();
+    if(array_key_exists('apphost', $options)) {
+      $apphost = $input->getOption('apphost');
+    }
 
     if (!$apphost) {
       $io->info(' ');
