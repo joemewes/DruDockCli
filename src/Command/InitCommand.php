@@ -8,6 +8,7 @@
 namespace Docker\Drupal\Command;
 
 use Docker\Drupal\Application;
+use const Docker\Drupal\Extension\PRODUCTION;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,6 +30,8 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
 // Config constants.
 const QUESTION = 'question';
 const DATE_FORMAT = 'Y-m-d--H-i-s';
+const DC = 'docker-compose -f ';
+const DOCKER = '/docker_';
 
 /**
  * Class InitCommand
@@ -36,6 +39,12 @@ const DATE_FORMAT = 'Y-m-d--H-i-s';
  * @package Docker\Drupal\ContainerAwareCommand
  */
 class InitCommand extends ContainerAwareCommand {
+
+  protected $app;
+
+  protected $cfa;
+
+  protected $cta;
 
   protected function configure() {
     $this
@@ -53,12 +62,10 @@ class InitCommand extends ContainerAwareCommand {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = new Application();
-    $config_application = new ApplicationConfigExtension();
+    $this->cfa = new ApplicationConfigExtension();
 
     $io = new DruDockStyle($input, $output);
     $fs = new Filesystem();
-    $client = new Client();
-    $zippy = Zippy::load();
 
     // Check if this folder is has APP config.
     if (file_exists('.config.yml')) {
@@ -67,15 +74,15 @@ class InitCommand extends ContainerAwareCommand {
     }
 
     // Setup app config.
-    $appname = $config_application->getSetAppname($io, $input, $output, $this);
-    $src = $config_application->getSetSource($io, $input, $output, $this);
+    $appname = $this->cfa->getSetAppname($io, $input, $output, $this);
+    $src = $this->cfa->getSetSource($io, $input, $output, $this);
     if ($src) {
-      $gitrepo = $config_application->getSetSCMSource($io, $input, $output, $src, $this);
+      $gitrepo = $this->cfa->getSetSCMSource($io, $input, $output, $src, $this);
     }
-    $dist = $config_application->getSetDistribution($io, $input, $output, $this);
-    $type = $config_application->getSetType($io, $input, $output, $this);
-    $apphost = $config_application->getSetHost($io, $input, $output, $this);
-    $service_types = $config_application->getSetServices($io, $input, $output, $this);
+    $dist = $this->cfa->getSetDistribution($io, $input, $output, $this);
+    $type = $this->cfa->getSetType($io, $input, $output, $this);
+    $apphost = $this->cfa->getSetHost($io, $input, $output, $this);
+    $service_types = $this->cfa->getSetServices($io, $input, $output, $this);
 
     // Setup app initial folder structure.
     $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -106,7 +113,7 @@ class InitCommand extends ContainerAwareCommand {
       ],
     ];
 
-    $config_application->writeDockerComposeConfig($io, $config);
+    $this->cfa->writeDockerComposeConfig($io, $config);
 
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
@@ -117,14 +124,14 @@ class InitCommand extends ContainerAwareCommand {
       $io->info(' ');
       $io->info($message);
       $io->info(' ');
-      $config_application->setHostConfig('drudock.dev', $io, $system_appname);
+      $this->cfa->setHostConfig('drudock.dev', $io, $system_appname);
     }
 
     $message = 'Fetching DruDock v' . $application->getVersion();
     $io->info(' ');
     $io->note($message);
 
-    $this->getDruDock($application, $io, $system_appname);
+    $this->getDruDock($application, $io, $system_appname, $config);
 
     $io->info(' ');
     $io->section("DruDock ::: Ready");
@@ -138,16 +145,23 @@ class InitCommand extends ContainerAwareCommand {
    * @param $io
    * @param $appname
    */
-  private function getDruDock($application, $io, $appname) {
+  private function getDruDock($application, $io, $appname, $config) {
 
     $message = 'Download and configure DruDock.... This may take a few minutes....';
     $io->note($message);
 
-    $dockerlogs = 'docker-compose -f ' . $appname . '/docker_' . $appname . '/docker-compose.yml logs -f';
+    $dockerlogs = DC . $appname . DOCKER . $appname . '/docker-compose.yml logs -f';
     $application->runcommand($dockerlogs, $io, TRUE);
 
-    $dockercmd = 'docker-compose -f ' . $appname . '/docker_' . $appname . '/docker-compose.yml pull';
+    $dockercmd = DC . $appname . DOCKER . $appname . '/docker-compose.yml pull';
     $application->runcommand($dockercmd, $io, TRUE);
 
+    if ($config['dist'] === PRODUCTION) {
+      $dockercmd = DC . $appname . DOCKER . $appname . '/docker-compose-data.yml pull';
+      $application->runcommand($dockercmd, $io, TRUE);
+
+      $dockercmd = DC . $appname . DOCKER . $appname . '/docker-compose-nginx-proxy.yml pull';
+      $application->runcommand($dockercmd, $io, TRUE);
+    }
   }
 }

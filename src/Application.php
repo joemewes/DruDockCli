@@ -12,7 +12,6 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Exception\IOException;
-
 use Symfony\Component\Console\Application as ParentApplication;
 
 const DEV_MYSQL_PASS = 'DEVPASSWORD';
@@ -29,9 +28,11 @@ class Application extends ParentApplication {
 
   const NAME = 'Docker Drupal';
 
-  const VERSION = '1.4-alpha1.0';
+  const VERSION = '1.4-alpha1.0.1';
 
-  const CDN = 'http://d1gem705zq3obi.cloudfront.net';
+  // const CDN = 'http://d1gem705zq3obi.cloudfront.net';.
+  const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
+
 
   /**
    * @var string

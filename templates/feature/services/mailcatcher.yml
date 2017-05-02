@@ -1,0 +1,4 @@
+image : schickling/mailcatcher
+ports :
+  - "1080"
+hostname: mailcatcher

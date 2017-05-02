@@ -62,6 +62,13 @@ class DestroyCommand extends Command {
       }
     }
 
+    if (isset($dist) && ($dist == 'Feature')) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
+        $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
+        $application->runcommand($command, $io);
+      }
+    }
+
     if (isset($dist) && $dist == 'Production') {
       if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
@@ -75,7 +82,7 @@ class DestroyCommand extends Command {
       $application->runcommand($command, $io);
     }
 
-    if (isset($dist) && $dist == 'Feature') {
+    if (isset($dist) && $dist == 'Staging') {
       if ($container_application->checkForAppContainers($appname, $io)) {
         $command = $container_application->getComposePath($appname, $io) . ' down -v 2>&1';
         $application->runcommand($command, $io);

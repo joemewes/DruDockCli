@@ -1,9 +1,13 @@
 image : mariadb:10.1.11
 ports:
- - "3306"
+  - "3306"
 volumes :
   - mysql-data:/var/lib/mysql:rw
-env_file: mysql.env
+environment:
+  MYSQL_ROOT_PASSWORD: password
+  MYSQL_USER: drudock
+  MYSQL_PASSWORD: MYSQLPASS
+  MYSQL_DATABASE: drudock_db
 hostname: db
 restart: always
 container_name: mysql
