@@ -323,6 +323,7 @@ class ApplicationConfigExtension extends Application {
     $io->info('@mysqli_connect(' . LOCALHOST . ', ' . MYSQL_USER . ', ' . MYSQL_PASS . ', ' . MYSQL_DB . ', ' . $db_port . ')');
 
     while (!@mysqli_connect(LOCALHOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB, $db_port)) {
+
       $phases = ["|", "/", "-", "\\"];
       foreach ($phases AS $phase) {
         printf('%s%s', chr(8), $phase);

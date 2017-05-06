@@ -489,9 +489,9 @@ class BuildCommand extends ContainerAwareCommand {
       $io->info($command);
       $this->app->runcommand($command, $io);
 
-      if (in_array('MYSQL', $config['services'])) {
-        $this->cfa->verifyMySQL($io, $system_appname, 'feature');
-      }
+//      if (in_array('MYSQL', $config['services'])) {
+//        $this->cfa->verifyMySQL($io, $system_appname, 'feature');
+//      }
     }
 
     // Feature/test option specific build.
@@ -499,9 +499,9 @@ class BuildCommand extends ContainerAwareCommand {
       $io->section("Docker ::: Build staging environment");
       $command = COMPOSE . $system_appname . COMPOSE_PROJECT . UP_CMD;
       $this->app->runcommand($command, $io);
-      if (in_array('MYSQL', $config['services'])) {
-        $this->cfa->verifyMySQL($io, $system_appname, 'feature');
-      }
+//      if (in_array('MYSQL', $config['services'])) {
+//        $this->cfa->verifyMySQL($io, $system_appname, 'feature');
+//      }
     }
   }
 }
