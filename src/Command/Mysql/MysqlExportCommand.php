@@ -27,7 +27,7 @@ class MysqlExportCommand extends Command {
     $this
       ->setName('mysql:export')
       ->setDescription('Export .sql files')
-      ->setHelp("Use this to dump .sql files to the current running APPs dev_db. eg. [drudock mysql:export -p ./latest.sql]")
+      ->setHelp("Use this to dump .sql files to the current running APPs drudock_db. eg. [drudock mysql:export -p ./latest.sql]")
       ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify export file path including filename [./latest.sql]');
   }
 
@@ -57,7 +57,7 @@ class MysqlExportCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io) && isset($savepath)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T db mysqldump -u dev -pDEVPASSWORD dev_db > ' . $savepath;
+      $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysqldump -u dev -pDEVPASSWORD dev_db > ' . $savepath;
       $application->runcommand($command, $io);
     }
   }

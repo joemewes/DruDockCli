@@ -402,7 +402,7 @@ class BuildCommand extends ContainerAwareCommand {
     $io->note($message);
     $system_appname = strtolower(str_replace(' ', '', $appname));
 
-    $port = $this->cfa->mysqlPort($system_appname, FALSE);
+    $port = $this->cfa->containerPort($system_appname, 'mysql', '3306', FALSE);
     $command = $command = $this->cta->getComposePath($appname, $io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD7@drudock.dev --db-url=mysql://dev:DEVPASSWORD@mysql:' . $port . '/dev_db -y';
     $this->app->runcommand($command, $io);
   }

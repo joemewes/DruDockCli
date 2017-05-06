@@ -308,17 +308,19 @@ class ApplicationConfigExtension extends Application {
       switch ($type) {
         case 'prod':
         case 'stage':
-          $db_port = $this->mysqlPort($system_appname, TRUE);
+          $db_port = $this->containerPort($system_appname, 'mysql', '3306', TRUE);
           break;
 
         case 'feature':
-          $db_port = $this->mysqlPort($system_appname);
+          $db_port = $this->containerPort($system_appname, 'mysql', '3306');
           break;
 
         default:
-          $db_port = $this->mysqlPort($system_appname);
+          $db_port = $this->containerPort($system_appname, 'mysql', '3306');
       }
     }
+
+    $io->info('@mysqli_connect(' . LOCALHOST . ', ' . MYSQL_USER . ', ' . MYSQL_PASS . ', ' . MYSQL_DB . ', ' . $db_port . ')');
 
     while (!@mysqli_connect(LOCALHOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB, $db_port)) {
       $phases = ["|", "/", "-", "\\"];
@@ -335,17 +337,19 @@ class ApplicationConfigExtension extends Application {
   /**
    * @param $system_appname
    * @param bool $data
+   * @param $container_name
+   * @param $internal_port
    *
    * @return mixed
    */
-  public function mysqlPort($system_appname, $data = FALSE) {
+  public function containerPort($system_appname, $container_name, $internal_port, $data = FALSE) {
     if ($data) {
       $cp = 'docker-compose-data.yml --project-name=' . $system_appname . '_data';
     }
     else {
       $cp = 'docker-compose.yml';
     }
-    $command = "docker-compose -f docker_" . $system_appname . "/" . $cp . " port mysql 3306";
+    $command = "docker-compose -f docker_" . $system_appname . "/" . $cp . " port " . $container_name . " " . $internal_port;
 
     $port_info = exec($command);
     $port = explode(':', $port_info);
