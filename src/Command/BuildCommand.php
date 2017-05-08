@@ -425,8 +425,6 @@ class BuildCommand extends ContainerAwareCommand {
     if (isset($dist) && ($dist === DEVELOPMENT)) {
 
       if (in_array('UNISON', $config['services'])) {
-        // Run Unison APP SYNC so that PHP working directory is ready to go with DATA stored in the Docker Volume.
-        // When 'Synchronization complete' kill this temp run container and start DruDock.
         $command = 'until ' . $this->cta->getComposePath($appname, $io) .
           'run unison 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
           'docker kill $(docker ps -q) 2>&1; ' . $this->cta->getComposePath($appname, $io) . 'up -d';
@@ -435,6 +433,10 @@ class BuildCommand extends ContainerAwareCommand {
       if (in_array('MYSQL', $config['services'])) {
         $this->cfa->verifyMySQL($io, $system_appname, 'default');
       }
+
+      $io->section("Docker ::: Build Development environment");
+      $command = COMPOSE . $system_appname . COMPOSE_PROJECT . UP_CMD;
+      $this->app->runcommand($command, $io);
     }
 
     // Production option specific build.
@@ -499,9 +501,7 @@ class BuildCommand extends ContainerAwareCommand {
       $io->section("Docker ::: Build staging environment");
       $command = COMPOSE . $system_appname . COMPOSE_PROJECT . UP_CMD;
       $this->app->runcommand($command, $io);
-//      if (in_array('MYSQL', $config['services'])) {
-//        $this->cfa->verifyMySQL($io, $system_appname, 'feature');
-//      }
     }
   }
+
 }

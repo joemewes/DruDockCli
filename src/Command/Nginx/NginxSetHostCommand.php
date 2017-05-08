@@ -8,6 +8,7 @@
 namespace Docker\Drupal\Command\Nginx;
 
 use Docker\Drupal\Application;
+use Docker\Drupal\Extension\ApplicationConfigExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,10 +36,8 @@ class NginxSetHostCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-    $fs = new Filesystem();
-    $client = new Client();
-    $zippy = Zippy::load();
+    $cta = new ApplicationContainerExtension();
+    $cfa = new ApplicationConfigExtension();
 
     $io = new DruDockStyle($input, $output);
     $io->section("Nginx ::: add host");
@@ -47,6 +46,7 @@ class NginxSetHostCommand extends Command {
       $appname = $config['appname'];
       $apphost = $config['host'];
     }
+    $system_appname = isset($appname) ? strtolower(str_replace(' ', '', $appname)) : 'app';
 
     if (!isset($apphost)) {
       $apphost = 'drudock.dev';
@@ -58,7 +58,7 @@ class NginxSetHostCommand extends Command {
     $newhost = $helper->ask($input, $output, $question);
 
     if ($application->getOs() == 'Darwin') {
-      $application->setHostConfig($fs, $client, $zippy, $newhost, $io, TRUE);
+      $cfa->setHostConfig($newhost, $io, $system_appname);
     }
 
     if (file_exists('.config.yml')) {
@@ -84,8 +84,8 @@ class NginxSetHostCommand extends Command {
 
     $application->setNginxHost($io);
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
+    if ($cta->checkForAppContainers($appname, $io)) {
+      $command = $cta->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
       $application->runcommand($command, $io);
     }
   }
