@@ -10,3 +10,5 @@ environment:
   MYSQL_PASSWORD: MYSQLPASS
   MYSQL_DATABASE: drudock_db
 hostname: db
+healthcheck:
+  test: "exit 0"

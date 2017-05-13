@@ -134,7 +134,8 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     $io->note($message);
-    shell_exec('python -mwebbrowser http://' . $apphost);
+    $nginx_port = $this->cfa->containerPort($system_appname, 'nginx', '80');
+    shell_exec('python -mwebbrowser http://' . $apphost .  ':' . $nginx_port);
 
   }
 
@@ -353,7 +354,6 @@ class BuildCommand extends ContainerAwareCommand {
   private function installDrupal8($io, $install_helpers = FALSE) {
 
     if ($config = $this->app->getAppConfig($io)) {
-      $dist = $config[DIST];
       $appname = $config[APP_NAME];
       $services = $config[SERVICES];
     }
@@ -430,9 +430,9 @@ class BuildCommand extends ContainerAwareCommand {
           'docker kill $(docker ps -q) 2>&1; ' . $this->cta->getComposePath($appname, $io) . 'up -d';
         $this->app->runcommand($command, $io);
       }
-      if (in_array('MYSQL', $config['services'])) {
-        $this->cfa->verifyMySQL($io, $system_appname, 'default');
-      }
+//      if (in_array('MYSQL', $config['services'])) {
+//        $this->cfa->verifyMySQL($io, $system_appname, 'default');
+//      }
 
       $io->section("Docker ::: Build Development environment");
       $command = COMPOSE . $system_appname . COMPOSE_PROJECT . UP_CMD;
@@ -464,9 +464,9 @@ class BuildCommand extends ContainerAwareCommand {
       $command = COMPOSE . $system_appname . COMPOSE_PROJECT . $system_appname . '--' . $build . UP_CMD;
       $this->app->runcommand($command, $io);
 
-      if (in_array('MYSQL', $config['services'])) {
-        $this->cfa->verifyMySQL($io, $system_appname, 'prod');
-      }
+//      if (in_array('MYSQL', $config['services'])) {
+//        $this->cfa->verifyMySQL($io, $system_appname, 'prod');
+//      }
 
     }
 

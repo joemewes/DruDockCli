@@ -12,8 +12,5 @@ dns:
   - 8.8.8.8
   - 8.8.4.4
 hostname: php
-depends_on:
-  mysql:
-    condition: service_healthy
 extra_hosts:
  - "drudock.dev:10.254.254.254"

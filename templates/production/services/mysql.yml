@@ -11,5 +11,7 @@ environment:
 hostname: db
 restart: always
 container_name: mysql
+healthcheck:
+  test: "exit 0"
 networks:
   - data

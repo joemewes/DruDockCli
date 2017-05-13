@@ -424,19 +424,26 @@ class ApplicationConfigExtension extends Application {
       $base_yaml = file_get_contents(__DIR__ . '/../../templates/base/docker-compose.yml');
     }
 
-    if ($dist === DEVELOPMENT || $dist === FEATURE) {
-      $base_compose = Yaml::parse($base_yaml);
-      $base_compose = $this->applyAppServices($io, $base_compose, $config, $dist_path);
-      $app_yaml = Yaml::dump($base_compose, 8, 2);
-      $this->renderFile($services_compose_dest, $app_yaml);
+    // Check if depends UNISON is required.
+    // @todo remove this when :cached options is added to Docker for Mac CE.
+    if ($this->getOs() == 'Darwin' && in_array('PHP', $config['services'])) {
+      $config['services'][] = 'UNISON';
     }
 
-    if ($dist === PRODUCTION) {
-      $base_compose = Yaml::parse($base_yaml);
-      $base_compose = $this->applyAppServices($io, $base_compose, $config, $dist_path);
-      $app_yaml = Yaml::dump($base_compose, 8, 2);
-      $this->renderFile($services_compose_dest, $app_yaml);
+    // Get base compose config.
+    $base_compose = Yaml::parse($base_yaml);
+    $base_compose = $this->applyAppServices($io, $base_compose, $config, $dist_path);
 
+    // Check if depends healthchecks are required.
+    if (in_array('MYSQL', $config['services']) && in_array('PHP', $config['services'])) {
+      $base_compose = $this->addMysqlHealthcheck($base_compose, 'php');
+    }
+
+    // Write final config
+    $app_yaml = Yaml::dump($base_compose, 8, 2);
+    $this->renderFile($services_compose_dest, $app_yaml);
+
+    if ($dist === PRODUCTION) {
       if (!file_exists((__DIR__ . '/../../templates/base/docker-compose-nginx-proxy.yml'))) {
         $io->error('Proxy template missing');
         exit;
@@ -461,6 +468,17 @@ class ApplicationConfigExtension extends Application {
     }
 
     $this->getRemoteBundle($io, 'config_' . $dist_path, $system_appname . '/docker_' . $system_appname . '/config');
+  }
+
+  /**
+   * @param $base_compose
+   * @param $service
+   *
+   * @return mixed
+   */
+  public function addMysqlHealthcheck($base_compose, $service) {
+    $base_compose['services'][$service]['depends_on']['mysql']['condition'] = 'service_healthy';
+    return $base_compose;
   }
 
   /**
