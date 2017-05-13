@@ -13,6 +13,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Console\Application as ParentApplication;
+use Docker\Drupal\Extension\ApplicationConfigExtension;
 
 const DEV_MYSQL_PASS = 'DEVPASSWORD';
 const LOCALHOST = '127.0.0.1';
@@ -33,6 +34,7 @@ class Application extends ParentApplication {
   // const CDN = 'http://d1gem705zq3obi.cloudfront.net';.
   const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
 
+  protected $cfa;
 
   /**
    * @var string
@@ -245,7 +247,7 @@ class Application extends ParentApplication {
    * @return Boolean
    */
 
-  public function setAppConfig($config, $appname, $io) {
+  public function setAppConfig($config, $io) {
     if (file_exists(CONFIG_PATH)) {
       $yaml = Yaml::dump($config);
       file_put_contents(CONFIG_PATH, $yaml);
@@ -514,5 +516,17 @@ VIRTUAL_NETWORK=nginx-proxy";
     } catch (IOException $e) {
       throw $e;
     }
+  }
+
+  /**
+   * RUn tests and save artifacts.
+   * @param $appname
+   */
+  public function runTest($appname){
+    $this->cfa = new ApplicationConfigExtension();
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+    $nginx_port = $this->cfa->containerPort($system_appname,'nginx', '80');
+    $command = 'curl  http://drudock.dev:' . $nginx_port . ' > /tmp/' . $system_appname . '.html';
+    shell_exec($command);
   }
 }

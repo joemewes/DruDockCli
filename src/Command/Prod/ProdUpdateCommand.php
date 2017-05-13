@@ -70,7 +70,7 @@ class ProdUpdateCommand extends Command {
         $application->runcommand($command, $io);
 
         $config['builds'][] = $date;
-        $application->setAppConfig($config, $appname, $io);
+        $application->setAppConfig($config, $io);
 
       }
     }

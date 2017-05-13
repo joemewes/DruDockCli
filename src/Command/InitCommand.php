@@ -53,7 +53,7 @@ class InitCommand extends ContainerAwareCommand {
       ->setHelp('This command will fetch the specified DruDock config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
       ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
-      ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Development,Production,Feature]')
+      ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Development,Feature]')
       ->addOption('src', 'g', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('git', 'gs', InputOption::VALUE_OPTIONAL, 'Git repository URL')
       ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [drudock.dev]')
@@ -112,6 +112,12 @@ class InitCommand extends ContainerAwareCommand {
         'date' => $date,
       ],
     ];
+
+    // Check if depends UNISON is required.
+    // @todo remove this when :cached options is added to Docker for Mac CE.
+    if ($application->getOs() == 'Darwin' && in_array('PHP', $config['services']) && $config['dist'] === 'Development') {
+      $config['services'][] = 'UNISON';
+    }
 
     $this->cfa->writeDockerComposeConfig($io, $config);
 

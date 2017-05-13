@@ -159,7 +159,7 @@ class ApplicationConfigExtension extends Application {
     if (array_key_exists('dist', $options)) {
       $dist = $input->getOption('dist');
     }
-    $available_dist = [DEVELOPMENT, PRODUCTION, FEATURE];
+    $available_dist = [DEVELOPMENT, FEATURE];
 
     if (isset($dist) && !in_array($dist, $available_dist)) {
       $io->warning('DIST : ' . $dist . DISALLOWED_MSG);
@@ -422,12 +422,6 @@ class ApplicationConfigExtension extends Application {
     }
     else {
       $base_yaml = file_get_contents(__DIR__ . '/../../templates/base/docker-compose.yml');
-    }
-
-    // Check if depends UNISON is required.
-    // @todo remove this when :cached options is added to Docker for Mac CE.
-    if ($this->getOs() == 'Darwin' && in_array('PHP', $config['services'])) {
-      $config['services'][] = 'UNISON';
     }
 
     // Get base compose config.
