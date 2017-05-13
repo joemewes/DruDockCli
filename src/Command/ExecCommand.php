@@ -7,23 +7,23 @@
 
 namespace Docker\Drupal\Command;
 
+use Docker\Drupal\Application;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Command\Command;
-//use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DruDockStyle;
-use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class DemoCommand
+ *
  * @package Docker\Drupal\Command
  */
 class ExecCommand extends Command {
+
   protected function configure() {
     $this
       ->setName('docker:exec')
@@ -36,7 +36,7 @@ class ExecCommand extends Command {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
 
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     $cmd = $input->getOption('cmd');
@@ -45,7 +45,7 @@ class ExecCommand extends Command {
     $io = new DruDockStyle($input, $output);
     $io->section("EXEC CMD");
 
-    $running_containers = $application->getRunningContainerNames();
+    $running_containers = $container_application->getRunningContainerNames();
     $available_services = [];
 
     foreach ($running_containers as $c) {
@@ -74,7 +74,7 @@ class ExecCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . 'exec -T ' . $service . ' ' . $cmd . ' 2>&1';
+      $command = $container_application->getComposePath($appname, $io) . 'exec -T ' . $service . ' ' . $cmd . ' 2>&1';
       $application->runcommand($command, $io);
     }
   }

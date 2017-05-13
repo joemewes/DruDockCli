@@ -38,26 +38,17 @@ Install and setup Docker
    - video 1 (Installation and setup) - https://www.youtube.com/watch?v=XfmN47xdrgY
    - video 2 (Initialise Drupal7 Env && App) - https://www.youtube.com/watch?v=FoDeyEPEhiY
    
-### Install via Composer
-  - Install Composer [Globally](https://getcomposer.org/doc/00-intro.md#globally) 
-  - Make sure you add composers vendor directory to your $PATH:
-    - add `export PATH="~/.composer/vendor/bin:$PATH"` to your ~/.bash_profile
+### Install via .phar
   - Install DruDock globally.
-
-```
-composer global require drudock/cli
-```
-
-- Note : drupal/console and drush/drush have complex dependencies and may cause conflicts with this utility. You should be able to resolve this by adding the following to your global/project composer.json file, and then running 'composer global update' :
-
-```
-{
-    "require": {
-        "drudock/cli": "@stable"
-    }
-}
-```
-
+  
+  ``` 
+  
+  curl -O http://d1gem705zq3obi.cloudfront.net/drudock.phar && \
+  mv drudock.phar /usr/local/bin/drudock && \
+  chmod +x /usr/local/bin/drudock && \
+  drudock
+  
+  ```
 
 # Status
 ## Initial Commands structure
@@ -129,21 +120,21 @@ composer global require drudock/cli
 ## Example Commands
 ```
       --------------
-      :$ drudock env my-great-app -t DEFAULT -r Basic -s New -p basic.drudock.dev
+      :$ drudock env:init defaultapp --type DEFAULT --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL"
       :$ cd my-great-app && drudock build:init
       --------------
 ```    
 #### DEV Drupal 8  
 ```
       --------------
-      :$ drudock env my-drupal8-site -t D8 -r Basic -s New -p d8.drudock.dev
+      :$ drudock env:init defaultapp --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL"
       :$ cd my-drupal8-site && drudock build:init
       --------------
 ```   
 #### DEV Drupal 7
 ```
       --------------
-      :$ drudock env my-drupal7-site -t D7 -r Full -s Git -p d7.drudock.dev
+      :$ drudock env:init defaultapp --type D7 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL"
       :$ cd my-drupal7-site && drudock build:init
       --------------
 ```
@@ -155,4 +146,4 @@ For more information see [roadmap](https://github.com/4AllDigital/DruDockCli/blo
 
 ### Known issues
 
-1. Its not finished - still in early -alpha and requires community testing and feedback.
+1. Its not finished - still in alpha and requires community testing and feedback.

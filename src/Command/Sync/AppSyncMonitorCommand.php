@@ -7,13 +7,12 @@
 
 namespace Docker\Drupal\Command\Sync;
 
+use Docker\Drupal\Application;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DruDockStyle;
-use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class WatchCommand
@@ -24,7 +23,7 @@ class AppSyncMonitorCommand extends Command {
   protected function configure() {
     $this
       ->setName('sync:monitor')
-      ->setDescription('Montitor current App sync activity')
+      ->setDescription('Monitor current App sync activity')
       ->setHelp("This command will output App Sync activity. [drudock sync:monitor]");
   }
 
@@ -33,7 +32,7 @@ class AppSyncMonitorCommand extends Command {
    * @param \Symfony\Component\Console\Output\OutputInterface $output
    */
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
     $io = new DruDockStyle($input, $output);
 
@@ -44,7 +43,7 @@ class AppSyncMonitorCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . 'logs -f app  2>&1';
+      $command = $container_application->getComposePath($appname, $io) . 'logs -f unison  2>&1';
       $application->runcommand($command, $io);
     }
   }
