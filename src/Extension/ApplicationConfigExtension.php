@@ -23,7 +23,9 @@ use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
 
 // Config constants.
-const DEV_MYSQL_PASS = 'DEVPASSWORD';
+const MYSQL_PASS = 'MYSQLPASS';
+const MYSQL_USER = 'drudock';
+const MYSQL_DB = 'drudock_db';
 const LOCALHOST = '127.0.0.1';
 const QUESTION = 'question';
 const DISALLOWED_MSG = ' not allowed.';
@@ -32,7 +34,21 @@ const SERVICES = 'services';
 const VOLUMES = 'volumes';
 const NETWORKS = 'networks';
 const DATE_FORMAT = 'Y-m-d--H-i-s';
+const TAR = '.tar.gz';
+const TPLS_PATH = '/../../templates/';
 
+const PRODUCTION = 'Production';
+const DEVELOPMENT = 'Development';
+const FEATURE = 'Feature';
+
+// Service/Network/Data Names.
+const REDIS = 'REDIS';
+const UNISON = 'UNISON';
+const PHP = 'PHP';
+const NGINX = 'NGINX';
+const MYSQL = 'MYSQL';
+const SOLR = 'SOLR';
+const MAILCATCHER = 'MAILCATCHER';
 
 /**
  * Class ApplicationConfigExtension
@@ -51,7 +67,7 @@ class ApplicationConfigExtension extends Application {
    *
    * @return mixed
    */
-  function getSetAppname($io, $input, $output, $cmd) {
+  public function getSetAppname($io, $input, $output, $cmd) {
     $appname = $input->getArgument(APPNAME);
     $date = date(DATE_FORMAT);
     if (!isset($appname)) {
@@ -63,6 +79,7 @@ class ApplicationConfigExtension extends Application {
     return $appname;
   }
 
+
   /**
    * GET AND SET APP SOURCE.
    *
@@ -73,8 +90,11 @@ class ApplicationConfigExtension extends Application {
    *
    * @return mixed
    */
-  function getSetSource($io, $input, $output, $cmd) {
-    $src = $input->getOption('src');
+  public function getSetSource($io, $input, $output, $cmd) {
+    $options = $input->getOptions();
+    if (array_key_exists('src', $options)) {
+      $src = $input->getOption('src');
+    }
     $available_src = ['New', 'Git'];
 
     if ($src && !in_array($src, $available_src)) {
@@ -107,8 +127,11 @@ class ApplicationConfigExtension extends Application {
    *
    * @return string
    */
-  function getSetSCMSource($io, $input, $output, $src, $cmd) {
-    $gitrepo = $input->getOption('git');
+  public function getSetSCMSource($io, $input, $output, $src, $cmd) {
+    $options = $input->getOptions();
+    if (array_key_exists('git', $options)) {
+      $gitrepo = $input->getOption('git');
+    }
     if ($src == 'New') {
       $gitrepo = '';
     }
@@ -131,11 +154,14 @@ class ApplicationConfigExtension extends Application {
    *
    * @return null
    */
-  function getSetDistribution($io, $input, $output, $cmd) {
-    $dist = $input->getOption('dist');
-    $available_dist = ['Development', 'Production', 'Feature'];
+  public function getSetDistribution($io, $input, $output, $cmd) {
+    $options = $input->getOptions();
+    if (array_key_exists('dist', $options)) {
+      $dist = $input->getOption('dist');
+    }
+    $available_dist = [DEVELOPMENT, FEATURE];
 
-    if ($dist && !in_array($dist, $available_dist)) {
+    if (isset($dist) && !in_array($dist, $available_dist)) {
       $io->warning('DIST : ' . $dist . DISALLOWED_MSG);
       $dist = NULL;
     }
@@ -164,7 +190,7 @@ class ApplicationConfigExtension extends Application {
    *
    * @return null
    */
-  function getSetType($io, $input, $output, $cmd) {
+  public function getSetType($io, $input, $output, $cmd) {
     $type = $input->getOption('type');
     $available_types = ['DEFAULT', 'D7', 'D8'];
 
@@ -197,8 +223,11 @@ class ApplicationConfigExtension extends Application {
    *
    * @return mixed
    */
-  function getSetHost($io, $input, $output, $cmd) {
-    $apphost = $input->getOption('apphost');
+  public function getSetHost($io, $input, $output, $cmd) {
+    $options = $input->getOptions();
+    if (array_key_exists('apphost', $options)) {
+      $apphost = $input->getOption('apphost');
+    }
 
     if (!$apphost) {
       $io->info(' ');
@@ -220,21 +249,26 @@ class ApplicationConfigExtension extends Application {
    *
    * @return null
    */
-  function getSetServices($io, $input, $output, $cmd) {
+  public function getSetServices($io, $input, $output, $cmd) {
     $service_types = $input->getOption(SERVICES);
     $available_services = [
-      'UNISON',
-      'PHP',
-      'NGINX',
-      'MYSQL',
-      'SOLR',
-      'REDIS',
-      'MAILCATCHER',
+      UNISON,
+      PHP,
+      NGINX,
+      MYSQL,
+      SOLR,
+      REDIS,
+      MAILCATCHER,
     ];
 
-    if ($service_types) {
-      $service_types_list = explode(',', $service_types);
-      foreach ($service_types_list as $st) {
+    // Inline Services entry as comma separated string.
+    if (is_string($service_types)) {
+      $service_types = explode(',', $service_types);
+    }
+
+    // Confirm valid service entry.
+    if ($service_types && is_array($service_types)) {
+      foreach ($service_types as $st) {
         if (!in_array($st, $available_services)) {
           $io->warning('SERVICES : ' . $service_types . DISALLOWED_MSG);
           $service_types = NULL;
@@ -242,6 +276,7 @@ class ApplicationConfigExtension extends Application {
       }
     }
 
+    // Get/Set Services manually.
     if (!$service_types) {
       $io->info(' ');
       $io->title("SET APP SERVICES");
@@ -264,7 +299,7 @@ class ApplicationConfigExtension extends Application {
    * @param $system_appname
    * @param $type
    */
-  function verifyMySQL($io, $system_appname, $type) {
+  public function verifyMySQL($io, $system_appname, $type) {
     // Check for running mySQL container before launching Drupal Installation.
     $io->text(' ');
     $io->warning('Waiting for mySQL service.');
@@ -272,27 +307,23 @@ class ApplicationConfigExtension extends Application {
     if ($type) {
       switch ($type) {
         case 'prod':
-          $command = exec('docker port mysql 3306');
-          $port = explode(':', $command);
-          $db_port = $port[1];
-          $db_name = 'prod';
+        case 'stage':
+          $db_port = $this->containerPort($system_appname, 'mysql', '3306', TRUE);
           break;
 
-        case 'stage':
-          $command = "docker-compose -f docker_" . $system_appname . "/docker-compose-data.yml --project-name=" . $system_appname . "_data port db 3306";
-          $port_info = exec($command);
-          $port = explode(':', $port_info);
-          $db_port = $port[1];
-          $db_name = 'stage';
+        case 'feature':
+          $db_port = $this->containerPort($system_appname, 'mysql', '3306');
           break;
 
         default:
-          $db_port = '3306';
-          $db_name = 'dev_db';
+          $db_port = $this->containerPort($system_appname, 'mysql', '3306');
       }
     }
 
-    while (!@mysqli_connect(LOCALHOST, 'dev', DEV_MYSQL_PASS, $db_name, $db_port)) {
+    $io->info('@mysqli_connect(' . LOCALHOST . ', ' . MYSQL_USER . ', ' . MYSQL_PASS . ', ' . MYSQL_DB . ', ' . $db_port . ')');
+
+    while (!@mysqli_connect(LOCALHOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB, $db_port)) {
+
       $phases = ["|", "/", "-", "\\"];
       foreach ($phases AS $phase) {
         printf('%s%s', chr(8), $phase);
@@ -305,20 +336,39 @@ class ApplicationConfigExtension extends Application {
   }
 
   /**
-   * @param $fs
-   * @param $client
-   * @param $zippy
+   * @param $system_appname
+   * @param bool $data
+   * @param $container_name
+   * @param $internal_port
+   *
+   * @return mixed
+   */
+  public function containerPort($system_appname, $container_name, $internal_port, $data = FALSE) {
+    if ($data) {
+      $cp = 'docker-compose-data.yml --project-name=' . $system_appname . '_data';
+    }
+    else {
+      $cp = 'docker-compose.yml';
+    }
+    $command = "docker-compose -f docker_" . $system_appname . "/" . $cp . " port " . $container_name . " " . $internal_port;
+
+    $port_info = exec($command);
+    $port = explode(':', $port_info);
+    return $port[1];
+  }
+
+  /**
    * @param $newhost
    * @param $io
-   * @param $appname
+   * @param $sys_appname
    */
-  public function setHostConfig($fs, $client, $zippy, $newhost, $io, $appname) {
+  public function setHostConfig($newhost, $io, $sys_appname) {
     // Add initial entry to hosts file.
-    // OSX @TODO update as command for all systems and OS's.
+    // @TODO update as command for Windows too.
 
     $ip = LOCALHOST;
 
-    if ($config = $this->getAppConfig($io, $appname)) {
+    if ($config = $this->getAppConfig($io, $sys_appname)) {
       $apphost = $config['host'];
       $appname = $config[APPNAME];
       $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -337,11 +387,13 @@ class ApplicationConfigExtension extends Application {
       $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
       $this->runcommand($command, $io, TRUE);
     }
-    else if($app_host_config !== $new_host_config) {
-      // Replace existing.
-      $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
-      $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
-      exec($command);
+    else {
+      if ($app_host_config !== $new_host_config) {
+        // Replace existing.
+        $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
+        $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
+        exec($command);
+      }
     }
 
     if (!file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
@@ -351,13 +403,18 @@ class ApplicationConfigExtension extends Application {
     }
   }
 
-  function writeDockerComposeConfig($io, $config) {
+  /**
+   * @param $io
+   * @param $config
+   */
+  public function writeDockerComposeConfig($io, $config) {
 
     $system_appname = strtolower(str_replace(' ', '', $config[APPNAME]));
     $dist = $config['dist'];
     $dist_path = strtolower($dist);
     $services_compose_dest = $system_appname . '/docker_' . $system_appname . '/docker-compose.yml';
-
+    $services_compose_proxy_dest = $system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml';
+    $services_compose_data_dest = $system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml';
 
     if (!file_exists((__DIR__ . '/../../templates/base/docker-compose.yml'))) {
       $io->error('base template missing');
@@ -367,30 +424,55 @@ class ApplicationConfigExtension extends Application {
       $base_yaml = file_get_contents(__DIR__ . '/../../templates/base/docker-compose.yml');
     }
 
-    switch ($dist) {
-      case 'Development':
-        if (isset($base_yaml)) {
-          $base_compose = Yaml::parse($base_yaml);
-        }
-        $base_compose = $this->applyAppServices($base_compose, $config, $dist_path);
-        $app_yaml = Yaml::dump($base_compose, 8, 2);
-        $this->renderFile($services_compose_dest, $app_yaml);
+    // Get base compose config.
+    $base_compose = Yaml::parse($base_yaml);
+    $base_compose = $this->applyAppServices($io, $base_compose, $config, $dist_path);
 
-        break;
-      case 'Production':
-        echo 'production env';
+    // Check if depends healthchecks are required.
+    if (in_array('MYSQL', $config['services']) && in_array('PHP', $config['services'])) {
+      $base_compose = $this->addMysqlHealthcheck($base_compose, 'php');
+    }
 
-        break;
-      case 'Feature':
-        echo 'feature branch';
+    // Write final config
+    $app_yaml = Yaml::dump($base_compose, 8, 2);
+    $this->renderFile($services_compose_dest, $app_yaml);
 
-        break;
-      default:
-        // Do nothing.
-        break;
+    if ($dist === PRODUCTION) {
+      if (!file_exists((__DIR__ . '/../../templates/base/docker-compose-nginx-proxy.yml'))) {
+        $io->error('Proxy template missing');
+        exit;
+      }
+      else {
+        $base_proxy_yaml = file_get_contents(__DIR__ . '/../../templates/base/docker-compose-nginx-proxy.yml');
+        $this->renderFile($services_compose_proxy_dest, $base_proxy_yaml);
+      }
+
+      if (!file_exists((__DIR__ . '/../../templates/base/docker-compose-data.yml'))) {
+        $io->error('Data template missing');
+        exit;
+      }
+      else {
+        $base_data_yaml = file_get_contents(__DIR__ . '/../../templates/base/docker-compose-data.yml');
+      }
+
+      $base_data_compose = Yaml::parse($base_data_yaml);
+      $base_data_compose = $this->applyDataAppServices($io, $base_data_compose, $config, $dist_path);
+      $app_data_yaml = Yaml::dump($base_data_compose, 8, 2);
+      $this->renderFile($services_compose_data_dest, $app_data_yaml);
     }
 
     $this->getRemoteBundle($io, 'config_' . $dist_path, $system_appname . '/docker_' . $system_appname . '/config');
+  }
+
+  /**
+   * @param $base_compose
+   * @param $service
+   *
+   * @return mixed
+   */
+  public function addMysqlHealthcheck($base_compose, $service) {
+    $base_compose['services'][$service]['depends_on']['mysql']['condition'] = 'service_healthy';
+    return $base_compose;
   }
 
   /**
@@ -403,8 +485,8 @@ class ApplicationConfigExtension extends Application {
     $client = new Client();
     $zippy = Zippy::load();
 
-    $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
-    $destination = '/tmp/' . $file . '.tar.gz';
+    $remote_file_path = $this::CDN . '/' . $file . TAR;
+    $destination = '/tmp/' . $file . TAR;
     $client->get($remote_file_path, ['save_to' => $destination]);
     $archive = $zippy->open($destination);
     $archive->extract('/tmp/');
@@ -424,8 +506,8 @@ class ApplicationConfigExtension extends Application {
     $client = new Client();
     $zippy = Zippy::load();
 
-    $remote_file_path = $this::CDN . '/' . $file . '.tar.gz';
-    $destination = sys_get_temp_dir() . '/' . $file . '.tar.gz';
+    $remote_file_path = $this::CDN . '/' . $file . TAR;
+    $destination = sys_get_temp_dir() . '/' . $file . TAR;
     $client->get($remote_file_path, ['save_to' => $destination]);
     $archive = $zippy->open($destination);
     $archive->extract('./');
@@ -437,29 +519,130 @@ class ApplicationConfigExtension extends Application {
     }
   }
 
-  public function applyAppServices($base_compose, $config, $dist_path) {
-    $services = $config[SERVICES];
-    foreach ($services as $service) {
+  /**
+   * @param $io
+   * @param $base_compose
+   * @param $config
+   * @param $dist_path
+   *
+   * @return mixed
+   */
+  public function applyAppServices($io, $base_compose, $config, $dist_path) {
+
+    // Set Services.
+    $services = $this->arrangeServices($io, $config);
+
+    foreach ($services['std'] as $service) {
       $service_name = strtolower($service);
-      $service_yaml = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/services/' . $service_name . '.yml');
+      $service_yaml = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/services/' . $service_name . '.yml');
       $service_compose = Yaml::parse($service_yaml);
       $base_compose[SERVICES][$service_name] = $service_compose;
 
-      if ($service === 'UNISON') {
-        $vol = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/' . VOLUMES . '/app-sync.yml');
+      // Set Volumes.
+      if ($service === UNISON) {
+        $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . VOLUMES . '/app-sync.yml');
         $vol_compose = Yaml::parse($vol);
         $base_compose[VOLUMES]['app-sync'] = $vol_compose;
       }
-      if ($service === 'MYSQL') {
-        $vol = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/'. VOLUMES . '/mysql-data.yml');
+
+      if ($service === MYSQL) {
+        $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . VOLUMES . '/mysql-data.yml');
         $vol_compose = Yaml::parse($vol);
         $base_compose[VOLUMES]['mysql-data'] = $vol_compose;
       }
 
-      $net = file_get_contents(__DIR__ . '/../../templates/' . $dist_path . '/' . NETWORKS . '/default.yml');
-      $net_compose = Yaml::parse($net);
-      $base_compose[NETWORKS]['default'] = $net_compose;
+      if ($service === 'APP') {
+        $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . VOLUMES . '/app-data.yml');
+        $vol_compose = Yaml::parse($vol);
+        $base_compose[VOLUMES]['app-data'] = $vol_compose;
+      }
     }
+
+    // Set Networks.
+    $net = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . NETWORKS . '/default.yml');
+    $net_compose = Yaml::parse($net);
+    $base_compose[NETWORKS]['default'] = $net_compose;
+
+    if ($config['dist'] === PRODUCTION) {
+      $net = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . NETWORKS . '/proxy.yml');
+      $net_compose = Yaml::parse($net);
+      $base_compose[NETWORKS]['proxy'] = $net_compose;
+
+      $net = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . NETWORKS . '/database.yml');
+      $net_compose = Yaml::parse($net);
+      $base_compose[NETWORKS]['database'] = $net_compose;
+    }
+
     return $base_compose;
+  }
+
+  /**
+   * @param $io
+   * @param $base_data_compose
+   * @param $config
+   * @param $dist_path
+   */
+  public function applyDataAppServices($io, $base_data_compose, $config, $dist_path) {
+
+    // Set Services.
+    $services = $this->arrangeServices($io, $config);
+
+    if ($config['dist'] === PRODUCTION) {
+      foreach ($services['prod'] as $service) {
+        $service_name = strtolower($service);
+        $service_yaml = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/services/' . $service_name . '.yml');
+        $service_compose = Yaml::parse($service_yaml);
+        $base_data_compose[SERVICES][$service_name] = $service_compose;
+
+        if ($service === MYSQL) {
+          $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . VOLUMES . '/mysql-data.yml');
+          $vol_compose = Yaml::parse($vol);
+          $base_data_compose[VOLUMES]['mysql-data'] = $vol_compose;
+        }
+      }
+
+      $net = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . NETWORKS . '/data.yml');
+      $net_compose = Yaml::parse($net);
+      $base_data_compose[NETWORKS]['data'] = $net_compose;
+    }
+    return $base_data_compose;
+  }
+
+  /**
+   * @param $io
+   * @param $config
+   *
+   * @return array
+   */
+  public function arrangeServices($io, $config) {
+    if (is_string($config[SERVICES])) {
+      $services['std'] = explode(',', $config[SERVICES]);
+    }
+    elseif (is_array($config[SERVICES])) {
+      $services['std'] = $config[SERVICES];
+    }
+    else {
+      $io->error('Invalid services options.');
+      exit;
+    }
+
+    if ($config['dist'] === PRODUCTION) {
+      array_unshift($services['std'], 'APP');
+
+      if (($key = array_search(MYSQL, $services['std'])) !== FALSE) {
+        unset($services['std'][$key]);
+        $services['prod'][] = MYSQL;
+      }
+      if (($key = array_search(REDIS, $services['std'])) !== FALSE) {
+        unset($services['std'][$key]);
+        $services['prod'][] = REDIS;
+      }
+      if (($key = array_search(SOLR, $services['std'])) !== FALSE) {
+        unset($services['std'][$key]);
+        $services['prod'][] = SOLR;
+      }
+    }
+
+    return $services;
   }
 }

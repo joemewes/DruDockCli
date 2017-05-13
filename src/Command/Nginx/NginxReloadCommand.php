@@ -7,11 +7,10 @@
 
 namespace Docker\Drupal\Command\Nginx;
 
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
@@ -29,7 +28,7 @@ class NginxReloadCommand extends Command {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     $io = new DruDockStyle($input, $output);
@@ -41,9 +40,8 @@ class NginxReloadCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
+      $command = $container_application->getComposePath($appname, $io) . 'exec -T nginx nginx -s reload 2>&1';
       $application->runcommand($command, $io);
     }
   }
-
 }

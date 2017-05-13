@@ -7,6 +7,7 @@
 
 namespace Docker\Drupal\Command\Mysql;
 
+use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,12 +27,12 @@ class MysqlImportCommand extends Command {
     $this
       ->setName('mysql:import')
       ->setDescription('Import .sql files')
-      ->setHelp("Use this to import .sql files to the current running APPs dev_db. [drudock mysql:import -p ./latest.sql]")
+      ->setHelp("Use this to import .sql files to the current running APPs drudock_db. [drudock mysql:import -p ./latest.sql]")
       ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify import file path including filename');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     $io = new DruDockStyle($input, $output);
@@ -63,17 +64,17 @@ class MysqlImportCommand extends Command {
 
         if ($container_application->checkForAppContainers($appname, $io)) {
 
-          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "drop database dev_db;"';
+          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u dev -pDEVPASSWORD -Bse "drop database drudock_db;"';
           $application->runcommand($command, $io);
 
           // recreate dev_db
-          $command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD -Bse "create database dev_db;"';
+          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u dev -pDEVPASSWORD -Bse "create database drudock_db;"';
           $application->runcommand($command, $io);
 
           // import new .sql file
           // @todo resolve and update - https://github.com/docker/compose/issues/4290
-          //$command = $application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
-          $command = 'docker exec -i $(docker ps --format {{.Names}} | grep db) mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
+          // $command = $container_application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
+          $command = 'docker exec -i $(docker ps --format {{.Names}} | grep mysql) mysql -u dev -pDEVPASSWORD drudock_db < ' . $importpath;
           $application->runcommand($command, $io);
 
         }

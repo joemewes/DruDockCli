@@ -3,7 +3,10 @@ volumes :
   - ./config/nginx:/etc/nginx/sites-enabled
   - app-data:/app:ro
   - ../app/www/sites/default/files:/app/www/sites/default/files:rw
-env_file: nginx.env
+environment:
+  VIRTUAL_HOST: docker.prod
+  APPS_PATH: ~/app
+  VIRTUAL_NETWORK: nginx-proxy
 hostname: nginx
 restart: always
 read_only: true

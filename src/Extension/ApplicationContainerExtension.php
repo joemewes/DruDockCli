@@ -14,6 +14,7 @@ const BUILDS = 'builds';
 
 /**
  * Class ApplicationContainerExtension
+ *
  * @package Docker\Drupal\Extension
  */
 class ApplicationContainerExtension extends Application {
@@ -79,7 +80,7 @@ class ApplicationContainerExtension extends Application {
 
     switch ($dist) {
       case 'Production':
-      case 'Feature':
+      case 'Staging':
         $project = '--project-name=' . $system_appname . '--' . end($latestbuild);
         break;
       default:

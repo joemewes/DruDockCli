@@ -12,7 +12,7 @@ namespace Docker\Drupal\Extension;
  * @package Docker\Drupal\Extension
  */
 
-//use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Parser;
 
 class DatabaseConfigExtension extends Extension
 {
@@ -21,7 +21,7 @@ class DatabaseConfigExtension extends Extension
     $configuration = new Configuration();
     $processedConfig = $this->processConfiguration( $configuration, $configs );
 
-    // Do not add a paramater now, just continue reading the services.
+    // Do not add a parameter now, just continue reading the services.
     $loader = new YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ) );
     $loader->load( '../config/database.yml' );
 

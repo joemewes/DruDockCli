@@ -16,13 +16,9 @@ cat <<EOF
 EOF
 
 echo -e "${GREEN}DEMO TEST${NC}"
-
-./bin/drudock about
-
-./bin/drudock --version
-./bin/drudock env:init travisapp --type D8 --dist Development --src New --apphost drudock.dev --services "UNISON,PHP,NGINX,MYSQL" && \
-cd travisapp && \
-../bin/drudock build:init && \
-which docker && \
-docker ps && \
-curl http://localhost > ./logs/travis-sample.html
+cd /Users/joe/dev/playground && \
+rm -rf testdev && \
+./bin/drudock env:init testdev --type D8 --dist Development --src New --apphost drudock.dev --services "UNISON,PHP,NGINX,MYSQL" && \
+cd testdev && \
+./bin/drudock build:init && \
+curl -O http://localhost

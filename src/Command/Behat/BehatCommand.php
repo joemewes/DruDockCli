@@ -7,21 +7,23 @@
 
 namespace Docker\Drupal\Command\Behat;
 
+use Docker\Drupal\Application;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Docker\Drupal\Style\DruDockStyle;
-use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
  * Class BehatCommand
+ *
  * @package Docker\Drupal\Command
  */
 class BehatCommand extends Command {
+
+  const QUESTION = 'question';
 
   protected function configure() {
     $this
@@ -33,8 +35,12 @@ class BehatCommand extends Command {
       ->addOption('tags', '-t', InputOption::VALUE_OPTIONAL, 'Tags to test [about]');
   }
 
+  /**
+   * @param \Symfony\Component\Console\Input\InputInterface $input
+   * @param \Symfony\Component\Console\Output\OutputInterface $output
+   */
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = $this->getApplication();
+    $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
     $io = new DruDockStyle($input, $output);
@@ -42,21 +48,24 @@ class BehatCommand extends Command {
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
+    else {
+      $appname = 'app';
+    }
 
     if (!$suite = $input->getOption('suite')) {
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Suite [global_features] : ', 'global_features');
       $suite = $helper->ask($input, $output, $question);
     }
 
     if (!$profile = $input->getOption('profile')) {
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Profile [local] : ', 'local');
       $profile = $helper->ask($input, $output, $question);
     }
 
     if (!$tags = $input->getOption('tags')) {
-      $helper = $this->getHelper('question');
+      $helper = $this->getHelper(QUESTION);
       $question = new Question('Profile [about] : ', 'about');
       $tags = $helper->ask($input, $output, $question);
     }
@@ -77,14 +86,14 @@ class BehatCommand extends Command {
       }
     }
 
-    $io->section("BEHAT :::" . $cmd);
+    $io->section("BEHAT ::: " . $cmd);
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $application->getComposePath($appname, $io) . 'exec behat behat ' . $cmd;
+      $command = $container_application->getComposePath($appname, $io) . 'exec behat behat ' . $cmd;
       $application->runcommand($command, $io);
     }
   }
