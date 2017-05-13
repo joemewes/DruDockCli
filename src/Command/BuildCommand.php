@@ -79,7 +79,7 @@ class BuildCommand extends ContainerAwareCommand {
 
   const TMP_BEHAT = '/tmp/behat/';
 
-  const TMP_D7 = '/tmp/behat/';
+  const TMP_D7 = '/tmp/d7/';
 
   const TMP = '/tmp/';
 
@@ -103,12 +103,17 @@ class BuildCommand extends ContainerAwareCommand {
 
   protected $io;
 
-  protected function initialize(InputInterface $input, OutputInterface $output) {
+  public function __construct()
+  {
     $this->app = new Application();
     $this->cfa = new ApplicationConfigExtension();
     $this->cta = new ApplicationContainerExtension();
-    $this->io = new DruDockStyle($input, $output);
     $this->fs = new Filesystem();
+    parent::__construct();
+  }
+
+  protected function initialize(InputInterface $input, OutputInterface $output) {
+    $this->io = new DruDockStyle($input, $output);
   }
 
   protected function configure() {
@@ -175,7 +180,7 @@ class BuildCommand extends ContainerAwareCommand {
     $app_dest = self::APP_DEST;
     $date = date('Y-m-d--H-i-s');
 
-    $config = $this->app->getAppConfig();
+    $config = $this->app->getAppConfig($this->io);
     if ($config) {
       $appsrc = $config[self::APPSRC];
       $apprepo = $config[self::REPO];
@@ -232,7 +237,7 @@ class BuildCommand extends ContainerAwareCommand {
         }
       }
 
-      //replace this with make.yml script
+      // Replace this with make.yml script.
       $command = 'drush make ' . $app_dest . '/repository/project.make.yml ' . $app_dest . '/builds/' . $date . '/public';
 
       $this->io->info(' ');
@@ -419,10 +424,11 @@ class BuildCommand extends ContainerAwareCommand {
 
     $message = 'Run Drupal Installation.... This may take a few minutes....';
     $this->io->note($message);
-    $system_appname = strtolower(str_replace(' ', '', $appname));
-
-    $port = $this->cfa->containerPort($system_appname, 'mysql', '3306', FALSE);
-    $command = $command = $this->cta->getComposePath($appname, $this->io) . 'exec -T php drush site-install standard --account-name=dev --account-pass=admin --site-name=DruDock --site-mail=drupalD7@drudock.dev --db-url=mysql://dev:DEVPASSWORD@mysql:' . $port . '/dev_db -y';
+    //$system_appname = strtolower(str_replace(' ', '', $appname));
+    //$port = $this->cfa->containerPort($system_appname, 'mysql', '3306', FALSE);
+    $command = $this->cta->getComposePath($appname, $this->io) . 'exec -T php drush ' .
+      'site-install standard --account-name=admin --account-pass=password --site-name=DruDock --site-mail=admin@drudock.dev ' .
+      '--db-url=mysql://' . self::MYSQL_USER . ':' . self::MYSQL_PASS . '@mysql:3306/' . self::MYSQL_DB . ' --quiet -y';
     $this->app->runcommand($command, $this->io);
   }
 
