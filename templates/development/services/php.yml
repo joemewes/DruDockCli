@@ -2,6 +2,7 @@ image : 4alldigital/drudock-php:7.1
 ports :
   - "8022:22"
 volumes :
+  - ./config/php/ssmtp.conf:/etc/ssmtp/ssmtp.conf
   - ../app/www/sites/default/files:/app/www/sites/default/files
 volumes_from:
   - unison:rw
