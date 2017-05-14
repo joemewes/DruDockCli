@@ -57,7 +57,7 @@ class StartCommand extends Command {
     if (exec("docker ps | grep docker | wc -l") > 0) {
 
       $helper = $this->getHelper('question');
-      $question = new ConfirmationQuestion('You have other containers running. Would you like to stop them? ', FALSE);
+      $question = new ConfirmationQuestion('You have other containers running. Would you like to stop them? [y/n]', FALSE);
 
       if ($helper->ask($input, $output, $question)) {
         $io->info(' ');
