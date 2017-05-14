@@ -57,7 +57,7 @@ class InitCommand extends ContainerAwareCommand {
       ->addOption('src', 'g', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('git', 'gs', InputOption::VALUE_OPTIONAL, 'Git repository URL')
       ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [drudock.dev]')
-      ->addOption('services', 's', InputOption::VALUE_OPTIONAL, 'Select app services [UNISON, PHP, NGINX, MYSQL, SOLR, REDIS, MAILHOG]');
+      ->addOption('services', 's', InputOption::VALUE_OPTIONAL, 'Select app services [PHP, NGINX, MYSQL, SOLR, REDIS, MAILHOG]');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -112,12 +112,6 @@ class InitCommand extends ContainerAwareCommand {
         'date' => $date,
       ],
     ];
-
-    // Check if depends UNISON is required.
-    // @todo remove this when :cached options is added to Docker for Mac CE.
-    if ($application->getOs() == 'Darwin' && in_array('PHP', $config['services']) && $config['dist'] === 'Development') {
-      $config['services'][] = 'UNISON';
-    }
 
     // Add Mailhog to local development setup.
     if(in_array('PHP', $config['services']) && $config['dist'] === 'Development'){

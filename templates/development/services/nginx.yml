@@ -3,7 +3,5 @@ ports :
   - "80"
 volumes :
   - ./config/nginx:/etc/nginx/sites-enabled
-  - ../app/www/sites/default/files:/app/www/sites/default/files
-volumes_from:
-  - unison:rw
+  - ../app:/app:cached
 hostname: nginx
