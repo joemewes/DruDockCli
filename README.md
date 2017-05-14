@@ -17,6 +17,7 @@ Install and setup Docker
   
 - Mac : https://www.docker.com/docker-mac : 
 [_download_](https://store.docker.com/editions/community/docker-ce-desktop-mac)
+  - NB: Currently limited to EDGE version for latest :cached performance gains. (https://download.docker.com/mac/edge/Docker.dmg)
 - Windows : https://www.docker.com/docker-windows
 [_download_](https://store.docker.com/editions/community/docker-ce-desktop-windows)
 - Linux
