@@ -43,7 +43,6 @@ const FEATURE = 'Feature';
 
 // Service/Network/Data Names.
 const REDIS = 'REDIS';
-const UNISON = 'UNISON';
 const PHP = 'PHP';
 const NGINX = 'NGINX';
 const MYSQL = 'MYSQL';
@@ -252,7 +251,6 @@ class ApplicationConfigExtension extends Application {
   public function getSetServices($io, $input, $output, $cmd) {
     $service_types = $input->getOption(SERVICES);
     $available_services = [
-      UNISON,
       PHP,
       NGINX,
       MYSQL,
@@ -539,12 +537,6 @@ class ApplicationConfigExtension extends Application {
       $base_compose[SERVICES][$service_name] = $service_compose;
 
       // Set Volumes.
-      if ($service === UNISON) {
-        $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . VOLUMES . '/app-sync.yml');
-        $vol_compose = Yaml::parse($vol);
-        $base_compose[VOLUMES]['app-sync'] = $vol_compose;
-      }
-
       if ($service === MYSQL) {
         $vol = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/' . VOLUMES . '/mysql-data.yml');
         $vol_compose = Yaml::parse($vol);
