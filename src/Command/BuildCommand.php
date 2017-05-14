@@ -426,8 +426,9 @@ class BuildCommand extends ContainerAwareCommand {
     $this->io->note($message);
     //$system_appname = strtolower(str_replace(' ', '', $appname));
     //$port = $this->cfa->containerPort($system_appname, 'mysql', '3306', FALSE);
-    $command = $this->cta->getComposePath($appname, $this->io) . 'exec -T php drush ' .
-      'site-install standard --account-name=admin --account-pass=password --site-name=DruDock --site-mail=admin@drudock.dev ' .
+    $command = $this->cta->getComposePath($appname, $this->io) . 'exec -T php ' .
+      '/usr/bin/env PHP_OPTIONS="-d sendmail_path=/bin/true" ' .
+      'drush site-install standard --account-name=admin --account-pass=password --site-name=DruDock --site-mail=admin@drudock.dev ' .
       '--db-url=mysql://' . self::MYSQL_USER . ':' . self::MYSQL_PASS . '@mysql:3306/' . self::MYSQL_DB . ' --quiet -y';
     $this->app->runcommand($command, $this->io);
   }
