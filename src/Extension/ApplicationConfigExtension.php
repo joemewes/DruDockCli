@@ -48,7 +48,7 @@ const PHP = 'PHP';
 const NGINX = 'NGINX';
 const MYSQL = 'MYSQL';
 const SOLR = 'SOLR';
-const MAILCATCHER = 'MAILCATCHER';
+const MAILHOG = 'MAILHOG';
 
 /**
  * Class ApplicationConfigExtension
@@ -258,7 +258,7 @@ class ApplicationConfigExtension extends Application {
       MYSQL,
       SOLR,
       REDIS,
-      MAILCATCHER,
+      MAILHOG,
     ];
 
     // Inline Services entry as comma separated string.
