@@ -45,14 +45,12 @@ aws s3 cp drudock.phar s3://drudock --region=eu-west-2 --acl=public-read
 ~/dd env:init d8app_production --type D8 --dist Production --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_production && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d8app_production
 
-
 ~/dd env:init d7app_development --type D7 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_development && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d7app_development
 ~/dd env:init d7app_feature --type D7 --dist Feature --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_feature && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d7app_feature
 ~/dd env:init d7app_production --type D7 --dist Production --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_production && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d7app_production
-
 
 ## TESTS
 drudock env:init d8app_development --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_development && drudock build:init

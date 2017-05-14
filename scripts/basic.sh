@@ -20,7 +20,7 @@ echo -e "${GREEN}DEMO TEST${NC}"
 ./bin/drudock about
 
 ./bin/drudock --version
-./bin/drudock env:init travisapp --type D8 --dist Development --src New --apphost drudock.dev --services "UNISON,PHP,NGINX,MYSQL" && \
+./bin/drudock env:init travisapp --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && \
 cd travisapp && \
 ../bin/drudock build:init && \
 which docker && \

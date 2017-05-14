@@ -3,9 +3,7 @@ ports :
   - "8022:22"
 volumes :
   - ./config/php/ssmtp.conf:/etc/ssmtp/ssmtp.conf
-  - ../app/www/sites/default/files:/app/www/sites/default/files
-volumes_from:
-  - unison:rw
+  - ../app:/app:cached
 environment:
   XDEBUG_CONFIG: "remote_host=10.254.254.254"
   PHP_IDE_CONFIG: "serverName=drudock.dev"

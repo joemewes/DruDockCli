@@ -449,14 +449,6 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     if (isset($dist) && ($dist === self::DEVELOPMENT)) {
-
-      if (in_array('UNISON', $config['services'])) {
-        $command = 'until ' . $this->cta->getComposePath($appname, $this->io) .
-          'run unison 2>&1 | grep -m 1 -e "Synchronization complete" -e "finished propagating changes" ; do : ; done ;' .
-          'docker kill $(docker ps -q) 2>&1; ' . $this->cta->getComposePath($appname, $this->io) . 'up -d';
-        $this->app->runcommand($command, $this->io);
-      }
-
       $this->io->section("Docker ::: Build Development environment");
       $command = self::COMPOSE . $system_appname . self::COMPOSE_PROJECT . self::UP_CMD;
       $this->app->runcommand($command, $this->io);
