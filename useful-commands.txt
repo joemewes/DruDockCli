@@ -31,11 +31,8 @@ cd project_folder && drudock start && docker exec -i $(docker ps --format {{.Nam
 ## DRUPAL 8
 drudock drush -c "config-export sync --skip-modules=devel,devel_generate,webprofiler,kint -y"
 
-## BOX BUILD
-/usr/local/bin/box build -v
-
-## upload drudock.phar to S3
-aws s3 cp drudock.phar s3://drudock --region=eu-west-2 --acl=public-read
+## BOX BUILD && upload drudock.phar to S3
+/usr/local/bin/box build -v && aws s3 cp drudock.phar s3://drudock --region=eu-west-2 --acl=public-read
 
 ## DEV LOCAL TESTS
 ~/dd env:init d8app_development --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_development && ~/dd build:initcd
