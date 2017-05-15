@@ -40,7 +40,7 @@ class NginxMonitorCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T nginx tail -f /var/log/nginx/app-error.log 2>&1';
+      $command = $container_application->getComposePath($appname, $io) . 'logs -f nginx';
       $application->runcommand($command, $io);
     }
   }

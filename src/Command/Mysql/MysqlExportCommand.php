@@ -57,9 +57,8 @@ class MysqlExportCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io) && isset($savepath)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysqldump -u dev -pDEVPASSWORD dev_db > ' . $savepath;
+      $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysqldump -u drudock -pMYSQLPASS drudock_db > ' . $savepath;
       $application->runcommand($command, $io);
     }
   }
-
 }

@@ -64,17 +64,17 @@ class MysqlImportCommand extends Command {
 
         if ($container_application->checkForAppContainers($appname, $io)) {
 
-          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u dev -pDEVPASSWORD -Bse "drop database drudock_db;"';
+          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "drop database drudock_db;"';
           $application->runcommand($command, $io);
 
           // recreate dev_db
-          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u dev -pDEVPASSWORD -Bse "create database drudock_db;"';
+          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "create database drudock_db;"';
           $application->runcommand($command, $io);
 
           // import new .sql file
           // @todo resolve and update - https://github.com/docker/compose/issues/4290
-          // $command = $container_application->getComposePath($appname, $io) . 'exec -T db mysql -u dev -pDEVPASSWORD dev_db < ' . $importpath;
-          $command = 'docker exec -i $(docker ps --format {{.Names}} | grep mysql) mysql -u dev -pDEVPASSWORD drudock_db < ' . $importpath;
+          //$command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
+          $command = 'docker exec -i $(docker ps --format {{.Names}} | grep mysql) mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
           $application->runcommand($command, $io);
 
         }
