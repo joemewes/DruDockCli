@@ -23,7 +23,7 @@ class RestartCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('docker:restart')
+      ->setName('drudock:restart')
       ->setAliases(['restart'])
       ->setDescription('Restart current APP containers')
       ->setHelp("This command will restart all containers for the current APP via the docker-compose.yml file.");
