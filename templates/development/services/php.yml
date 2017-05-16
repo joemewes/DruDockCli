@@ -1,6 +1,6 @@
 image : 4alldigital/drudock-php:7.1
 ports :
-  - "8022:22"
+  - "22"
 volumes :
   - ./config/php/ssmtp.conf:/etc/ssmtp/ssmtp.conf
   - ../app:/app:cached
