@@ -23,7 +23,7 @@ class StopCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('docker:stop')
+      ->setName('drudock:stop')
       ->setAliases(['stop'])
       ->setDescription('Stop current APP containers')
       ->setHelp("Example : [drudock stop]");

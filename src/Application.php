@@ -152,6 +152,7 @@ class Application extends ParentApplication {
     $commands[] = new Command\AboutCommand();
     $commands[] = new Command\UpdateCommand();
     $commands[] = new Command\UpdateConfigCommand();
+    $commands[] = new Command\OpenAppCommand();
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();

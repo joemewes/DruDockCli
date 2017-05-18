@@ -20,7 +20,7 @@ use Docker\Drupal\Style\DruDockStyle;
 class StatusCommand extends Command {
   protected function configure() {
     $this
-      ->setName('docker:status')
+      ->setName('drudock:status')
       ->setAliases(['status'])
       ->setDescription('Get current status of all containers')
       ->setHelp("This command will output a quick status healthcheck of all running containers.");

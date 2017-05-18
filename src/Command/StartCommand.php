@@ -26,7 +26,7 @@ class StartCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('docker:start')
+      ->setName('drudock:start')
       ->setAliases(['start'])
       ->setDescription('Start current APP containers')
       ->setHelp("Example : [drudock start]");
