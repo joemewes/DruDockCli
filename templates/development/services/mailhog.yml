@@ -2,3 +2,5 @@ image : mailhog/mailhog
 ports :
   - "8025"
 hostname: mailhog
+networks:
+  - default

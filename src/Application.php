@@ -141,18 +141,19 @@ class Application extends ParentApplication {
       return $commands;
     }
 
-    $commands[] = new Command\InitCommand();
-    $commands[] = new Command\BuildCommand();
-    $commands[] = new Command\StopCommand();
-    $commands[] = new Command\StartCommand();
-    $commands[] = new Command\RestartCommand();
-    $commands[] = new Command\DestroyCommand();
-    $commands[] = new Command\StatusCommand();
-    $commands[] = new Command\ExecCommand();
-    $commands[] = new Command\AboutCommand();
-    $commands[] = new Command\UpdateCommand();
-    $commands[] = new Command\UpdateConfigCommand();
-    $commands[] = new Command\OpenAppCommand();
+    $commands[] = new Command\Drudock\InitCommand();
+    $commands[] = new Command\Drudock\BuildCommand();
+    $commands[] = new Command\Drudock\StopCommand();
+    $commands[] = new Command\Drudock\StartCommand();
+    $commands[] = new Command\Drudock\RestartCommand();
+    $commands[] = new Command\Drudock\DestroyCommand();
+    $commands[] = new Command\Drudock\StatusCommand();
+    $commands[] = new Command\Drudock\ExecCommand();
+    $commands[] = new Command\Drudock\AboutCommand();
+    $commands[] = new Command\Drudock\UpdateCommand();
+    $commands[] = new Command\Drudock\UpdateConfigCommand();
+    $commands[] = new Command\Drudock\OpenAppCommand();
+    $commands[] = new Command\Drudock\InitContainersCommand();
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();
@@ -162,6 +163,8 @@ class Application extends ParentApplication {
     $commands[] = new Command\Nginx\NginxReloadCommand();
     $commands[] = new Command\Nginx\NginxFlushPagespeedCommand();
     $commands[] = new Command\Nginx\NginxSetHostCommand();
+    $commands[] = new Command\Nginx\NginxProxyStartCommand();
+    $commands[] = new Command\Nginx\NginxProxyStopCommand();
 
     $commands[] = new Command\Drush\DrushCommand();
     $commands[] = new Command\Drush\DrushClearCacheCommand();

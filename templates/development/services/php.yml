@@ -14,3 +14,5 @@ dns:
 hostname: php
 extra_hosts:
  - "drudock.dev:10.254.254.254"
+networks:
+  - default
