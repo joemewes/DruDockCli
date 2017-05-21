@@ -41,7 +41,7 @@ class NginxProxyStopCommand extends Command {
     $container_application = new ApplicationContainerExtension();
     $io = new DruDockStyle($input, $output);
 
-    $io->section("Proxy ::: Start");
+    $io->section("Proxy ::: Stop");
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config[self::APPNAME];
