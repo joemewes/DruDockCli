@@ -5,3 +5,5 @@ volumes :
   - ./config/nginx:/etc/nginx/sites-enabled
   - ../app:/app:cached
 hostname: nginx
+networks:
+  - default

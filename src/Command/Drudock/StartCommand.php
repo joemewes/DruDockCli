@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command;
+namespace Docker\Drupal\Command\Drudock;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
@@ -26,7 +26,7 @@ class StartCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('docker:start')
+      ->setName('drudock:start')
       ->setAliases(['start'])
       ->setDescription('Start current APP containers')
       ->setHelp("Example : [drudock start]");
@@ -57,7 +57,7 @@ class StartCommand extends Command {
     if (exec("docker ps | grep docker | wc -l") > 0) {
 
       $helper = $this->getHelper('question');
-      $question = new ConfirmationQuestion('You have other containers running. Would you like to stop them? ', FALSE);
+      $question = new ConfirmationQuestion('You have other containers running. Would you like to stop them? [y/n]', FALSE);
 
       if ($helper->ask($input, $output, $question)) {
         $io->info(' ');

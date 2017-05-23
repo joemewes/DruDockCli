@@ -6,5 +6,4 @@ vendor/*
 .phpintel
 .phpintel/*
 
-.phar
-drudock.phar
+*.phar
