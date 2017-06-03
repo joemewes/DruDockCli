@@ -480,7 +480,7 @@ class BuildCommand extends ContainerAwareCommand {
       $this->app->runcommand($command, $this->io);
     }
 
-    // Production option specific build.
+    // UAT option specific build.
     if (isset($dist) && $dist == self::UAT) {
       $this->io->section("Docker ::: Build staging environment");
 
