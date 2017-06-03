@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command;
+namespace Docker\Drupal\Command\Drudock;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
@@ -18,14 +18,14 @@ use Docker\Drupal\Style\DruDockStyle;
  * Class DemoCommand
  * @package Docker\Drupal\Command
  */
-class UpdateCommand extends Command {
+class InitContainersCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('docker:update:containers')
-      ->setAliases(['up:ct'])
-      ->setDescription('Update APP containers')
-      ->setHelp("This command will update all containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
+      ->setName('drudock:init:containers')
+      ->setAliases(['init:ct'])
+      ->setDescription('Create APP containers')
+      ->setHelp("This command will create app containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -39,13 +39,14 @@ class UpdateCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-
-      $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
-      $application->runcommand($command, $io);
-
-      $command = $container_application->getComposePath($appname, $io) . ' up -d --force-recreate 2>&1';
-      $application->runcommand($command, $io);
+      $io->warning("Container for this app already exist.  Try `drudock up:ct`");
+      return;
     }
-  }
 
+    $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
+    $application->runcommand($command, $io);
+
+    $command = $container_application->getComposePath($appname, $io) . ' up -d --force-recreate 2>&1';
+    $application->runcommand($command, $io);
+  }
 }

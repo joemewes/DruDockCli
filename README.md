@@ -17,6 +17,7 @@ Install and setup Docker
   
 - Mac : https://www.docker.com/docker-mac : 
 [_download_](https://store.docker.com/editions/community/docker-ce-desktop-mac)
+  - NB: Currently limited to EDGE version for latest :cached performance gains. (https://download.docker.com/mac/edge/Docker.dmg)
 - Windows : https://www.docker.com/docker-windows
 [_download_](https://store.docker.com/editions/community/docker-ce-desktop-windows)
 - Linux
@@ -48,6 +49,15 @@ Install and setup Docker
   chmod +x /usr/local/bin/drudock && \
   drudock
   
+  ```
+  
+  ## DEV version
+  
+  ```
+  curl -O http://d1gem705zq3obi.cloudfront.net/drudock-beta.phar && \
+  mv drudock-beta.phar /usr/local/bin/drudock && \
+  chmod +x /usr/local/bin/drudock && \
+  drudock
   ```
 
 # Status

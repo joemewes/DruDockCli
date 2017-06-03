@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command;
+namespace Docker\Drupal\Command\Drudock;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
@@ -19,14 +19,14 @@ use Docker\Drupal\Style\DruDockStyle;
  *
  * @package Docker\Drupal\Command
  */
-class RestartCommand extends Command {
+class StopCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('docker:restart')
-      ->setAliases(['restart'])
-      ->setDescription('Restart current APP containers')
-      ->setHelp("This command will restart all containers for the current APP via the docker-compose.yml file.");
+      ->setName('drudock:stop')
+      ->setAliases(['stop'])
+      ->setDescription('Stop current APP containers')
+      ->setHelp("Example : [drudock stop]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -34,15 +34,18 @@ class RestartCommand extends Command {
     $container_application = new ApplicationContainerExtension();
 
     $io = new DruDockStyle($input, $output);
-    $io->section("RESTARTING CONTAINERS");
-
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
     }
+    else {
+      $appname = 'app';
+    }
+
+    $io->section("APP ::: Stopping " . $appname . " containers");
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . 'restart 2>&1';
+      $command = $container_application->getComposePath($appname, $io) . ' stop 2>&1';
       $application->runcommand($command, $io);
     }
   }

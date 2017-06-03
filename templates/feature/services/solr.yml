@@ -2,3 +2,5 @@ image : 4alldigital/drudock-solr:4.10.1
 ports :
   - "8983"
 hostname: solr
+networks:
+  - default

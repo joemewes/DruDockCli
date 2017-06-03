@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command;
+namespace Docker\Drupal\Command\Drudock;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
@@ -28,7 +28,7 @@ class UpdateConfigCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('docker:update:config')
+      ->setName('drudock:update:config')
       ->setAliases(['up:cg'])
       ->setDescription('Update APP config')
       ->setHelp('This command will update all .config.yaml to include current drudock config requirements.');

@@ -1,6 +1,6 @@
 image : 4alldigital/drudock-php:7.1
 ports :
-  - "8022:22"
+  - "22"
 volumes :
   - app-data:/app:ro
   - ../app/www/sites/default/files:/app/www/sites/default/files:rw

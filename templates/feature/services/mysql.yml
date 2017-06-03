@@ -12,3 +12,5 @@ environment:
 hostname: db
 healthcheck:
   test: "exit 0"
+networks:
+  - default
