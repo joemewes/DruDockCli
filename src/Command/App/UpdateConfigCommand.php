@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
@@ -13,9 +13,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DruDockStyle;
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-
 
 /**
  * Class UpdateConfigCommand
@@ -28,7 +25,7 @@ class UpdateConfigCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('drudock:update:config')
+      ->setName('app:update:config')
       ->setAliases(['up:cg'])
       ->setDescription('Update APP config')
       ->setHelp('This command will update all .config.yaml to include current drudock config requirements.');

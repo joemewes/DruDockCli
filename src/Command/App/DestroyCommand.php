@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
@@ -15,9 +15,8 @@ use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-
 /**
- * Class DemoCommand
+ * Class DestroyCommand
  *
  * @package Docker\Drupal\Command
  */

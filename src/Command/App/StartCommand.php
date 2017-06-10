@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
@@ -16,9 +16,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Filesystem\Filesystem;
 
-
 /**
- * Class DemoCommand
+ * Class StartCommand
  *
  * @package Docker\Drupal\Command
  */
@@ -26,7 +25,7 @@ class StartCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('drudock:start')
+      ->setName('app:start')
       ->setAliases(['start'])
       ->setDescription('Start current APP containers')
       ->setHelp("Example : [drudock start]");

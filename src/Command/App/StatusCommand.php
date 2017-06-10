@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
@@ -14,13 +14,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DemoCommand
+ * Class StatusCommand
  * @package Docker\Drupal\Command
  */
 class StatusCommand extends Command {
   protected function configure() {
     $this
-      ->setName('drudock:status')
+      ->setName('app:status')
       ->setAliases(['status'])
       ->setDescription('Get current status of all containers')
       ->setHelp("This command will output a quick status healthcheck of all running containers.");
