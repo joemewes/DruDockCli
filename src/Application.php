@@ -29,7 +29,7 @@ class Application extends ParentApplication {
 
   const NAME = 'Docker Drupal';
 
-  const VERSION = '1.4-alpha1.0.3';
+  const VERSION = '1.4-alpha1.0.4';
 
   // const CDN = 'http://d1gem705zq3obi.cloudfront.net';.
   const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
