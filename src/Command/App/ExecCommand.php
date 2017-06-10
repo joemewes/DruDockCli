@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Question\Question;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DemoCommand
+ * Class ExecCommand
  *
  * @package Docker\Drupal\Command
  */
@@ -26,7 +26,7 @@ class ExecCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('drudock:exec')
+      ->setName('app:exec')
       ->setAliases(['exec'])
       ->setDescription('Execute bespoke commands at :container')
       ->setHelp("This command will run command inside specified container")

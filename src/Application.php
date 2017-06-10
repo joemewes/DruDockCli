@@ -141,19 +141,19 @@ class Application extends ParentApplication {
       return $commands;
     }
 
-    $commands[] = new Command\Drudock\InitCommand();
-    $commands[] = new Command\Drudock\BuildCommand();
-    $commands[] = new Command\Drudock\StopCommand();
-    $commands[] = new Command\Drudock\StartCommand();
-    $commands[] = new Command\Drudock\RestartCommand();
-    $commands[] = new Command\Drudock\DestroyCommand();
-    $commands[] = new Command\Drudock\StatusCommand();
-    $commands[] = new Command\Drudock\ExecCommand();
-    $commands[] = new Command\Drudock\AboutCommand();
-    $commands[] = new Command\Drudock\UpdateCommand();
-    $commands[] = new Command\Drudock\UpdateConfigCommand();
-    $commands[] = new Command\Drudock\OpenAppCommand();
-    $commands[] = new Command\Drudock\InitContainersCommand();
+    $commands[] = new Command\App\InitCommand();
+    $commands[] = new Command\App\BuildCommand();
+    $commands[] = new Command\App\StopCommand();
+    $commands[] = new Command\App\StartCommand();
+    $commands[] = new Command\App\RestartCommand();
+    $commands[] = new Command\App\DestroyCommand();
+    $commands[] = new Command\App\StatusCommand();
+    $commands[] = new Command\App\ExecCommand();
+    $commands[] = new Command\App\AboutCommand();
+    $commands[] = new Command\App\UpdateCommand();
+    $commands[] = new Command\App\UpdateConfigCommand();
+    $commands[] = new Command\App\OpenAppCommand();
+    $commands[] = new Command\App\InitContainersCommand();
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();

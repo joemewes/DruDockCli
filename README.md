@@ -64,62 +64,56 @@ Install and setup Docker
 ## Initial Commands structure
 ```
      Available commands:
-       about                     About DruDock
-       destroy                   Disable and delete APP and containers
-       env                       Fetch and build DruDock containers
-       exec                      Execute bespoke commands at :container
-       help                      Displays help for a command
-       init                      Fetch and build Drupal apps
-       list                      Lists commands
-       restart                   Restart current APP containers
-       start                     Start current APP containers
-       status                    Get current status of all containers
-       stop                      Stop current APP containers
+       help                   Displays help for a command
+       list                   Lists commands
+      app
+       app:exec               [exec] Execute bespoke commands at :container
+       app:init:containers    [init:ct] Create APP containers
+       app:open               [open] Open APP in default browser.
+       app:restart            [restart] Restart current APP containers
+       app:start              [start] Start current APP containers
+       app:status             [status] Get current status of all containers
+       app:stop               [stop] Stop current APP containers
+       app:update:config      [up:cg] Update APP config
+       app:update:containers  [up:ct] Update APP containers
       behat
-       behat:cmd                 Run behat commands
-       behat:monitor             Launch behat VNC viewer
-       behat:status              Runs example command against running APP and current config
+       behat:cmd              Run behat commands
+       behat:monitor          Launch behat VNC viewer
+       behat:status           Runs example command against running APP and current config
       build
-       build:destroy             Disable and delete APP and containers
-       build:init                Fetch and build Drupal apps
-      docker
-       docker:exec               Execute bespoke commands at :container
-       docker:restart            Restart current APP containers
-       docker:start              Start current APP containers
-       docker:status             Get current status of all containers
-       docker:stop               Stop current APP containers
-       docker:update:config      Update APP config
-       docker:update:containers  Update APP containers
+       build:destroy          [destroy] Disable and delete APP and containers
+       build:init             [init] Fetch and build Drupal apps
       drush
-       drush:cc                  Run drush cache clear 
-       drush:cmd                 Run drush commands 
-       drush:dis                 Disable/Uninstall Drupal module
-       drush:en                  Enable Drupal module
-       drush:init:config         Run drush config init
-       drush:uli                 Run Drush ULI
-       drush:updb                Run Drush updb
+       drush:cc               Run drush cache clear 
+       drush:cmd              Run drush commands 
+       drush:dis              Disable/Uninstall Drupal module
+       drush:en               Enable Drupal module
+       drush:init:config      Run drush config init
+       drush:uli              Run Drush ULI
+       drush:updb             Run Drush updb
       env
-       env:init                  Fetch and build DruDock containers
+       env:init               Fetch and build DruDock containers
+      init
       mysql
-       mysql:export              Export .sql files
-       mysql:import              Import .sql files
-       mysql:log                 Monitor mysql activity
+       mysql:export           Export .sql files
+       mysql:import           Import .sql files
+       mysql:log              Monitor mysql activity
       nginx
-       nginx:addhost             Add nginx host to DD and host OS
-       nginx:flush               Flush nginx cache
-       nginx:log                 Monitor nginx activity
-       nginx:reload              Reload nginx activity
+       nginx:flush            Flush nginx cache
+       nginx:log              Monitor nginx activity
+       nginx:proxy:start      Start nginx proxy
+       nginx:proxy:stop       Stop nginx proxy
+       nginx:reload           Reload nginx activity
+       nginx:sethost          Add nginx host to DD and host OS
       prod
-       prod:update               Rebuild app and deploy latest code into app containers
+       prod:update            Rebuild app and deploy latest code into app containers
       redis
-       redis:flush               Flush Redis cache
-       redis:info                Get Redis running config information
-       redis:monitor             Montitor redis activity
-       redis:ping                Ping Redis
+       redis:flush            Flush Redis cache
+       redis:info             Get Redis running config information
+       redis:monitor          Montitor redis activity
+       redis:ping             Ping Redis
       self
-       self:about                About DruDock
-      sync
-       sync:monitor              Montitor current App sync activity
+       self:about             [about] About DruDock
       up
        up:cg                     Update APP config
        up:ct                     Update APP containers

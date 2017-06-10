@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
@@ -190,7 +190,7 @@ class BuildCommand extends ContainerAwareCommand {
     if (isset($appsrc) && $appsrc == 'Git' && !$this->fs->exists($app_dest)) {
       $command = 'git clone ' . $apprepo . ' app';
       $this->app->runcommand($command, $this->io);
-      $this->io->info('Downloading app from repo.... This may take a few minutes....');
+      $this->io->info('Downloading app from repo... This may take a few minutes...');
       $this->io->info(' ');
       $this->io->title("SET APP DOCROOT");
       $helper = $this->getHelper('question');

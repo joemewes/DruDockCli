@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use const Docker\Drupal\Extension\PRODUCTION;
@@ -17,11 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Yaml\Yaml;
-use Alchemy\Zippy\Zippy;
-use GuzzleHttp\Client;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
-use Docker\Drupal\Extension\ApplicationContainerExtension;
-
 
 /**
  * Define constants

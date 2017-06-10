@@ -5,7 +5,7 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drudock;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DemoCommand
+ * Class AboutCommand
  *
  * @package Docker\Drupal\Command
  */
@@ -31,7 +31,6 @@ class AboutCommand extends Command {
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = new Application();
     $io = new DruDockStyle($input, $output);
-
 
     if ($dockerversion = $application->getDockerVersion()) {
       $dv = $dockerversion;
@@ -71,17 +70,18 @@ class AboutCommand extends Command {
 
     $io->simple('BUILD DRUPAL 8 APP');
     $io->info(' ');
-    $io->info('     drudock env my-app --type D8 --dist Basic --appsrc New --apphost drudock.dev');
+    $io->info('     drudock env:init my-app --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL"');
     $io->info(' ');
 
-    $io->simple('BUILD DRUPAL 7 APP WITH FULL SELENIUM/BEHAT TEST SUITE');
+
+    $io->simple('BUILD DRUPAL 7 APP');
     $io->info(' ');
-    $io->info('     drudock env my-app --type D7 --dist Basic --appsrc New --apphost drudock.dev');
+    $io->info('     drudock env:init my-app --type D7 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL"');
     $io->info(' ');
 
     $io->simple('AVAILABLE COMMANDS');
     $io->info(' ');
-    $io->info('drudock list');
+    $io->info('     drudock list');
     $io->info(' ');
 
   }

@@ -47,7 +47,7 @@ class MysqlImportCommand extends Command {
 
     $io->warning("Dropping the database is potentially a very bad thing to do.\nAny data stored in the database will be destroyed.");
 
-    $question = new ConfirmationQuestion('Do you really want to drop the \'dev_db\' database [y/N] : ', FALSE);
+    $question = new ConfirmationQuestion('Do you really want to drop the \'drudock_db\' database [y/N] : ', FALSE);
     if (!$helper->ask($input, $output, $question)) {
       return;
     }
