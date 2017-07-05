@@ -15,9 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DemoCommand
+ * Class DrushRegistryRebuildCommand
  *
- * @package Docker\Drupal\Command
+ * @package \Docker\Drupal\Command\DrushRegistryRebuildCommand
  */
 class DrushRegistryRebuildCommand extends Command
 {
