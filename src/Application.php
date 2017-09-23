@@ -341,8 +341,8 @@ class Application extends ParentApplication {
 
     index index.php index.html;
     server_name ' . $apphost . ';
-    error_log  /var/log/nginx/app-error.log;
-    access_log /var/log/nginx/app-access.log;
+    error_log  /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log;
     root /app/www;
 
     ## GENERIC
@@ -416,7 +416,6 @@ class Application extends ParentApplication {
         fastcgi_intercept_errors on;
         fastcgi_hide_header \'X-Drupal-Cache\';
         fastcgi_hide_header \'X-Generator\';
-
     }
 
     location @rewrite {
