@@ -72,4 +72,15 @@ class DruDockStyle extends SymfonyStyle
             $this->write($message);
         }
     }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function section($message)
+  {
+    // If we do not have the clean-output flag prevent outputting the sections.
+    if (false === $this->input->hasParameterOption(array('--clean-output', '-co'), true)) {
+      parent::section($message);
+    }
+  }
 }
