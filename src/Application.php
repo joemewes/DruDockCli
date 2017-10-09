@@ -122,6 +122,7 @@ class Application extends ParentApplication {
         new InputArgument('command', InputArgument::REQUIRED),
         new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display this help message'),
         new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Do not output any message'),
+        new InputOption('--clean-output', '-co', InputOption::VALUE_NONE, 'Clean output without section labels'),
         new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages'),
         new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version'),
         new InputOption('--ansi', '', InputOption::VALUE_NONE, 'Force ANSI output'),
