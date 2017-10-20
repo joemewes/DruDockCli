@@ -7,3 +7,4 @@ vendor/*
 .phpintel/*
 
 *.phar
+.DS_Store
