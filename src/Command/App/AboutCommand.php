@@ -70,13 +70,13 @@ class AboutCommand extends Command {
 
     $io->simple('BUILD DRUPAL 8 APP');
     $io->info(' ');
-    $io->info('     drudock env:init my-app --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL"');
+    $io->info('     drudock env:init my-app --type D8 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"');
     $io->info(' ');
 
 
     $io->simple('BUILD DRUPAL 7 APP');
     $io->info(' ');
-    $io->info('     drudock env:init my-app --type D7 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL"');
+    $io->info('     drudock env:init my-app --type D7 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"');
     $io->info(' ');
 
     $io->simple('AVAILABLE COMMANDS');

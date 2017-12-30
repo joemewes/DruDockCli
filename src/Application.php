@@ -333,7 +333,7 @@ class Application extends ParentApplication {
     }
 
     if (!isset($apphost)) {
-      $apphost = 'drudock.dev';
+      $apphost = 'drudock.localhost';
     }
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -447,7 +447,7 @@ VIRTUAL_NETWORK=nginx-proxy";
         file_put_contents('./' . PATH_PREFIX . $system_appname . '/nginx.env', $nginxenv);
         break;
       default:
-        file_put_contents('./' . PATH_PREFIX . $system_appname . '/config/nginx/drudock.dev', $nginxconfig);
+        file_put_contents('./' . PATH_PREFIX . $system_appname . '/config/nginx/drudock.localhost', $nginxconfig);
     }
   }
 
@@ -531,7 +531,7 @@ VIRTUAL_NETWORK=nginx-proxy";
     $this->cfa = new ApplicationConfigExtension();
     $system_appname = strtolower(str_replace(' ', '', $appname));
     $nginx_port = $this->cfa->containerPort($system_appname, 'nginx', '80');
-    $command = 'curl  http://drudock.dev:' . $nginx_port . ' > /tmp/' . $system_appname . '.html';
+    $command = 'curl  http://drudock.localhost:' . $nginx_port . ' > /tmp/' . $system_appname . '.html';
     shell_exec($command);
   }
 }

@@ -232,7 +232,7 @@ class ApplicationConfigExtension extends Application {
       $io->info(' ');
       $io->title("SET APP HOSTNAME");
       $helper = $cmd->getHelper(QUESTION);
-      $question = new Question('Enter preferred app hostname [drudock.dev] : ', 'drudock.dev');
+      $question = new Question('Enter preferred app hostname [drudock.localhost] : ', 'drudock.localhost');
       $apphost = $helper->ask($input, $output, $question);
     }
     return $apphost;
@@ -372,7 +372,7 @@ class ApplicationConfigExtension extends Application {
       $system_appname = strtolower(str_replace(' ', '', $appname));
     }
     else {
-      $apphost = 'drudock.dev';
+      $apphost = 'drudock.localhost';
     }
 
     $hosts_file = '/etc/hosts';

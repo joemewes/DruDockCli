@@ -49,7 +49,7 @@ class NginxSetHostCommand extends Command {
     $system_appname = isset($appname) ? strtolower(str_replace(' ', '', $appname)) : 'app';
 
     if (!isset($apphost)) {
-      $apphost = 'drudock.dev';
+      $apphost = 'drudock.localhost';
     }
 
     $currenthost = $apphost;

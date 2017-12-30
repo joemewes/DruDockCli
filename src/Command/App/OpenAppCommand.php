@@ -49,7 +49,7 @@ class OpenAppCommand extends Command {
     }
     else {
       $appname = 'app';
-      $host = 'drudock.dev';
+      $host = 'drudock.localhost';
     }
 
     $io->section("APP ::: Opening " . $appname);

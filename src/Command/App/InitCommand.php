@@ -52,7 +52,7 @@ class InitCommand extends ContainerAwareCommand {
       ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Development,Feature]')
       ->addOption('src', 'g', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('git', 'gs', InputOption::VALUE_OPTIONAL, 'Git repository URL')
-      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [drudock.dev]')
+      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [drudock.localhost]')
       ->addOption('services', 's', InputOption::VALUE_OPTIONAL, 'Select app services [PHP, NGINX, MYSQL, SOLR, REDIS, MAILHOG]');
   }
 
@@ -125,7 +125,7 @@ class InitCommand extends ContainerAwareCommand {
       $io->info(' ');
       $io->info($message);
       $io->info(' ');
-      $this->cfa->setHostConfig('drudock.dev', $io, $system_appname);
+      $this->cfa->setHostConfig('drudock.localhost', $io, $system_appname);
     }
 
     $message = 'Fetching DruDock v' . $application->getVersion();
