@@ -29,10 +29,11 @@ class Application extends ParentApplication {
 
   const NAME = 'Docker Drupal';
 
-  const VERSION = '1.4-alpha1.0.4';
+  const VERSION = '1.4-alpha1.0.6';
 
-  // const CDN = 'http://d1gem705zq3obi.cloudfront.net';.
-  const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
+  const CDN = 'http://d1gem705zq3obi.cloudfront.net';
+
+  // const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
 
   protected $cfa;
 
@@ -308,7 +309,7 @@ class Application extends ParentApplication {
     $process->run(function ($type, $buffer) {
       global $output;
       if ($output) {
-        $type = null;
+        $type = NULL;
         $output->info($buffer);
       }
     });
@@ -523,12 +524,13 @@ VIRTUAL_NETWORK=nginx-proxy";
 
   /**
    * RUn tests and save artifacts.
+   *
    * @param $appname
    */
-  public function runTest($appname){
+  public function runTest($appname) {
     $this->cfa = new ApplicationConfigExtension();
     $system_appname = strtolower(str_replace(' ', '', $appname));
-    $nginx_port = $this->cfa->containerPort($system_appname,'nginx', '80');
+    $nginx_port = $this->cfa->containerPort($system_appname, 'nginx', '80');
     $command = 'curl  http://drudock.dev:' . $nginx_port . ' > /tmp/' . $system_appname . '.html';
     shell_exec($command);
   }
