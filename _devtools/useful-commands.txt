@@ -18,8 +18,8 @@ docker stop $(docker ps -q)
 docker exec -it $(docker ps --format {{.Names}} | grep php) bash
 
 # multisite drush -> args :multi
-docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://drudock.dev uli 1
-drudock drush:cmd -c " -l http://drudock.dev uli" -> ADAPT into shortcut ??
+docker exec -i $(docker ps --format {{.Names}} | grep php) drush -l http://drudock.localhost uli 1
+drudock drush:cmd -c " -l http://drudock.localhost uli" -> ADAPT into shortcut ??
 
 
 # SCREEN into HYVE
@@ -35,29 +35,29 @@ drudock drush -c "config-export sync --skip-modules=devel,devel_generate,webprof
 /usr/local/bin/box build -v && aws s3 cp drudock.phar s3://drudock --region=eu-west-2 --acl=public-read
 
 ## DEV LOCAL TESTS
-~/dd env:init d8app_development --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_development && ~/dd build:init
+~/dd env:init d8app_development --type D8 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d8app_development && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d8app_development
-~/dd env:init d8app_feature --type D8 --dist Feature --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_feature && ~/dd build:init
+~/dd env:init d8app_feature --type D8 --dist Feature --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d8app_feature && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d8app_feature
-~/dd env:init d8app_production --type D8 --dist Production --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_production && ~/dd build:init
+~/dd env:init d8app_production --type D8 --dist Production --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d8app_production && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d8app_production
 
-~/dd env:init d7app_development --type D7 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_development && ~/dd build:init
+~/dd env:init d7app_development --type D7 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d7app_development && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d7app_development
-~/dd env:init d7app_feature --type D7 --dist Feature --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_feature && ~/dd build:init
+~/dd env:init d7app_feature --type D7 --dist Feature --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d7app_feature && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d7app_feature
-~/dd env:init d7app_production --type D7 --dist Production --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_production && ~/dd build:init
+~/dd env:init d7app_production --type D7 --dist Production --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d7app_production && ~/dd build:init
 ~/dd build:destroy --no-interaction && cd ../ && sudo rm -R d7app_production
 
-~/dd env:init defaultapp_development --type DEFAULT --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd defaultapp_development && ~/dd build:init
+~/dd env:init defaultapp_development --type DEFAULT --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd defaultapp_development && ~/dd build:init
 
 
 ## TESTS
-drudock env:init drudock_d8app_development --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_development && drudock build:init
-drudock env:init drudock_d8app_feature --type D8 --dist Feature --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_feature && drudock build:init
-drudock env:init drudock_d8app_production --type D8 --dist Production --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d8app_production && drudock build:init
+drudock env:init drudock_d8app_development --type D8 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d8app_development && drudock build:init
+drudock env:init drudock_d8app_feature --type D8 --dist Feature --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d8app_feature && drudock build:init
+drudock env:init drudock_d8app_production --type D8 --dist Production --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d8app_production && drudock build:init
 
-drudock env:init drudock_d7app_development --type D7 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_development && drudock build:init
-drudock env:init drudock_d7app_feature --type D7 --dist Feature --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_feature && drudock build:init
-drudock env:init drudock_d7app_production --type D7 --dist Production --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && cd d7app_production && drudock build:init
+drudock env:init drudock_d7app_development --type D7 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d7app_development && drudock build:init
+drudock env:init drudock_d7app_feature --type D7 --dist Feature --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d7app_feature && drudock build:init
+drudock env:init drudock_d7app_production --type D7 --dist Production --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && cd d7app_production && drudock build:init
 

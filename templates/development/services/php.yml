@@ -7,13 +7,13 @@ volumes :
   - ../app:/app:cached
 environment:
   XDEBUG_CONFIG: "remote_host=10.254.254.254"
-  PHP_IDE_CONFIG: "serverName=drudock.dev"
+  PHP_IDE_CONFIG: "serverName=drudock.localhost"
   HOST_IP: "10.254.254.254"
 dns:
   - 8.8.8.8
   - 8.8.4.4
 hostname: php
 extra_hosts:
- - "drudock.dev:10.254.254.254"
+ - "drudock.localhost:10.254.254.254"
 networks:
   - default
