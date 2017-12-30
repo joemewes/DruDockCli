@@ -48,15 +48,7 @@ class NginxProxyStartCommand extends Command {
       $apptype = $config[self::DIST];
     }
 
-    $command = 'docker network ls | grep drudock-frontend 2>&1 ';
-    if (shell_exec($command)) {
-      $io->info("FRONTEND network exists.");
-    }
-    else {
-      $io->info("Creating frontend network.");
-      $command = 'docker network create drudock-frontend';
-      $application->runcommand($command, $io);
-    }
+    $container_application->createProxyNetwork($io);
 
     if ($container_application->checkForAppContainers($appname, $io)) {
 

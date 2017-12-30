@@ -43,6 +43,8 @@ class InitContainersCommand extends Command {
       return;
     }
 
+    $container_application->createProxyNetwork($io);
+
     $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
     $application->runcommand($command, $io);
 
