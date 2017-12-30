@@ -23,7 +23,7 @@ class DrushUpDbCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:updb')
-      ->setAliases('dudb')
+      ->setAliases(['dudb'])
       ->setDescription('Run Drush updb')
       ->setHelp("This command will run all pending database updates for the current Drupal app.");
   }
