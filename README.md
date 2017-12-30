@@ -50,15 +50,6 @@ Install and setup Docker
   drudock
   
   ```
-  
-  ## DEV version
-  
-  ```
-  curl -O http://d1gem705zq3obi.cloudfront.net/drudock-beta.phar && \
-  mv drudock-beta.phar /usr/local/bin/drudock && \
-  chmod +x /usr/local/bin/drudock && \
-  drudock
-  ```
 
 # Status
 ## Initial Commands structure
