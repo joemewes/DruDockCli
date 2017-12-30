@@ -44,10 +44,11 @@ class InitCommand extends ContainerAwareCommand {
 
   protected function configure() {
     $this
-      ->setName('env:init')
+      ->setName('app:init')
+      ->setAliases(['ai'])
       ->setDescription('Fetch and build DruDock containers')
       ->setHelp('This command will fetch the specified DruDock config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
-      ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
+      ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
       ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Development,Feature]')
       ->addOption('src', 'g', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
@@ -119,8 +120,7 @@ class InitCommand extends ContainerAwareCommand {
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
 
-    if ($application->getOs() == 'Darwin' && isset($appname)) {
-
+    if ($application->getOs() == 'Darwin' && isset($appname) && !file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
       $message = "If prompted, please type admin password to add app localhost details \n and COPY ifconfig alias.plist to /Library/LaunchDaemons/";
       $io->info(' ');
       $io->info($message);
@@ -145,6 +145,7 @@ class InitCommand extends ContainerAwareCommand {
    * @param $application
    * @param $io
    * @param $appname
+   * @param $config
    */
   private function getDruDock($application, $io, $appname, $config) {
 

@@ -31,7 +31,7 @@ class OpenAppCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:open')
-      ->setAliases(['open'])
+      ->setAliases(['ao'])
       ->setDescription('Open APP in default browser.')
       ->setHelp("Example : [drudock open]");
   }

@@ -21,7 +21,7 @@ class StatusCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:status')
-      ->setAliases(['status'])
+      ->setAliases(['as'])
       ->setDescription('Get current status of all containers')
       ->setHelp("This command will output a quick status healthcheck of all running containers.");
   }

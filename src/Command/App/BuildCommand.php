@@ -118,9 +118,9 @@ class BuildCommand extends ContainerAwareCommand {
 
   protected function configure() {
     $this
-      ->setName('build:init')
-      ->setAliases(['init'])
-      ->setDescription('Fetch and build Drupal apps')
+      ->setName('app:build')
+      ->setAliases(['ab'])
+      ->setDescription('Fetch and build App containers and resources.')
       ->setHelp('This command will fetch and build Drupal apps')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]');
   }
@@ -424,8 +424,6 @@ class BuildCommand extends ContainerAwareCommand {
 
     $message = 'Run Drupal Installation.... This may take a few minutes....';
     $this->io->note($message);
-    //$system_appname = strtolower(str_replace(' ', '', $appname));
-    //$port = $this->cfa->containerPort($system_appname, 'mysql', '3306', FALSE);
     $command = $this->cta->getComposePath($appname, $this->io) . 'exec -T php ' .
       '/usr/bin/env PHP_OPTIONS="-d sendmail_path=/bin/true" ' .
       'drush site-install standard --account-name=admin --account-pass=password --site-name=DruDock --site-mail=admin@drudock.localhost ' .

@@ -144,6 +144,7 @@ class Application extends ParentApplication {
     }
 
     $commands[] = new Command\App\InitCommand();
+    $commands[] = new Command\App\InitBuildCommand();
     $commands[] = new Command\App\BuildCommand();
     $commands[] = new Command\App\StopCommand();
     $commands[] = new Command\App\StartCommand();

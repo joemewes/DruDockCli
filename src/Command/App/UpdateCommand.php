@@ -23,7 +23,7 @@ class UpdateCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:update:containers')
-      ->setAliases(['up:ct'])
+      ->setAliases(['auct'])
       ->setDescription('Update APP containers')
       ->setHelp("This command will update all containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
   }

@@ -115,21 +115,21 @@ Install and setup Docker
 ## Example Commands
 ```
       --------------
-      :$ drudock env:init defaultapp --type DEFAULT --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"
+      :$ drudock env:init --appname defaultapp --type DEFAULT --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"
       :$ cd my-great-app && drudock build:init
       --------------
 ```    
 #### DEV Drupal 8  
 ```
       --------------
-      :$ drudock env:init defaultapp --type D8 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"
+      :$ drudock env:init --appname defaultapp --type D8 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"
       :$ cd my-drupal8-site && drudock build:init
       --------------
 ```   
 #### DEV Drupal 7
 ```
       --------------
-      :$ drudock env:init defaultapp --type D7 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"
+      :$ drudock env:init --appname defaultapp --type D7 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"
       :$ cd my-drupal7-site && drudock build:init
       --------------
 ```

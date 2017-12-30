@@ -67,7 +67,11 @@ class ApplicationConfigExtension extends Application {
    * @return mixed
    */
   public function getSetAppname($io, $input, $output, $cmd) {
-    $appname = $input->getArgument(APPNAME);
+    $options = $input->getOptions();
+    if (array_key_exists('dist', $options)) {
+      $appname = $input->getOption('appname');
+    }
+
     $date = date(DATE_FORMAT);
     if (!isset($appname)) {
       $io->title("SET APP NAME");
@@ -363,36 +367,35 @@ class ApplicationConfigExtension extends Application {
   public function setHostConfig($newhost, $io, $sys_appname) {
     // Add initial entry to hosts file.
     // @TODO update as command for Windows too.
-
-    $ip = LOCALHOST;
-
-    if ($config = $this->getAppConfig($io, $sys_appname)) {
-      $apphost = $config['host'];
-      $appname = $config[APPNAME];
-      $system_appname = strtolower(str_replace(' ', '', $appname));
-    }
-    else {
-      $apphost = 'drudock.localhost';
-    }
-
-    $hosts_file = '/etc/hosts';
-    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
-    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
-    $hosts_file_contents = file_get_contents($hosts_file);
-
-    if (!strpos($hosts_file_contents, $app_host_config)) {
-      // Add new.
-      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
-      $this->runcommand($command, $io, TRUE);
-    }
-    else {
-      if ($app_host_config !== $new_host_config) {
-        // Replace existing.
-        $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
-        $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
-        exec($command);
-      }
-    }
+    //    $ip = LOCALHOST;
+    //
+    //    if ($config = $this->getAppConfig($io, $sys_appname)) {
+    //      $apphost = $config['host'];
+    //      $appname = $config[APPNAME];
+    //      $system_appname = strtolower(str_replace(' ', '', $appname));
+    //    }
+    //    else {
+    //      $apphost = 'drudock.localhost';
+    //    }
+    //
+    //    $hosts_file = '/etc/hosts';
+    //    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
+    //    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
+    //    $hosts_file_contents = file_get_contents($hosts_file);
+    //
+    //    if (!strpos($hosts_file_contents, $app_host_config)) {
+    //      // Add new.
+    //      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
+    //      $this->runcommand($command, $io, TRUE);
+    //    }
+    //    else {
+    //      if ($app_host_config !== $new_host_config) {
+    //        // Replace existing.
+    //        $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
+    //        $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
+    //        exec($command);
+    //      }
+    //    }
 
     if (!file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
       $this->tmpRemoteBundle('osx');

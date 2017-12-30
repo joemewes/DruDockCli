@@ -23,7 +23,7 @@ class InitContainersCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:init:containers')
-      ->setAliases(['init:ct'])
+      ->setAliases(['aic'])
       ->setDescription('Create APP containers')
       ->setHelp("This command will create app containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
   }
