@@ -25,7 +25,7 @@ class DrushModuleEnableCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:en')
-      ->setAlias('de')
+      ->setAliases('de')
       ->setDescription('Enable Drupal module')
       ->setHelp("This command will enable Drupal module. [drudock drush:en myModule]")
       ->addArgument('modulename', InputArgument::OPTIONAL, 'Specify NAME of module');

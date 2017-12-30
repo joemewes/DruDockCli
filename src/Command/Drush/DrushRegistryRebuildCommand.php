@@ -32,7 +32,7 @@ class DrushRegistryRebuildCommand extends Command
   {
     $this
         ->setName('drush:rr')
-        ->setAlias('drr')
+        ->setAliases('drr')
         ->setDescription('Run drush registry rebuild')
         ->setHelp("This command will rebuild the Drupal APP registry.");
   }

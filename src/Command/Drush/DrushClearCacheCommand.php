@@ -24,7 +24,7 @@ class DrushClearCacheCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:cc')
-      ->setAlias('dcc')
+      ->setAliases('dcc')
       ->setDescription('Run drush cache clear ')
       ->setHelp("This command will clear Drupal APP caches.");
   }
