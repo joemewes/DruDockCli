@@ -25,6 +25,7 @@ class DrushModuleDisableCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:dis')
+      ->setAlias('dd')
       ->setDescription('Disable/Uninstall Drupal module')
       ->setHelp("This command will disable (D7) or uninstall (D8) Drupal  contrib modules. [drudock drush:dis myModule]")
       ->addArgument('modulename', InputArgument::OPTIONAL, 'Specify NAME of module');

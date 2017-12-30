@@ -27,6 +27,7 @@ class DrushInitConfigCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:init:config')
+      ->setAlias('dicg')
       ->setDescription('Run drush config init')
       ->setHelp("This command will force import existing config into fresh installation.");
   }

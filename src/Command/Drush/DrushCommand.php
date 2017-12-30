@@ -26,6 +26,7 @@ class DrushCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:cmd')
+      ->setAlias('dc')
       ->setDescription('Run drush commands ')
       ->setHelp("This command will execute Drush commands directly against your Drupal APP.")
       ->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');

@@ -24,6 +24,7 @@ class DrushLoginCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:uli')
+      ->setAlias('duli')
       ->setDescription('Run Drush ULI')
       ->setHelp("This command will output a login URL.");
   }
