@@ -34,10 +34,6 @@ Install and setup Docker
   
 ### DOCS - @TODO
   Read more - http://drudockcli.readthedocs.io/en/latest/
-  
-### Example experience
-   - video 1 (Installation and setup) - https://www.youtube.com/watch?v=XfmN47xdrgY
-   - video 2 (Initialise Drupal7 Env && App) - https://www.youtube.com/watch?v=FoDeyEPEhiY
    
 ### Install via .phar
   - Install DruDock globally.
@@ -54,60 +50,56 @@ Install and setup Docker
 # Status
 ## Initial Commands structure
 ```
-     Available commands:
-       help                   Displays help for a command
-       list                   Lists commands
-      app
-       app:exec               [exec] Execute bespoke commands at :container
-       app:init:containers    [init:ct] Create APP containers
-       app:open               [open] Open APP in default browser.
-       app:restart            [restart] Restart current APP containers
-       app:start              [start] Start current APP containers
-       app:status             [status] Get current status of all containers
-       app:stop               [stop] Stop current APP containers
-       app:update:config      [up:cg] Update APP config
-       app:update:containers  [up:ct] Update APP containers
-      behat
-       behat:cmd              Run behat commands
-       behat:monitor          Launch behat VNC viewer
-       behat:status           Runs example command against running APP and current config
-      build
-       build:destroy          [destroy] Disable and delete APP and containers
-       build:init             [init] Fetch and build Drupal apps
-      drush
-       drush:cc               Run drush cache clear 
-       drush:cmd              Run drush commands 
-       drush:dis              Disable/Uninstall Drupal module
-       drush:en               Enable Drupal module
-       drush:init:config      Run drush config init
-       drush:uli              Run Drush ULI
-       drush:updb             Run Drush updb
-      env
-       env:init               Fetch and build DruDock containers
-      init
-      mysql
-       mysql:export           Export .sql files
-       mysql:import           Import .sql files
-       mysql:log              Monitor mysql activity
-      nginx
-       nginx:flush            Flush nginx cache
-       nginx:log              Monitor nginx activity
-       nginx:proxy:start      Start nginx proxy
-       nginx:proxy:stop       Stop nginx proxy
-       nginx:reload           Reload nginx activity
-       nginx:sethost          Add nginx host to DD and host OS
-      prod
-       prod:update            Rebuild app and deploy latest code into app containers
-      redis
-       redis:flush            Flush Redis cache
-       redis:info             Get Redis running config information
-       redis:monitor          Montitor redis activity
-       redis:ping             Ping Redis
-      self
-       self:about             [about] About DruDock
-      up
-       up:cg                     Update APP config
-       up:ct                     Update APP containers
+  Available commands:
+    help                   Displays help for a command
+    list                   Lists commands
+   app
+    app:build              [ab] Fetch and build App containers and resources.
+    app:destroy            [ad] Disable and delete APP and containers
+    app:exec               [ae] Execute bespoke commands at :container
+    app:init               [ai] Fetch and build DruDock containers
+    app:init:build         [aib] Initialize environment and run build.
+    app:init:containers    [aic] Create APP containers
+    app:open               [ao] Open APP in default browser.
+    app:restart            [ar] Restart current APP containers
+    app:start              [start] Start current APP containers
+    app:status             [as] Get current status of all containers
+    app:stop               [stop] Stop current APP containers
+    app:update:config      [aucg] Update APP config
+    app:update:containers  [auct] Update APP containers
+   behat
+    behat:cmd              Run behat commands
+    behat:monitor          Launch behat VNC viewer
+    behat:status           Runs example command against running APP and current config
+   drush
+    drush:cc               [dcc] Run drush cache clear
+    drush:cmd              [dc] Run drush commands
+    drush:dis              [dd] Disable/Uninstall Drupal module
+    drush:en               [de] Enable Drupal module
+    drush:init:config      [dicg] Run drush config init
+    drush:rr               [drr] Run drush registry rebuild
+    drush:uli              [duli] Run Drush ULI
+    drush:updb             [dudb] Run Drush updb
+   mysql
+    mysql:export           Export .sql files
+    mysql:import           Import .sql files
+    mysql:log              Monitor mysql activity
+   nginx
+    nginx:flush            Flush nginx cache
+    nginx:log              Monitor nginx activity
+    nginx:proxy:start      Start nginx proxy
+    nginx:proxy:stop       Stop nginx proxy
+    nginx:reload           Reload nginx activity
+    nginx:sethost          Add nginx host to DD and host OS
+   prod
+    prod:update            Rebuild app and deploy latest code into app containers
+   redis
+    redis:flush            Flush Redis cache
+    redis:info             Get Redis running config information
+    redis:monitor          Montitor redis activity
+    redis:ping             Ping Redis
+   self
+    self:about             [about] About DruDock
 
        
 ```
