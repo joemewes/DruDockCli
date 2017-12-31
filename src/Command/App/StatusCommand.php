@@ -11,6 +11,7 @@ use Docker\Drupal\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
@@ -27,10 +28,10 @@ class StatusCommand extends Command {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
+    $container_application = new ApplicationContainerExtension();
     $io = new DruDockStyle($input, $output);
     $io->section("HEALTHCHECK");
 
-    $application->dockerHealthCheck($io);
+    $container_application->dockerHealthCheck($io);
   }
 }
