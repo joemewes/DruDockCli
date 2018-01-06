@@ -56,6 +56,8 @@ class BuildCommand extends ContainerAwareCommand {
 
   const UAT = 'UAT';
 
+  const WEBROOT = 'webroot';
+
   // General constants.
   const APP_DEST = './app';
 
@@ -63,9 +65,9 @@ class BuildCommand extends ContainerAwareCommand {
 
   const ROBOTS_TXT = '/robots.txt';
 
-  const SETTINGS = '/web/sites/default/settings.php';
+  const SETTINGS = '/sites/default/settings.php';
 
-  const SETTINGS_LOCAL = '/web/sites/default/settings.local.php';
+  const SETTINGS_LOCAL = '/sites/default/settings.local.php';
 
   const FILES = '/sites/default/files';
 
@@ -194,12 +196,12 @@ class BuildCommand extends ContainerAwareCommand {
       $this->io->info(' ');
       $this->io->title("SET APP DOCROOT");
       $helper = $this->getHelper('question');
-      $question = new Question('Please specify repository relative path to site docroot [./web/] [./docroot/] [./] : ', './web/');
+      $question = new Question('Please specify repository relative path to site docroot [web] [docroot] [.] : ', 'web');
       $root = $helper->ask($input, $output, $question);
       $this->fs->symlink($root, $app_dest . '/www');
 
       // Update config to include webroot for future use.
-      $config['webroot'] = $root;
+      $config[self::WEBROOT] = $root;
       $this->app->setAppConfig($config, $this->io);
 
       if($this->fs->exists('./app/composer.json')){
@@ -213,32 +215,32 @@ class BuildCommand extends ContainerAwareCommand {
       $this->app->runcommand($command, $this->io);
 
       // Update config to include webroot for future use.
-      $config['webroot'] = './web';
+      $config[self::WEBROOT] = 'web';
       $this->app->setAppConfig($config, $this->io);
     }
 
     if ($this->fs->exists($app_dest)) {
 
       try {
-        $this->fs->mkdir($app_dest . '/web/sites/all/themes/custom');
-        $this->fs->mkdir($app_dest . '/web/sites/all/modules/custom');
-        $this->fs->mkdir($app_dest . '/web/sites/all/features/');
+        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/themes/custom');
+        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/modules/custom');
+        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/features/');
       } catch (IOExceptionInterface $e) {
         $this->io->error(sprintf(self::ERR_MSG . $e->getPath()));
       }
 
-      $this->setLocalConfig('d7', $app_dest, $dist);
+      $this->setLocalConfig('d7', $app_dest, $config);
       // Set perms.
-//      $this->fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
-//      $this->fs->chmod($app_dest . '/web/sites/default/settings.php', 0755, 0000, TRUE);
-      $this->fs->chmod($app_dest . self::SETTINGS_LOCAL, 0755, 0000, TRUE);
+      // $this->fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
+      // $this->fs->chmod($app_dest . '/web/sites/default/settings.php', 0755, 0000, TRUE);
+      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/' . self::SETTINGS_LOCAL, 0755, 0000, TRUE);
       // Setup $VAR for redis cache_prefix in settings.local.php template.
       $cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
-      $local_settings = $app_dest . self::SETTINGS_LOCAL;
+      $local_settings = $app_dest . '/' . $config[self::WEBROOT] . '/' . self::SETTINGS_LOCAL;
       $process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
       $process->run();
 
-      $this->fs->symlink($config['webroot'], $app_dest . '/www', TRUE);
+      $this->fs->symlink('./' . $config[self::WEBROOT], $app_dest . '/www', TRUE);
     }
   }
 
@@ -261,12 +263,12 @@ class BuildCommand extends ContainerAwareCommand {
       $this->io->info(' ');
       $this->io->title("SET APP DOCROOT");
       $helper = $this->getHelper('question');
-      $question = new Question('Please specify repository relative path to site docroot [./web/] [./docroot/] [./] : ', './web/');
+      $question = new Question('Please specify repository relative path to site docroot [web] [docroot] [.] : ', 'web');
       $root = $helper->ask($input, $output, $question);
       $this->fs->symlink($root, $app_dest . '/www');
 
       // Update config to include webroot for future use.
-      $config['webroot'] = $root;
+      $config[self::WEBROOT] = $root;
       $this->app->setAppConfig($config, $this->io);
 
       if($this->fs->exists('./app/composer.json')){
@@ -281,39 +283,40 @@ class BuildCommand extends ContainerAwareCommand {
       $this->app->runcommand($command, $this->io);
 
       // Update config to include webroot for future use.
-      $config['webroot'] = './web';
+      $config[self::WEBROOT] = './web';
       $this->app->setAppConfig($config, $this->io);
     }
 
     if ($this->fs->exists($app_dest)) {
       try {
         $this->fs->mkdir($app_dest . '/config/sync');
-        $this->fs->mkdir($app_dest . '/web/sites/default/files');
-        $this->fs->mkdir($app_dest . '/web/themes/custom');
-        $this->fs->mkdir($app_dest . '/web/modules/custom');
+        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/files');
+        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/themes/custom');
+        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/modules/custom');
         $this->fs->mkdir($app_dest . '/shared/files');
       } catch (IOExceptionInterface $e) {
         $this->io->error(sprintf(self::ERR_MSG . $e->getPath()));
       }
 
-      $this->setLocalConfig('d8', $app_dest, $dist);
+      $this->setLocalConfig('d8', $app_dest, $config);
       // Set perms.
       //$this->fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
       //$this->fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
       //$this->fs->chmod($app_dest . '/web/sites/default/settings.php', 0755, 0000, TRUE);
-      //$this->fs->chmod($app_dest . self::SETTINGS_LOCAL, 0755, 0000, TRUE);
+      $this->fs->chmod($app_dest . './' . $config[self::WEBROOT] . '/' . self::SETTINGS_LOCAL, 0755, 0000, TRUE);
 
       // Setup $VAR for redis cache_prefix in settings.local.php template.
       $cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
-      $local_settings = $app_dest . self::SETTINGS_LOCAL;
+      $local_settings = $app_dest . '/' . $config[self::WEBROOT] . '/' . self::SETTINGS_LOCAL;
       $process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
       $process->run();
 
-      $this->fs->symlink('./web', $app_dest . '/www', TRUE);
+      $this->fs->symlink('./' . $config[self::WEBROOT], $app_dest . '/www', TRUE);
     }
   }
 
-  private function setLocalConfig($fd, $app_dest, $dist) {
+  private function setLocalConfig($fd, $app_dest, $config) {
+    $dist = $config[self::DIST];
     // Move DruDock Drupal 8 config files into install
     $this->cfa->tmpRemoteBundle($fd);
     if (is_dir(self::TMP . $fd) && is_dir($app_dest)) {
@@ -321,14 +324,14 @@ class BuildCommand extends ContainerAwareCommand {
       $this->fs->chmod($app_dest, 0755, 0000, true);
 
       if($fd === 'd8') {
-        $this->fs->copy($dfiles . '/development.services.yml', $app_dest . '/web/sites/development.services.yml', TRUE);
-        $this->fs->copy($dfiles . '/services.yml', $app_dest . '/web/sites/default/services.yml', TRUE);
-        $this->fs->copy($dfiles . '/drushrc.php', $app_dest . '/web/sites/default/drushrc.php', TRUE);
+        $this->fs->copy($dfiles . '/development.services.yml', $app_dest . '/' . $config[self::WEBROOT] . '/sites/development.services.yml', TRUE);
+        $this->fs->copy($dfiles . '/services.yml', $app_dest . '/' . $config[self::WEBROOT] . '/sites/default/services.yml', TRUE);
+        $this->fs->copy($dfiles . '/drushrc.php', $app_dest . '/' . $config[self::WEBROOT] . '/sites/default/drushrc.php', TRUE);
       }
 
-      $this->fs->copy($dfiles . self::ROBOTS_TXT, $app_dest . '/web/robots.txt', TRUE);
-      $this->fs->copy($dfiles . '/settings.php', $app_dest . self::SETTINGS, TRUE);
-      $this->fs->copy($dfiles . '/settings.local.php', $app_dest . self::SETTINGS_LOCAL, TRUE);
+      $this->fs->copy($dfiles . self::ROBOTS_TXT, $app_dest . '/' . $config[self::WEBROOT] . '/robots.txt', TRUE);
+      $this->fs->copy($dfiles . '/settings.php', $app_dest . '/' . $config[self::WEBROOT] . self::SETTINGS, TRUE);
+      $this->fs->copy($dfiles . '/settings.local.php', $app_dest . '/' . $config[self::WEBROOT] . self::SETTINGS_LOCAL, TRUE);
 
       $this->fs->remove(self::TMP . $fd);
       if (isset($dist) && $dist == 'Full') {
