@@ -438,7 +438,6 @@ class ApplicationConfigExtension extends Application {
 
     // Write final config
     $app_yaml = Yaml::dump($base_compose, 8, 2);
-    var_dump($app_yaml);
     $this->renderFile($services_compose_dest, $app_yaml);
 
     if ($dist === PRODUCTION) {
