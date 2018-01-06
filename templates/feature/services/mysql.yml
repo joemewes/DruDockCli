@@ -1,4 +1,4 @@
-image : 4AllDigital/drudock-mysql:latest
+image : 4alldigital/drudock-mysql:latest
 ports :
   - "3306"
 volumes :

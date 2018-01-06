@@ -31,9 +31,9 @@ class Application extends ParentApplication {
 
   const VERSION = '1.4-alpha1.0.6';
 
-  const CDN = 'http://d1gem705zq3obi.cloudfront.net';
+  // const CDN = 'http://d1gem705zq3obi.cloudfront.net';
 
-  // const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
+  const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
 
   protected $cfa;
 

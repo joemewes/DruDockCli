@@ -365,37 +365,39 @@ class ApplicationConfigExtension extends Application {
    * @param $sys_appname
    */
   public function setHostConfig($newhost, $io, $sys_appname) {
+
+    $io->note('Adding local domain to /etc/hosts. Please enter password if prompted.');
     // Add initial entry to hosts file.
     // @TODO update as command for Windows too.
-    //    $ip = LOCALHOST;
-    //
-    //    if ($config = $this->getAppConfig($io, $sys_appname)) {
-    //      $apphost = $config['host'];
-    //      $appname = $config[APPNAME];
-    //      $system_appname = strtolower(str_replace(' ', '', $appname));
-    //    }
-    //    else {
-    //      $apphost = 'drudock.localhost';
-    //    }
-    //
-    //    $hosts_file = '/etc/hosts';
-    //    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
-    //    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
-    //    $hosts_file_contents = file_get_contents($hosts_file);
-    //
-    //    if (!strpos($hosts_file_contents, $app_host_config)) {
-    //      // Add new.
-    //      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
-    //      $this->runcommand($command, $io, TRUE);
-    //    }
-    //    else {
-    //      if ($app_host_config !== $new_host_config) {
-    //        // Replace existing.
-    //        $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
-    //        $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
-    //        exec($command);
-    //      }
-    //    }
+    $ip = LOCALHOST;
+
+    if ($config = $this->getAppConfig($io, $sys_appname)) {
+      $apphost = $config['host'];
+      $appname = $config[APPNAME];
+      $system_appname = strtolower(str_replace(' ', '', $appname));
+    }
+    else {
+      $apphost = 'drudock.localhost';
+    }
+
+    $hosts_file = '/etc/hosts';
+    $app_host_config = "### " . $system_appname . "\n" . $ip . " " . $apphost . "\n###";
+    $new_host_config = "### " . $system_appname . "\n" . $ip . " " . $newhost . "\n###";
+    $hosts_file_contents = file_get_contents($hosts_file);
+
+    if (!strpos($hosts_file_contents, $app_host_config)) {
+      // Add new.
+      $command = sprintf("echo '%s' | sudo tee -a %s >/dev/null", $new_host_config, $hosts_file);
+      $this->runcommand($command, $io, TRUE);
+    }
+    else {
+      if ($app_host_config !== $new_host_config) {
+        // Replace existing.
+        $hosts_file_contents = str_replace($app_host_config, $new_host_config, $hosts_file_contents);
+        $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
+        exec($command);
+      }
+    }
 
     if (!file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
       $this->tmpRemoteBundle('osx');
@@ -427,7 +429,7 @@ class ApplicationConfigExtension extends Application {
 
     // Get base compose config.
     $base_compose = Yaml::parse($base_yaml);
-    $base_compose = $this->applyAppServices($io, $base_compose, $config, $dist_path);
+    $base_compose = $this->applyAppServices($io, $base_compose, $config);
 
     // Check if depends healthchecks are required.
     if (in_array('MYSQL', $config['services']) && in_array('PHP', $config['services'])) {
@@ -436,6 +438,7 @@ class ApplicationConfigExtension extends Application {
 
     // Write final config
     $app_yaml = Yaml::dump($base_compose, 8, 2);
+    var_dump($app_yaml);
     $this->renderFile($services_compose_dest, $app_yaml);
 
     if ($dist === PRODUCTION) {
@@ -457,7 +460,7 @@ class ApplicationConfigExtension extends Application {
       }
 
       $base_data_compose = Yaml::parse($base_data_yaml);
-      $base_data_compose = $this->applyDataAppServices($io, $base_data_compose, $config, $dist_path);
+      $base_data_compose = $this->applyDataAppServices($io, $base_data_compose, $config);
       $app_data_yaml = Yaml::dump($base_data_compose, 8, 2);
       $this->renderFile($services_compose_data_dest, $app_data_yaml);
     }
@@ -521,17 +524,20 @@ class ApplicationConfigExtension extends Application {
   }
 
   /**
+   * Apply config service to compose.yaml.
+   *
    * @param $io
    * @param $base_compose
    * @param $config
-   * @param $dist_path
    *
    * @return mixed
    */
-  public function applyAppServices($io, $base_compose, $config, $dist_path) {
+  public function applyAppServices($io, $base_compose, $config) {
 
     // Set Services.
     $services = $this->arrangeServices($io, $config);
+    $dist = $config['dist'];
+    $dist_path = strtolower($dist);
 
     foreach ($services['std'] as $service) {
       $service_name = strtolower($service);
@@ -576,11 +582,15 @@ class ApplicationConfigExtension extends Application {
    * @param $base_data_compose
    * @param $config
    * @param $dist_path
+   *
+   * @return mixed
    */
-  public function applyDataAppServices($io, $base_data_compose, $config, $dist_path) {
+  public function applyDataAppServices($io, $base_data_compose, $config) {
 
     // Set Services.
     $services = $this->arrangeServices($io, $config);
+    $dist = $config['dist'];
+    $dist_path = strtolower($dist);
 
     if ($config['dist'] === PRODUCTION) {
       foreach ($services['prod'] as $service) {

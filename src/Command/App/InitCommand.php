@@ -110,11 +110,6 @@ class InitCommand extends ContainerAwareCommand {
       ],
     ];
 
-    // Add Mailhog to local development setup.
-    if(in_array('PHP', $config['services']) && $config['dist'] === 'Development'){
-      $config['services'][] = 'MAILHOG';
-    }
-
     $this->cfa->writeDockerComposeConfig($io, $config);
 
     $yaml = Yaml::dump($config);
@@ -136,7 +131,7 @@ class InitCommand extends ContainerAwareCommand {
 
     $io->info(' ');
     $io->section("DruDock ::: Ready");
-    $info = 'Go to app directory [cd ' . $system_appname . '] and run [drudock build:init]';
+    $info = 'Go to app directory [cd ' . $system_appname . '] and run [drudock app:build]';
     $io->info($info);
     $io->info(' ');
   }
