@@ -1,4 +1,4 @@
-image : 4alldigital/drudock-php:7.1
+image : 4alldigital/drudock-php:7.1-dev
 ports :
   - "22"
 volumes :
