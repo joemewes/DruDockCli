@@ -175,7 +175,6 @@ class Application extends ParentApplication {
     $commands[] = new Command\Nginx\NginxProxyStartCommand();
     $commands[] = new Command\Nginx\NginxProxyStopCommand();
 
-    $commands[] = new Command\Drush\DrushCommand();
     $commands[] = new Command\Drush\DrushRegistryRebuildCommand();
     $commands[] = new Command\Drush\DrushClearCacheCommand();
     $commands[] = new Command\Drush\DrushLoginCommand();
