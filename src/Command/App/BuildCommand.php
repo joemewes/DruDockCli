@@ -218,6 +218,7 @@ class BuildCommand extends ContainerAwareCommand {
       $this->app->setAppConfig($config, $this->io);
     }
 
+    // Create site install directory structure.
     if ($this->fs->exists($app_dest)) {
       try {
         if($type === 'd7') {
@@ -237,7 +238,7 @@ class BuildCommand extends ContainerAwareCommand {
       // Setup local configuration files.
       $this->setLocalConfig($type, $app_dest, $config);
 
-      // Set perms.
+      // Setup directory permissions.
       $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/files', 0775, 0000, TRUE);
       $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/settings.php', 0775, 0000, TRUE);
       $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . self::SETTINGS_LOCAL, 0775, 0000, TRUE);
@@ -257,11 +258,12 @@ class BuildCommand extends ContainerAwareCommand {
 
   private function setLocalConfig($fd, $app_dest, $config) {
     $dist = $config[self::DIST];
-    // Move DruDock Drupal config files into install
+
+    // Move DruDock Drupal config files into install.
     $this->cfa->tmpRemoteBundle($fd);
     if (is_dir(self::TMP . $fd) && is_dir($app_dest)) {
       $dfiles = self::TMP . $fd;
-      $this->fs->chmod($app_dest, 0755, 0000, true);
+      $this->fs->chmod($app_dest, 0775, 0000, true);
 
       if($fd === 'd8') {
         $this->fs->copy($dfiles . '/development.services.yml', $app_dest . '/' . $config[self::WEBROOT] . '/sites/development.services.yml', TRUE);
