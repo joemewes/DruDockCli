@@ -14,6 +14,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Console\Application as ParentApplication;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
+use Docker\Drupal\Style\DruDockStyle;
 
 const DEV_MYSQL_PASS = 'DEVPASSWORD';
 const LOCALHOST = '127.0.0.1';
@@ -53,6 +54,9 @@ class Application extends ParentApplication {
    * {@inheritdoc}
    */
   public function doRun(InputInterface $input, OutputInterface $output) {
+    // Check docker is running.
+    $this->checkDocker($input, $output);
+    // Continue Bootstrap.
     $this->registerCommands();
     parent::doRun($input, $output);
   }
@@ -457,13 +461,15 @@ VIRTUAL_NETWORK=nginx-proxy";
   /**
    * @return string
    */
-  public function checkDocker() {
+  public function checkDocker(InputInterface $input, OutputInterface $output) {
     $command = 'docker info';
     $process = new Process($command);
     $process->setTimeout(2);
     $process->run();
     if (!$process->isSuccessful()) {
-      return FALSE;
+      $io = new DruDockStyle($input, $output);
+      $io->error('Cannot connect to the Docker daemon. Is the docker daemon running?');
+      exit;
     }
     return TRUE;
   }
