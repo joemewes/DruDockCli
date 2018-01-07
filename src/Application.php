@@ -162,6 +162,7 @@ class Application extends ParentApplication {
     $commands[] = new Command\App\OpenAppCommand();
     $commands[] = new Command\App\InitContainersCommand();
     $commands[] = new Command\App\SSHCommand();
+    $commands[] = new Command\App\SelfUpdateCommand();
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();
