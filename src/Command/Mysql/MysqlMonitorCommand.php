@@ -43,7 +43,7 @@ class MysqlMonitorCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql tail -f /var/log/mysql/mysql.log  2>&1';
+      $command = $container_application->getComposePath($appname, $io) . 'logs -f mysql';
       $application->runcommand($command, $io);
     }
   }

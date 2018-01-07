@@ -59,34 +59,29 @@ class MysqlImportCommand extends Command {
       $helper = $this->getHelper('question');
       $question = new Question('Specify import path, including filename : ');
       $importpath = $helper->ask($input, $output, $question);
+    } else {
+      $importpath = $path;
+    }
+    if (file_exists($importpath)) {
+      if ($container_application->checkForAppContainers($appname, $io)) {
 
-      if (file_exists($importpath)) {
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "drop database drudock_db;"';
+        $application->runcommand($command, $io);
 
-        if ($container_application->checkForAppContainers($appname, $io)) {
+        // recreate dev_db
+        $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "create database drudock_db;"';
+        $application->runcommand($command, $io);
 
-          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "drop database drudock_db;"';
-          $application->runcommand($command, $io);
-
-          // recreate dev_db
-          $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "create database drudock_db;"';
-          $application->runcommand($command, $io);
-
-          // import new .sql file
-          // @todo resolve and update - https://github.com/docker/compose/issues/4290
-          //$command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
-          $command = 'docker exec -i $(' . $container_application->getComposePath($appname, $io) . 'ps -q mysql) mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
-          $application->runcommand($command, $io);
-
-        }
-
-      }
-      else {
-
-        $io->error('Import .sql file not found at path ' . $importpath);
-        exit;
-
+        // import new .sql file
+        // @todo resolve and update - https://github.com/docker/compose/issues/4290
+        //$command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
+        $command = 'docker exec -i $(' . $container_application->getComposePath($appname, $io) . 'ps -q mysql) mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
+        $application->runcommand($command, $io);
       }
     }
+    else {
+      $io->error('Import .sql file not found at path ' . $importpath);
+      exit;
+    }
   }
-
 }
