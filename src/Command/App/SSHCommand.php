@@ -12,6 +12,7 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DruDockStyle;
 
@@ -33,7 +34,8 @@ class SSHCommand extends Command {
       ->setName('app:ssh')
       ->setAliases(['assh'])
       ->setDescription('SSH into Apps PHP container.')
-      ->setHelp("Example : [drudock app:ssh]");
+      ->setHelp("Example : [drudock app:ssh]")
+      ->addOption('key', 'k', InputOption::VALUE_OPTIONAL, 'Specify path to SSH key that has already been added to project authorized_keys file. ["./config/php/drudock"]');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -52,6 +54,16 @@ class SSHCommand extends Command {
       $host = 'drudock.localhost';
     }
 
+    $key = $input->getOption('key');
+
+    $io->section('PHP ::: drush ' . $cmd);
+
+    if ($key) {
+      $keypath = $key;
+    }else{
+      $keypath = './docker_' . $system_appname . '/config/php/drudock';
+    }
+
     $io->section("APP ::: SSH " . $appname);
 
     if ($container_application->checkForAppContainers($appname, $io)) {
@@ -61,7 +73,7 @@ class SSHCommand extends Command {
       if(!file_exists('./docker_' . $system_appname . '/config/php/drudock')){
         $io->error('SSH key missing at `./docker_' . $system_appname . '/config/php/drudock` ');
       }
-      $command = 'ssh -i ./docker_' . $system_appname . '/config/php/drudock -tt root@' . $host . ' -p ' . $ssh_port . ' "cd /app/www ; bash"';
+      $command = 'ssh -i '. $keypath . ' -tt root@' . $host . ' -p ' . $ssh_port . ' "cd /app/www ; bash"';
       $application->runcommand($command, $io, TRUE);
     }
   }
