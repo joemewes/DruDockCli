@@ -195,7 +195,7 @@ class BuildCommand extends ContainerAwareCommand {
       $this->io->info(' ');
       $this->io->title("SET APP DOCROOT");
       $helper = $this->getHelper('question');
-      $question = new Question('Please specify repository relative path to site docroot [web] [docroot] [.] : ', 'web');
+      $question = new Question('Please specify Drupal root. eg. [web] [docroot] [.] : ', 'web');
       $root = $helper->ask($input, $output, $question);
       $this->fs->symlink($root, $app_dest . '/www');
 
