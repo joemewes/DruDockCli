@@ -3,6 +3,7 @@ ports :
   - "22"
 volumes :
   - ./config/php/ssmtp.conf:/etc/ssmtp/ssmtp.conf
+  - ./config/php/authorized_keys:/root/.ssh/authorized_keys
   - ../app:/app
 environment:
   XDEBUG_CONFIG: "remote_host=10.254.254.254"

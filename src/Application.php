@@ -157,6 +157,7 @@ class Application extends ParentApplication {
     $commands[] = new Command\App\UpdateConfigCommand();
     $commands[] = new Command\App\OpenAppCommand();
     $commands[] = new Command\App\InitContainersCommand();
+    $commands[] = new Command\App\SSHCommand();
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();
@@ -299,14 +300,14 @@ class Application extends ParentApplication {
   /**
    * @return string
    */
-  public function runcommand($command, $io) {
+  public function runcommand($command, $io, $TTY = FALSE) {
 
     global $output;
     $output = $io;
 
     $process = new Process($command);
     $process->setTimeout(3600);
-    $process->setTty(FALSE);
+    $process->setTty($TTY);
     $process->run(function ($type, $buffer) {
       global $output;
       if ($output) {
