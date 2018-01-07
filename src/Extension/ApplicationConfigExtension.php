@@ -474,7 +474,7 @@ class ApplicationConfigExtension extends Application {
    * @return mixed
    */
   public function addMysqlHealthcheck($base_compose, $service) {
-    $base_compose['services'][$service]['depends_on']['mysql']['condition'] = 'service_healthy';
+    $base_compose['services'][$service]['depends_on'][] = 'mysql';
     return $base_compose;
   }
 
