@@ -159,14 +159,14 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     if (isset($type) && $type == 'D7') {
-      $this->setupD7($input, $output);
+      $this->setupDrupal($input, $output, '7.x-dev', 'd7');
       $this->initDocker($system_appname);
       $this->installDrupal7();
       $message = 'Opening Drupal 7 base Installation at http://' . $apphost;
     }
 
     if (isset($type) && $type == 'D8') {
-      $this->setupD8($system_appname, $input, $output);
+      $this->setupDrupal($input, $output, '8.x-dev', 'd8');
       $this->initDocker($system_appname);
       $this->installDrupal8();
       $message = 'Opening Drupal 8 base Installation at http://' . $apphost;
@@ -177,7 +177,7 @@ class BuildCommand extends ContainerAwareCommand {
     shell_exec('python -mwebbrowser http://' . $apphost . ':' . $nginx_port);
   }
 
-  private function setupD7($input, $output) {
+  private function setupDrupal($input, $output, $drupal_version, $type) {
     $app_dest = self::APP_DEST;
     $config = $this->app->getAppConfig($this->io);
 
@@ -185,7 +185,6 @@ class BuildCommand extends ContainerAwareCommand {
       $appname = $config[self::APP_NAME];
       $appsrc = $config[self::APPSRC];
       $apprepo = $config[self::REPO];
-      $dist = $config[self::DIST];
     }
 
     if (isset($appsrc) && $appsrc == 'Git' && !$this->fs->exists($app_dest) && isset($apprepo)) {
@@ -209,9 +208,9 @@ class BuildCommand extends ContainerAwareCommand {
         $this->app->runcommand($command, $this->io);
       }
     } else {
-      $command = sprintf('composer create-project drupal-composer/drupal-project:7.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
+      $command = sprintf('composer create-project drupal-composer/drupal-project:' . $drupal_version . ' ' . $app_dest . ' -dir --stability dev --no-interaction');
       $this->io->info(' ');
-      $this->io->note('Download and configure Drupal 7.... This may take a few minutes....');
+      $this->io->note('Download and configure Drupal ' . $drupal_version . '.... This may take a few minutes....');
       $this->app->runcommand($command, $this->io);
 
       // Update config to include webroot for future use.
@@ -220,90 +219,31 @@ class BuildCommand extends ContainerAwareCommand {
     }
 
     if ($this->fs->exists($app_dest)) {
-
       try {
-        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/themes/custom');
-        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/modules/custom');
-        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/features/');
+        if($type === 'd7') {
+          $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/themes/custom');
+          $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/modules/custom');
+          $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/all/features/');
+        }
+        if($type === 'd8') {
+          $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/themes/custom');
+          $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/modules/custom');
+          $this->fs->mkdir($app_dest . '/config/sync');
+        }
       } catch (IOExceptionInterface $e) {
         $this->io->error(sprintf(self::ERR_MSG . $e->getPath()));
       }
 
-      $this->setLocalConfig('d7', $app_dest, $config);
+      // Setup local configuration files.
+      $this->setLocalConfig($type, $app_dest, $config);
+
       // Set perms.
-      // $this->fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
-      // $this->fs->chmod($app_dest . '/web/sites/default/settings.php', 0755, 0000, TRUE);
-      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/' . self::SETTINGS_LOCAL, 0755, 0000, TRUE);
-      // Setup $VAR for redis cache_prefix in settings.local.php template.
-      $cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
-      $local_settings = $app_dest . '/' . $config[self::WEBROOT] . '/' . self::SETTINGS_LOCAL;
-      $process = new Process(sprintf('echo %s | sudo tee -a %s >/dev/null', $cache_prefix, $local_settings));
-      $process->run();
-
-      $this->fs->symlink('./' . $config[self::WEBROOT], $app_dest . '/www', TRUE);
-    }
-  }
-
-  private function setupD8($appname, $input, $output) {
-    $app_dest = self::APP_DEST;
-    $config = $this->app->getAppConfig($this->io);
-
-    if ($config) {
-      $appname = $config[self::APP_NAME];
-      $appsrc = $config[self::APPSRC];
-      $apprepo = $config[self::REPO];
-      $dist = $config[self::DIST];
-    }
-
-    if (isset($appsrc) && $appsrc == 'Git' && !$this->fs->exists($app_dest) && isset($apprepo)) {
-      $command = 'git clone ' . $apprepo . ' app';
-      $this->app->runcommand($command, $this->io);
-      $this->io->info('Downloading app from repo.... This may take a few minutes....');
-
-      $this->io->info(' ');
-      $this->io->title("SET APP DOCROOT");
-      $helper = $this->getHelper('question');
-      $question = new Question('Please specify repository relative path to site docroot [web] [docroot] [.] : ', 'web');
-      $root = $helper->ask($input, $output, $question);
-      $this->fs->symlink($root, $app_dest . '/www');
-
-      // Update config to include webroot for future use.
-      $config[self::WEBROOT] = $root;
-      $this->app->setAppConfig($config, $this->io);
-
-      if($this->fs->exists('./app/composer.json')){
-        $command = 'cd app && composer install';
-        $this->app->runcommand($command, $this->io);
-      }
-
-    } else {
-      $command = sprintf('composer create-project drupal-composer/drupal-project:8.x-dev ' . $app_dest . ' -dir --stability dev --no-interaction');
-      $this->io->info(' ');
-      $this->io->note('Download and configure Drupal 8.... This may take a few minutes....');
-      $this->app->runcommand($command, $this->io);
-
-      // Update config to include webroot for future use.
-      $config[self::WEBROOT] = './web';
-      $this->app->setAppConfig($config, $this->io);
-    }
-
-    if ($this->fs->exists($app_dest)) {
-      try {
+      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/files', 0775, 0000, TRUE);
+      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/settings.php', 0775, 0000, TRUE);
+      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . self::SETTINGS_LOCAL, 0775, 0000, TRUE);
+      if($type === 'd8') {
         $this->fs->mkdir($app_dest . '/config/sync');
-        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/files');
-        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/themes/custom');
-        $this->fs->mkdir($app_dest . '/' . $config[self::WEBROOT] . '/modules/custom');
-        $this->fs->mkdir($app_dest . '/shared/files');
-      } catch (IOExceptionInterface $e) {
-        $this->io->error(sprintf(self::ERR_MSG . $e->getPath()));
       }
-
-      $this->setLocalConfig('d8', $app_dest, $config);
-      // Set perms.
-      //$this->fs->chmod($app_dest . '/config/sync', 0777, 0000, TRUE);
-      //$this->fs->chmod($app_dest . '/web/sites/default/files', 0777, 0000, TRUE);
-      //$this->fs->chmod($app_dest . '/web/sites/default/settings.php', 0755, 0000, TRUE);
-      $this->fs->chmod($app_dest . './' . $config[self::WEBROOT] . '/' . self::SETTINGS_LOCAL, 0755, 0000, TRUE);
 
       // Setup $VAR for redis cache_prefix in settings.local.php template.
       $cache_prefix = "\$settings['cache_prefix'] = '" . $appname . "_';";
@@ -317,7 +257,7 @@ class BuildCommand extends ContainerAwareCommand {
 
   private function setLocalConfig($fd, $app_dest, $config) {
     $dist = $config[self::DIST];
-    // Move DruDock Drupal 8 config files into install
+    // Move DruDock Drupal config files into install
     $this->cfa->tmpRemoteBundle($fd);
     if (is_dir(self::TMP . $fd) && is_dir($app_dest)) {
       $dfiles = self::TMP . $fd;
@@ -326,7 +266,6 @@ class BuildCommand extends ContainerAwareCommand {
       if($fd === 'd8') {
         $this->fs->copy($dfiles . '/development.services.yml', $app_dest . '/' . $config[self::WEBROOT] . '/sites/development.services.yml', TRUE);
         $this->fs->copy($dfiles . '/services.yml', $app_dest . '/' . $config[self::WEBROOT] . '/sites/default/services.yml', TRUE);
-        $this->fs->copy($dfiles . '/drushrc.php', $app_dest . '/' . $config[self::WEBROOT] . '/sites/default/drushrc.php', TRUE);
       }
 
       $this->fs->copy($dfiles . self::ROBOTS_TXT, $app_dest . '/' . $config[self::WEBROOT] . '/robots.txt', TRUE);
