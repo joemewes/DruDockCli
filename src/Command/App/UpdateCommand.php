@@ -36,16 +36,13 @@ class UpdateCommand extends Command {
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
-    }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-
-      $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
-      $application->runcommand($command, $io);
-
-      $command = $container_application->getComposePath($appname, $io) . ' up -d --force-recreate 2>&1';
-      $application->runcommand($command, $io);
+      if ($container_application->checkForAppContainers($appname, $io)) {
+        $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
+        $application->runcommand($command, $io);
+        $command = $container_application->getComposePath($appname, $io) . ' up -d --force-recreate 2>&1';
+        $application->runcommand($command, $io);
+      }
     }
   }
-
 }

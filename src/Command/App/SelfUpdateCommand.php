@@ -51,6 +51,7 @@ class SelfUpdateCommand extends Command {
 
     // Output version.
     $dockerversion = $application->getVersion();
+    $io->info(' ');
     $io->note('Drudock Version ::: ' . $dockerversion);
 
   }

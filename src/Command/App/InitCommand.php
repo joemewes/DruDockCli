@@ -9,7 +9,6 @@ namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use const Docker\Drupal\Extension\PRODUCTION;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -109,6 +108,9 @@ class InitCommand extends ContainerAwareCommand {
         'date' => $date,
       ],
     ];
+
+    // Apply required versions to default config templates.
+    $config['services'] = $this->cfa->updateConfigServiceVersions($config);
 
     $this->cfa->writeDockerComposeConfig($io, $config);
 
