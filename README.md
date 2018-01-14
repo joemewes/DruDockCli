@@ -54,6 +54,7 @@ Install and setup Docker
     help                   Displays help for a command
     list                   Lists commands
    app
+    app:bash               [ab] Bash into container
     app:build              [ab] Fetch and build App containers and resources.
     app:destroy            [ad] Disable and delete APP and containers
     app:exec               [ae] Execute bespoke commands at :container
@@ -62,18 +63,19 @@ Install and setup Docker
     app:init:containers    [aic] Create APP containers
     app:open               [ao] Open APP in default browser.
     app:restart            [ar] Restart current APP containers
+    app:ssh                [assh] SSH into Apps PHP container.
     app:start              [start] Start current APP containers
     app:status             [as] Get current status of all containers
     app:stop               [stop] Stop current APP containers
     app:update:config      [aucg] Update APP config
     app:update:containers  [auct] Update APP containers
+    app:update:services    [aus] Update APP services
    behat
     behat:cmd              Run behat commands
     behat:monitor          Launch behat VNC viewer
     behat:status           Runs example command against running APP and current config
    drush
     drush:cc               [dcc] Run drush cache clear
-    drush:cmd              [dc] Run drush commands
     drush:dis              [dd] Disable/Uninstall Drupal module
     drush:en               [de] Enable Drupal module
     drush:init:config      [dicg] Run drush config init
@@ -96,10 +98,11 @@ Install and setup Docker
    redis
     redis:flush            Flush Redis cache
     redis:info             Get Redis running config information
-    redis:monitor          Montitor redis activity
+    redis:monitor          Monitor redis activity
     redis:ping             Ping Redis
    self
     self:about             [about] About DruDock
+    self:update            [su] Update Drudock version to latest released version.
 
        
 ```
