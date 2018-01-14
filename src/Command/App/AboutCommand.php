@@ -45,7 +45,7 @@ class AboutCommand extends Command {
     $io->info(' ');
     $io->section(' Docker status ');
 
-    if ($application->checkDocker()) {
+    if ($application->checkDocker($input, $output)) {
       $io->success(' Docker Running');
     }
     else {
@@ -65,18 +65,18 @@ class AboutCommand extends Command {
 
     $io->simple('SETUP DOCKER ENVIRONMENT');
     $io->info(' ');
-    $io->info('     drudock env:init');
+    $io->info('     drudock app:init');
     $io->info(' ');
 
     $io->simple('BUILD DRUPAL 8 APP');
     $io->info(' ');
-    $io->info('     drudock env:init:build --appname my-app --type D8 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"');
+    $io->info('     drudock app:init:build --appname d8newpp_development --type D8 --dist Development --src New --apphost testd8.drudock.localhost --services "PHP,NGINX,MYSQL"');
     $io->info(' ');
 
 
     $io->simple('BUILD DRUPAL 7 APP');
     $io->info(' ');
-    $io->info('     drudock env:init:build --appname my-app --type D7 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL"');
+    $io->info('     drudock app:init:build --appname d7newpp_development --type D7 --dist Development --src New --apphost testd7.drudock.localhost --services "PHP,NGINX,MYSQL"');
     $io->info(' ');
 
     $io->simple('AVAILABLE COMMANDS');
