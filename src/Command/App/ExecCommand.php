@@ -27,7 +27,7 @@ class ExecCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:exec')
-      ->setAliases(['exec'])
+      ->setAliases(['ae'])
       ->setDescription('Execute bespoke commands at :container')
       ->setHelp("This command will run command inside specified container")
       ->addOption('service', 's', InputOption::VALUE_OPTIONAL, 'Specify the service/container [php]')

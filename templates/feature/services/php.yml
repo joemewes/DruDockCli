@@ -1,18 +1,19 @@
-image : 4alldigital/drudock-php:7.1
+image : 4alldigital/drudock-php:7.1-dev
 ports :
   - "22"
 volumes :
   - ./config/php/ssmtp.conf:/etc/ssmtp/ssmtp.conf
+  - ./config/php/authorized_keys:/root/.ssh/authorized_keys
   - ../app:/app
 environment:
   XDEBUG_CONFIG: "remote_host=10.254.254.254"
-  PHP_IDE_CONFIG: "serverName=drudock.dev"
+  PHP_IDE_CONFIG: "serverName=drudock.localhost"
   HOST_IP: "10.254.254.254"
 dns:
   - 8.8.8.8
   - 8.8.4.4
 hostname: php
 extra_hosts:
- - "drudock.dev:10.254.254.254"
+  - "drudock.localhost:10.254.254.254"
 networks:
- - default
+  - default

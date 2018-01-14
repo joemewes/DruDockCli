@@ -5,46 +5,37 @@
  * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
-namespace Docker\Drupal\Command\Drush;
+namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Input\InputArgument;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DrushCommand
+ * Class StopCommand
  *
  * @package Docker\Drupal\Command
  */
-class DrushCommand extends Command {
+class BashCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('drush:cmd')
-      ->setDescription('Run drush commands ')
-      ->setHelp("This command will execute Drush commands directly against your Drupal APP.")
-      ->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');
+      ->setName('app:bash')
+      ->setAliases(['ab'])
+      ->setDescription('Bash into container')
+      ->addArgument('service', InputArgument::REQUIRED, 'Specify NAME of service')
+      ->setHelp("Example : [drudock app:bash mysql]");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $application = new Application();
     $container_application = new ApplicationContainerExtension();
 
-    $cmd = $input->getOption('cmd');
-
     $io = new DruDockStyle($input, $output);
-    $io->section('PHP ::: drush ' . $cmd);
-
-    if (!$cmd) {
-      $helper = $this->getHelper('question');
-      $question = new Question('Enter command : ', 'bash');
-      $cmd = $helper->ask($input, $output, $question);
-    }
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
@@ -53,11 +44,13 @@ class DrushCommand extends Command {
       $appname = 'app';
     }
 
+    $serviceName = $input->getArgument('service');
+
+    $io->section("APP ::: bash " . $serviceName);
+
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
-      $application->runcommand($command, $io);
+      $command = $container_application->getComposePath($appname, $io) . ' exec ' . $serviceName . ' bash';
+      $application->runcommand($command, $io, TRUE, 0, 300);
     }
   }
-
 }
-

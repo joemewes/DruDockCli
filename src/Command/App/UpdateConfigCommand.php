@@ -26,7 +26,7 @@ class UpdateConfigCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:update:config')
-      ->setAliases(['up:cg'])
+      ->setAliases(['aucg'])
       ->setDescription('Update APP config')
       ->setHelp('This command will update all .config.yaml to include current drudock config requirements.');
   }

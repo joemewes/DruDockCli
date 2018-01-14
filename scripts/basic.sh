@@ -20,9 +20,8 @@ echo -e "${GREEN}DEMO TEST${NC}"
 ./bin/drudock about
 
 ./bin/drudock --version
-./bin/drudock env:init travisapp --type D8 --dist Development --src New --apphost drudock.dev --services "PHP,NGINX,MYSQL" && \
-cd travisapp && \
-../bin/drudock build:init && \
+./bin/drudock app:init:build --appname travisapp --type D8 --dist Development --src New --apphost drudock.localhost --services "PHP,NGINX,MYSQL" && \
+./bin/drudock nginx:proxy:start && \
 which docker && \
 docker ps && \
 curl http://localhost > ./logs/travis-sample.html

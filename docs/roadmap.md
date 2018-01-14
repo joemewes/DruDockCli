@@ -57,7 +57,7 @@ After merging and update of READ_ONLY prod environment:
 - the use of Port :80 will prevent multiple apps/services running concurrently
 - ADD PhantomCSS support for running testsuite.js
 - with services running
-    - linux -> write 127.0.0.1 drudock.dev to /etc/hosts file
+    - linux -> write 127.0.0.1 drudock.localhost to /etc/hosts file
     - Windows -> ??     
        
 ## Active APP commands @TODO :
@@ -84,6 +84,6 @@ UTIL
 
 GENERAL
 
-- python -mwebbrowser http://drudock.dev:8983/solr/#/SITE
-- python -mwebbrowser http://drudock.dev:4444/grid/console
-- python -mwebbrowser http://drudock.dev:1080
+- python -mwebbrowser http://drudock.localhost:8983/solr/#/SITE
+- python -mwebbrowser http://drudock.localhost:4444/grid/console
+- python -mwebbrowser http://drudock.localhost:1080

@@ -24,7 +24,7 @@ class RestartCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:restart')
-      ->setAliases(['restart'])
+      ->setAliases(['ar'])
       ->setDescription('Restart current APP containers')
       ->setHelp("This command will restart all containers for the current APP via the docker-compose.yml file.");
   }
