@@ -164,6 +164,7 @@ class Application extends ParentApplication {
     $commands[] = new Command\App\SSHCommand();
     $commands[] = new Command\App\SelfUpdateCommand();
     $commands[] = new Command\App\UpdateServicesCommand();
+    $commands[] = new Command\App\BashCommand();
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();
@@ -304,14 +305,21 @@ class Application extends ParentApplication {
 
   /**
    * @return string
+   *
+   * @param $command
+   * @param $io
+   * @param $TTY
+   * @param $timeout
+   * @param $idleTimeout
    */
-  public function runcommand($command, $io, $TTY = FALSE) {
+  public function runcommand($command, $io, $TTY = FALSE, $timeout = 3600, $idleTimeout = 60) {
 
     global $output;
     $output = $io;
 
     $process = new Process($command);
-    $process->setTimeout(3600);
+    $process->setTimeout($timeout);
+    $process->setIdleTimeout($idleTimeout);
     $process->setTty($TTY);
     $process->run(function ($type, $buffer) {
       global $output;
