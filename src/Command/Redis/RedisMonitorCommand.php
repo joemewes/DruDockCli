@@ -24,7 +24,7 @@ class RedisMonitorCommand extends Command {
   protected function configure() {
     $this
       ->setName('redis:monitor')
-      ->setDescription('Montitor redis activity')
+      ->setDescription('Monitor redis activity')
       ->setHelp("This command will output REDIS activity.");
   }
 
