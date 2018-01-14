@@ -46,7 +46,7 @@ class StartCommand extends Command {
       if (exec($command) > 0) {
         $io->info(' ');
         $io->section("You have running containers for your current App.");
-        $io->info("Try one of the following is you are experiencing issues :: \n\n[drudock docker:stop]\n\n[drudock docker:restart]\n\n[drudock up:ct]\n");
+        $io->info("Try one of the following is you are experiencing issues :: \n\n[drudock app:stop]\n\n[drudock app:restart]\n\n[drudock app:up:ct]\n");
         return;
       }
     }

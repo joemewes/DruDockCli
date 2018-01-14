@@ -8,16 +8,9 @@
 namespace Docker\Drupal\Extension;
 
 use Docker\Drupal\Application;
-//use Symfony\Component\Console\Input\InputArgument;
-//use Symfony\Component\Console\Input\InputInterface;
-//use Symfony\Component\Console\Input\InputOption;
-//use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-//use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-//use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-//use Docker\Drupal\Style\DruDockStyle;
 use Symfony\Component\Yaml\Yaml;
 use Alchemy\Zippy\Zippy;
 use GuzzleHttp\Client;
@@ -36,6 +29,7 @@ const NETWORKS = 'networks';
 const DATE_FORMAT = 'Y-m-d--H-i-s';
 const TAR = '.tar.gz';
 const TPLS_PATH = '/../../templates/';
+const CONFIG_PATH = '.config.yml';
 
 const PRODUCTION = 'Production';
 const DEVELOPMENT = 'Development';
@@ -67,7 +61,11 @@ class ApplicationConfigExtension extends Application {
    * @return mixed
    */
   public function getSetAppname($io, $input, $output, $cmd) {
-    $appname = $input->getArgument(APPNAME);
+    $options = $input->getOptions();
+    if (array_key_exists('dist', $options)) {
+      $appname = $input->getOption('appname');
+    }
+
     $date = date(DATE_FORMAT);
     if (!isset($appname)) {
       $io->title("SET APP NAME");
@@ -232,7 +230,7 @@ class ApplicationConfigExtension extends Application {
       $io->info(' ');
       $io->title("SET APP HOSTNAME");
       $helper = $cmd->getHelper(QUESTION);
-      $question = new Question('Enter preferred app hostname [drudock.dev] : ', 'drudock.dev');
+      $question = new Question('Enter preferred app hostname [drudock.localhost] : ', 'drudock.localhost');
       $apphost = $helper->ask($input, $output, $question);
     }
     return $apphost;
@@ -287,6 +285,7 @@ class ApplicationConfigExtension extends Application {
       $question->setMultiselect(TRUE);
       $service_types = $helper->ask($input, $output, $question);
     }
+
     return $service_types;
   }
 
@@ -361,9 +360,10 @@ class ApplicationConfigExtension extends Application {
    * @param $sys_appname
    */
   public function setHostConfig($newhost, $io, $sys_appname) {
+
+    $io->note('Adding local domain to /etc/hosts. Please enter password if prompted.');
     // Add initial entry to hosts file.
     // @TODO update as command for Windows too.
-
     $ip = LOCALHOST;
 
     if ($config = $this->getAppConfig($io, $sys_appname)) {
@@ -372,7 +372,7 @@ class ApplicationConfigExtension extends Application {
       $system_appname = strtolower(str_replace(' ', '', $appname));
     }
     else {
-      $apphost = 'drudock.dev';
+      $apphost = 'drudock.localhost';
     }
 
     $hosts_file = '/etc/hosts';
@@ -404,13 +404,17 @@ class ApplicationConfigExtension extends Application {
   /**
    * @param $io
    * @param $config
+   * @param $updating
    */
-  public function writeDockerComposeConfig($io, $config) {
-
+  public function writeDockerComposeConfig($io, $config, $updating = FALSE) {
     $system_appname = strtolower(str_replace(' ', '', $config[APPNAME]));
     $dist = $config['dist'];
     $dist_path = strtolower($dist);
-    $services_compose_dest = $system_appname . '/docker_' . $system_appname . '/docker-compose.yml';
+    if (file_exists(CONFIG_PATH)) {
+      $services_compose_dest = './docker_' . $system_appname . '/docker-compose.yml';
+    }else{
+      $services_compose_dest = $system_appname . '/docker_' . $system_appname . '/docker-compose.yml';
+    }
     $services_compose_proxy_dest = $system_appname . '/docker_' . $system_appname . '/docker-compose-nginx-proxy.yml';
     $services_compose_data_dest = $system_appname . '/docker_' . $system_appname . '/docker-compose-data.yml';
 
@@ -424,7 +428,10 @@ class ApplicationConfigExtension extends Application {
 
     // Get base compose config.
     $base_compose = Yaml::parse($base_yaml);
-    $base_compose = $this->applyAppServices($io, $base_compose, $config, $dist_path);
+    $base_compose = $this->applyAppServices($io, $base_compose, $config);
+
+    // Apply config service versions.
+    $base_compose = $this->applyAppServicesVersions($base_compose, $config);
 
     // Check if depends healthchecks are required.
     if (in_array('MYSQL', $config['services']) && in_array('PHP', $config['services'])) {
@@ -454,12 +461,15 @@ class ApplicationConfigExtension extends Application {
       }
 
       $base_data_compose = Yaml::parse($base_data_yaml);
-      $base_data_compose = $this->applyDataAppServices($io, $base_data_compose, $config, $dist_path);
+      $base_data_compose = $this->applyDataAppServices($io, $base_data_compose, $config);
       $app_data_yaml = Yaml::dump($base_data_compose, 8, 2);
       $this->renderFile($services_compose_data_dest, $app_data_yaml);
     }
 
-    $this->getRemoteBundle($io, 'config_' . $dist_path, $system_appname . '/docker_' . $system_appname . '/config');
+    // Get bundle on initial write.
+    if(!$updating) {
+      $this->getRemoteBundle($io, 'config_' . $dist_path, $system_appname . '/docker_' . $system_appname . '/config');
+    }
   }
 
   /**
@@ -469,7 +479,7 @@ class ApplicationConfigExtension extends Application {
    * @return mixed
    */
   public function addMysqlHealthcheck($base_compose, $service) {
-    $base_compose['services'][$service]['depends_on']['mysql']['condition'] = 'service_healthy';
+    $base_compose['services'][$service]['depends_on'][] = 'mysql';
     return $base_compose;
   }
 
@@ -518,19 +528,24 @@ class ApplicationConfigExtension extends Application {
   }
 
   /**
+   * Apply config service to compose.yaml.
+   *
    * @param $io
    * @param $base_compose
    * @param $config
-   * @param $dist_path
    *
    * @return mixed
    */
-  public function applyAppServices($io, $base_compose, $config, $dist_path) {
+  public function applyAppServices($io, $base_compose, $config) {
 
     // Set Services.
     $services = $this->arrangeServices($io, $config);
+    $dist = $config['dist'];
+    $dist_path = strtolower($dist);
 
-    foreach ($services['std'] as $service) {
+    $serviceNames = array_keys($services['std']);
+
+    foreach ($serviceNames as $service) {
       $service_name = strtolower($service);
       $service_yaml = file_get_contents(__DIR__ . TPLS_PATH . $dist_path . '/services/' . $service_name . '.yml');
       $service_compose = Yaml::parse($service_yaml);
@@ -569,15 +584,70 @@ class ApplicationConfigExtension extends Application {
   }
 
   /**
+   * Apply config service versions to compose.yaml.
+   *
+   * @param $base_compose
+   * @param $config
+   *
+   * @return mixed
+   */
+  public function applyAppServicesVersions($base_compose, $config) {
+    // Get image default config and apply app config versions.
+    foreach($base_compose['services'] as $serviceName => $service) {
+      // Currently only have option to set PHP version.
+      $configVersion = $config['services'][strtoupper($serviceName)];
+      $imageData = explode(':', $service['image']);
+      $imageData[1] = $configVersion;
+      $imageUpdated = implode(':', $imageData);
+      $base_compose['services'][$serviceName]['image'] = $imageUpdated;
+    }
+
+    return $base_compose;
+  }
+
+  /**
+   * Apply updates to service config.
+   *
+   * @param $io
+   * @param $input
+   * @param $output
+   * @param $cmd
+   * @param $config
+   *
+   * @return mixed
+   */
+  public function updateConfigServiceVersions($io, $input, $output, $cmd, $config) {
+
+    // Convert array in associative array with versions.
+    $servicesWithVersions = [];
+    foreach ($config['services'] as $service) {
+      // Currently only have option to set PHP version.
+      if ($service === 'PHP') {
+        // getSet PHP version.
+        $phpVersion = $this->getSetPHP($io, $input, $output, $cmd);
+        $servicesWithVersions[$service] = $phpVersion;
+      }
+      else {
+        $servicesWithVersions[$service] = 'latest';
+      }
+    }
+    return $servicesWithVersions;
+  }
+
+  /**
    * @param $io
    * @param $base_data_compose
    * @param $config
    * @param $dist_path
+   *
+   * @return mixed
    */
-  public function applyDataAppServices($io, $base_data_compose, $config, $dist_path) {
+  public function applyDataAppServices($io, $base_data_compose, $config) {
 
     // Set Services.
     $services = $this->arrangeServices($io, $config);
+    $dist = $config['dist'];
+    $dist_path = strtolower($dist);
 
     if ($config['dist'] === PRODUCTION) {
       foreach ($services['prod'] as $service) {
@@ -636,5 +706,40 @@ class ApplicationConfigExtension extends Application {
     }
 
     return $services;
+  }
+
+  /**
+   * GET AND SET PHP VERSION.
+   *
+   * @param $io
+   * @param $input
+   * @param $output
+   * @param $cmd
+   * @param $config
+   *
+   * @return mixed
+   */
+  public function getSetPHP($io, $input, $output, $cmd) {
+    $available_php_versions = [
+      '5.6',
+      '7.0',
+      '7.1',
+      '7.1-dev',
+      '7.2',
+      '7.2-dev',
+    ];
+
+    // Get/Set Services manually.
+    $io->info(' ');
+    $io->title("Choose PHP version:");
+    $helper = $cmd->getHelper(QUESTION);
+    $question = new ChoiceQuestion(
+      'Choose PHP version [eg. 0]: ',
+      $available_php_versions,
+      '1'
+    );
+    // $question->setMultiselect(TRUE);
+    $php_version = $helper->ask($input, $output, $question);
+    return $php_version;
   }
 }

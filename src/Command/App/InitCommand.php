@@ -9,7 +9,6 @@ namespace Docker\Drupal\Command\App;
 
 use Docker\Drupal\Application;
 use const Docker\Drupal\Extension\PRODUCTION;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,15 +43,16 @@ class InitCommand extends ContainerAwareCommand {
 
   protected function configure() {
     $this
-      ->setName('env:init')
+      ->setName('app:init')
+      ->setAliases(['ai'])
       ->setDescription('Fetch and build DruDock containers')
       ->setHelp('This command will fetch the specified DruDock config, download and build all necessary images.  NB: The first time you run this command it will need to download 4GB+ images from DockerHUB so make take some time.  Subsequent runs will be much quicker.')
-      ->addArgument('appname', InputArgument::OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
+      ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Specify NAME of application to build [app-dd-mm-YYYY]')
       ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Specify app version [D7,D8,DEFAULT]')
       ->addOption('dist', 'r', InputOption::VALUE_OPTIONAL, 'Specify app requirements [Development,Feature]')
       ->addOption('src', 'g', InputOption::VALUE_OPTIONAL, 'Specify app src [New, Git]')
       ->addOption('git', 'gs', InputOption::VALUE_OPTIONAL, 'Git repository URL')
-      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [drudock.dev]')
+      ->addOption('apphost', 'p', InputOption::VALUE_OPTIONAL, 'Specify preferred host path [drudock.localhost]')
       ->addOption('services', 's', InputOption::VALUE_OPTIONAL, 'Select app services [PHP, NGINX, MYSQL, SOLR, REDIS, MAILHOG]');
   }
 
@@ -109,23 +109,20 @@ class InitCommand extends ContainerAwareCommand {
       ],
     ];
 
-    // Add Mailhog to local development setup.
-    if(in_array('PHP', $config['services']) && $config['dist'] === 'Development'){
-      $config['services'][] = 'MAILHOG';
-    }
+    // Apply required versions to default config templates.
+    $config['services'] = $this->cfa->updateConfigServiceVersions($io, $input, $output, $this, $config);
 
     $this->cfa->writeDockerComposeConfig($io, $config);
 
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
 
-    if ($application->getOs() == 'Darwin' && isset($appname)) {
-
+    if ($application->getOs() == 'Darwin' && isset($appname) && !file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
       $message = "If prompted, please type admin password to add app localhost details \n and COPY ifconfig alias.plist to /Library/LaunchDaemons/";
       $io->info(' ');
       $io->info($message);
       $io->info(' ');
-      $this->cfa->setHostConfig('drudock.dev', $io, $system_appname);
+      $this->cfa->setHostConfig('drudock.localhost', $io, $system_appname);
     }
 
     $message = 'Fetching DruDock v' . $application->getVersion();
@@ -136,7 +133,7 @@ class InitCommand extends ContainerAwareCommand {
 
     $io->info(' ');
     $io->section("DruDock ::: Ready");
-    $info = 'Go to app directory [cd ' . $system_appname . '] and run [drudock build:init]';
+    $info = 'Go to app directory [cd ' . $system_appname . '] and run [drudock app:build]';
     $io->info($info);
     $io->info(' ');
   }
@@ -145,6 +142,7 @@ class InitCommand extends ContainerAwareCommand {
    * @param $application
    * @param $io
    * @param $appname
+   * @param $config
    */
   private function getDruDock($application, $io, $appname, $config) {
 

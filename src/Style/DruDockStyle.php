@@ -54,7 +54,7 @@ class DruDockStyle extends SymfonyStyle
     {
         $this->block(
             $message, null,
-            'bg=cyan;',
+            'bg=blue;fg=white',
             ' ',
             true
         );

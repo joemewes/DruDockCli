@@ -49,7 +49,7 @@ class NginxSetHostCommand extends Command {
     $system_appname = isset($appname) ? strtolower(str_replace(' ', '', $appname)) : 'app';
 
     if (!isset($apphost)) {
-      $apphost = 'drudock.dev';
+      $apphost = 'drudock.localhost';
     }
 
     $currenthost = $apphost;
@@ -62,10 +62,17 @@ class NginxSetHostCommand extends Command {
     }
 
     if (file_exists('.config.yml')) {
+      // Update app config.yaml.
       $config = Yaml::parse(file_get_contents('.config.yml'));
       $config['host'] = $newhost;
       $yaml = Yaml::dump($config);
       file_put_contents('.config.yml', $yaml);
+      // Update docker-compose.yaml file.
+      $base_yaml = file_get_contents('./docker_' . $system_appname . '/docker-compose.yml');
+      $base_compose = Yaml::parse($base_yaml);
+      $base_compose['services']['nginx']['environment']['VIRTUAL_HOST'] = $config['host'];
+      $app_yaml = Yaml::dump($base_compose, 8, 2);
+      $application->renderFile('./docker_' . $system_appname . '/docker-compose.yml', $app_yaml);
     }
     else {
       $io->error('You\'re not currently in an APP directory. APP .config.yml not found.');

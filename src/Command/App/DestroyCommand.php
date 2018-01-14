@@ -24,8 +24,8 @@ class DestroyCommand extends Command {
 
   protected function configure() {
     $this
-      ->setName('build:destroy')
-      ->setAliases(['destroy'])
+      ->setName('app:destroy')
+      ->setAliases(['ad'])
       ->setDescription('Disable and delete APP and containers')
       ->setHelp("This command will completely remove all containers and volumes for the current APP via the docker-compose.yml file.");
   }

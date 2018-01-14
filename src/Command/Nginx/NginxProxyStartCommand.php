@@ -48,19 +48,11 @@ class NginxProxyStartCommand extends Command {
       $apptype = $config[self::DIST];
     }
 
-    $command = 'docker network ls | grep drudock-frontend 2>&1 ';
-    if (shell_exec($command)) {
-      $io->info("FRONTEND network exists.");
-    }
-    else {
-      $io->info("Creating frontend network.");
-      $command = 'docker network create drudock-frontend';
-      $application->runcommand($command, $io);
-    }
+    $container_application->createProxyNetwork($io);
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
+    if (isset($appname) && $container_application->checkForAppContainers($appname, $io)) {
 
-      // Check if depends healthchecks are required.
+      // Check if depends health checks are required.
       if (isset($apptype) && $apptype !== 'Development') {
         $io->warning("Nginx proxy is for local development purposes and should be used with Development apps.");
       }

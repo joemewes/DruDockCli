@@ -23,7 +23,7 @@ class InitContainersCommand extends Command {
   protected function configure() {
     $this
       ->setName('app:init:containers')
-      ->setAliases(['init:ct'])
+      ->setAliases(['aic'])
       ->setDescription('Create APP containers')
       ->setHelp("This command will create app containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
   }
@@ -42,6 +42,8 @@ class InitContainersCommand extends Command {
       $io->warning("Container for this app already exist.  Try `drudock up:ct`");
       return;
     }
+
+    $container_application->createProxyNetwork($io);
 
     $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
     $application->runcommand($command, $io);

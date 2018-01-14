@@ -14,6 +14,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Console\Application as ParentApplication;
 use Docker\Drupal\Extension\ApplicationConfigExtension;
+use Docker\Drupal\Style\DruDockStyle;
 
 const DEV_MYSQL_PASS = 'DEVPASSWORD';
 const LOCALHOST = '127.0.0.1';
@@ -31,9 +32,9 @@ class Application extends ParentApplication {
 
   const VERSION = '1.4-alpha1.0.6';
 
-  const CDN = 'http://d1gem705zq3obi.cloudfront.net';
+  // const CDN = 'http://d1gem705zq3obi.cloudfront.net';
 
-  // const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
+  const CDN = 'https://s3.eu-west-2.amazonaws.com/drudock';
 
   protected $cfa;
 
@@ -53,6 +54,9 @@ class Application extends ParentApplication {
    * {@inheritdoc}
    */
   public function doRun(InputInterface $input, OutputInterface $output) {
+    // Check docker is running.
+    $this->checkDocker($input, $output);
+    // Continue Bootstrap.
     $this->registerCommands();
     parent::doRun($input, $output);
   }
@@ -144,6 +148,7 @@ class Application extends ParentApplication {
     }
 
     $commands[] = new Command\App\InitCommand();
+    $commands[] = new Command\App\InitBuildCommand();
     $commands[] = new Command\App\BuildCommand();
     $commands[] = new Command\App\StopCommand();
     $commands[] = new Command\App\StartCommand();
@@ -156,6 +161,10 @@ class Application extends ParentApplication {
     $commands[] = new Command\App\UpdateConfigCommand();
     $commands[] = new Command\App\OpenAppCommand();
     $commands[] = new Command\App\InitContainersCommand();
+    $commands[] = new Command\App\SSHCommand();
+    $commands[] = new Command\App\SelfUpdateCommand();
+    $commands[] = new Command\App\UpdateServicesCommand();
+    $commands[] = new Command\App\BashCommand();
 
     $commands[] = new Command\Mysql\MysqlImportCommand();
     $commands[] = new Command\Mysql\MysqlExportCommand();
@@ -168,7 +177,6 @@ class Application extends ParentApplication {
     $commands[] = new Command\Nginx\NginxProxyStartCommand();
     $commands[] = new Command\Nginx\NginxProxyStopCommand();
 
-    $commands[] = new Command\Drush\DrushCommand();
     $commands[] = new Command\Drush\DrushRegistryRebuildCommand();
     $commands[] = new Command\Drush\DrushClearCacheCommand();
     $commands[] = new Command\Drush\DrushLoginCommand();
@@ -297,15 +305,22 @@ class Application extends ParentApplication {
 
   /**
    * @return string
+   *
+   * @param $command
+   * @param $io
+   * @param $TTY
+   * @param $timeout
+   * @param $idleTimeout
    */
-  public function runcommand($command, $io) {
+  public function runcommand($command, $io, $TTY = FALSE, $timeout = 3600, $idleTimeout = 60) {
 
     global $output;
     $output = $io;
 
     $process = new Process($command);
-    $process->setTimeout(3600);
-    $process->setTty(FALSE);
+    $process->setTimeout($timeout);
+    $process->setIdleTimeout($idleTimeout);
+    $process->setTty($TTY);
     $process->run(function ($type, $buffer) {
       global $output;
       if ($output) {
@@ -333,7 +348,7 @@ class Application extends ParentApplication {
     }
 
     if (!isset($apphost)) {
-      $apphost = 'drudock.dev';
+      $apphost = 'drudock.localhost';
     }
 
     $system_appname = strtolower(str_replace(' ', '', $appname));
@@ -447,7 +462,7 @@ VIRTUAL_NETWORK=nginx-proxy";
         file_put_contents('./' . PATH_PREFIX . $system_appname . '/nginx.env', $nginxenv);
         break;
       default:
-        file_put_contents('./' . PATH_PREFIX . $system_appname . '/config/nginx/drudock.dev', $nginxconfig);
+        file_put_contents('./' . PATH_PREFIX . $system_appname . '/config/nginx/drudock.localhost', $nginxconfig);
     }
   }
 
@@ -455,13 +470,15 @@ VIRTUAL_NETWORK=nginx-proxy";
   /**
    * @return string
    */
-  public function checkDocker() {
+  public function checkDocker(InputInterface $input, OutputInterface $output) {
     $command = 'docker info';
     $process = new Process($command);
     $process->setTimeout(2);
     $process->run();
     if (!$process->isSuccessful()) {
-      return FALSE;
+      $io = new DruDockStyle($input, $output);
+      $io->error('Cannot connect to the Docker daemon. Is the docker daemon running?');
+      exit;
     }
     return TRUE;
   }
@@ -531,7 +548,7 @@ VIRTUAL_NETWORK=nginx-proxy";
     $this->cfa = new ApplicationConfigExtension();
     $system_appname = strtolower(str_replace(' ', '', $appname));
     $nginx_port = $this->cfa->containerPort($system_appname, 'nginx', '80');
-    $command = 'curl  http://drudock.dev:' . $nginx_port . ' > /tmp/' . $system_appname . '.html';
+    $command = 'curl  http://drudock.localhost:' . $nginx_port . ' > /tmp/' . $system_appname . '.html';
     shell_exec($command);
   }
 }

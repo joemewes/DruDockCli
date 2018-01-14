@@ -24,6 +24,7 @@ class DrushLoginCommand extends Command {
   protected function configure() {
     $this
       ->setName('drush:uli')
+      ->setAliases(['duli'])
       ->setDescription('Run Drush ULI')
       ->setHelp("This command will output a login URL.");
   }
@@ -37,12 +38,19 @@ class DrushLoginCommand extends Command {
 
     if ($config = $application->getAppConfig($io)) {
       $appname = $config['appname'];
+      $hosts = explode(' ', $config['host']);
+      $host = $hosts[0];
+    } else {
+      $appname = 'app';
+      $host = 'drudock.localhost';
     }
 
     if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush uli';
-      $application->runcommand($command, $io);
+      $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush -l ' . $host .  ' uli';
+      $uli_path = exec($command);
+      exec('python -mwebbrowser ' . $uli_path);
     }
+
   }
 
 }

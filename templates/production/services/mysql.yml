@@ -1,4 +1,4 @@
-image : mariadb:10.3.1
+image : 4alldigital/drudock-mysql:latest
 ports:
   - "3306"
 volumes :
