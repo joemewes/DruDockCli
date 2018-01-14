@@ -110,7 +110,7 @@ class InitCommand extends ContainerAwareCommand {
     ];
 
     // Apply required versions to default config templates.
-    $config['services'] = $this->cfa->updateConfigServiceVersions($config);
+    $config['services'] = $this->cfa->updateConfigServiceVersions($io, $input, $output, $this, $config);
 
     $this->cfa->writeDockerComposeConfig($io, $config);
 

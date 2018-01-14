@@ -36,7 +36,7 @@ class MysqlExportCommand extends Command {
     $this
       ->setName('mysql:export')
       ->setDescription('Export .sql files')
-      ->setHelp("Use this to dump .sql files to the current running APPs drudock_db. eg. [drudock mysql:export -p ./latest.sql]")
+      ->setHelp("Use this to dump .sql files to the current running APPs drudock_db. eg. [drudock mysql:export -p ./_mysql_backups/latest.sql]")
       ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Specify export file path including filename [./latest.sql]');
   }
 
@@ -55,14 +55,18 @@ class MysqlExportCommand extends Command {
       $appname = 'app';
     }
 
-    // GET AND SET APP TYPE
+    if (!file_exists('_mysql_backups')) {
+      mkdir('_mysql_backups', 0777, true);
+    }
+
+    // GET AND SET APP TYPE.
     $savepath = $input->getOption('path');
 
     if (!$savepath) {
-      //specify save path
+      // Specify save path.
       $datetime = date("Y-m-d--H-i-s");
       $helper = $this->getHelper('question');
-      $question = new Question('Specify save path, including filename [latest-' . $appname . '--' . $datetime . '.sql] : ', 'latest-' . $appname . '--' . $datetime . '.sql');
+      $question = new Question('Specify save path, including filename [_mysql_backups/latest-' . $appname . '--' . $datetime . '.sql] : ', 'latest-' . $appname . '--' . $datetime . '.sql');
       $savepath = $helper->ask($input, $output, $question);
     }
 
@@ -114,7 +118,7 @@ class MysqlExportCommand extends Command {
     }
 
     if ($container_application->checkForAppContainers($appname, $io) && isset($savepath)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql bash -c "' . $mysqldump . '" > ' . $savepath;
+      $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql bash -c "' . $mysqldump . '" > ./_mysql_backups/' . $savepath;
       $application->runcommand($command, $io);
     }
   }
