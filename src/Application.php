@@ -312,7 +312,7 @@ class Application extends ParentApplication {
    * @param $timeout
    * @param $idleTimeout
    */
-  public function runcommand($command, $io, $TTY = FALSE, $timeout = 3600, $idleTimeout = 60) {
+  public function runcommand($command, $io, $TTY = FALSE, $timeout = 3600, $idleTimeout = 600) {
 
     global $output;
     $output = $io;

@@ -120,7 +120,7 @@ class MysqlImportCommand extends Command {
         // @todo resolve and update - https://github.com/docker/compose/issues/4290
         //$command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
         $command = 'docker exec -i $(' . $container_application->getComposePath($appname, $io) . 'ps -q mysql) mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
-        $application->runcommand($command, $io, FALSE, 3600, 600);
+        $application->runcommand($command, $io);
       }
     }
     else {
