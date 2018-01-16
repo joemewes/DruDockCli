@@ -62,7 +62,11 @@ class MysqlImportCommand extends Command {
     if (!$path) {
 
       $finder = new Finder();
-      $finder->files()->in('_mysql_backups');
+      $sqlFilter = function (\SplFileInfo $file) {
+        return (substr($file, -4) === '.sql') ;
+      };
+
+      $finder->files()->in('_mysql_backups')->filter($sqlFilter);
       $sqlDumpsNames = [];
       $sqlDumpsPaths = [];
 
@@ -116,8 +120,6 @@ class MysqlImportCommand extends Command {
         // @todo resolve and update - https://github.com/docker/compose/issues/4290
         //$command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
         $command = 'docker exec -i $(' . $container_application->getComposePath($appname, $io) . 'ps -q mysql) mysql -u drudock -pMYSQLPASS drudock_db < ' . $importpath;
-        var_dump($command);
-        die();
         $application->runcommand($command, $io);
       }
     }
