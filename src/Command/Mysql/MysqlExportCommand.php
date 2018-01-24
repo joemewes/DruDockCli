@@ -119,6 +119,7 @@ class MysqlExportCommand extends Command {
 
     if ($container_application->checkForAppContainers($appname, $io) && isset($savepath)) {
       $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql bash -c "' . $mysqldump . '" > ./_mysql_backups/' . $savepath;
+      $io->info("Exporting database. This may take a few minutes depending on size of import. Please wait.");
       $application->runcommand($command, $io);
     }
   }

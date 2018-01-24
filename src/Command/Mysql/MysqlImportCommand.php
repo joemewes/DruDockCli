@@ -124,9 +124,11 @@ class MysqlImportCommand extends Command {
 
         $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "drop database drudock_db;"';
         $application->runcommand($command, $io);
+        $io->info("Dropped `drudock_db` database.");
 
         // recreate dev_db
         $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "create database drudock_db;"';
+        $io->info("Importing database. This may take a few minutes depending on size of import. Please wait.");
         $application->runcommand($command, $io);
 
         // import new .sql file
