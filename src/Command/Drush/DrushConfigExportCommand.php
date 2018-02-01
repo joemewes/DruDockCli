@@ -52,7 +52,7 @@ class DrushConfigExportCommand extends Command {
 
     switch ($config['apptype']) {
       case 'D8':
-        $cmd = implode(' ', array_merge(['config-import', $label], $options));
+        $cmd = implode(' ', array_merge(['config-export', $label], $options));
         break;
       case 'D7':
           $io->error('This command is only available for D8');

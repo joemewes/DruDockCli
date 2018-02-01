@@ -18,7 +18,7 @@ use Docker\Drupal\Style\DruDockStyle;
  *
  * @package Docker\Drupal\Command
  */
-class ExecCommand extends Command {
+class AboutCommand extends Command {
 
   protected function configure() {
     $this
@@ -100,7 +100,7 @@ class ExecCommand extends Command {
   }
 
   /**
-   * @return boolean
+   * @param object
    */
   private function checkGitInstalled($io) {
     exec('which git', $output);
@@ -111,6 +111,4 @@ class ExecCommand extends Command {
       $io->error('GIT not found. Please install.');
     }
   }
-
-
 }
