@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Extension\DemoCommand.
+ * Contains \Docker\Drupal\Extension\ApplicationConfigExtension.
  */
 
 namespace Docker\Drupal\Extension;
@@ -392,12 +392,6 @@ class ApplicationConfigExtension extends Application {
         $command = 'echo "' . $hosts_file_contents . '" | sudo tee ' . $hosts_file;
         exec($command);
       }
-    }
-
-    if (!file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
-      $this->tmpRemoteBundle('osx');
-      $command = 'sudo cp -R /tmp/osx/com.4alldigital.drudock.plist /Library/LaunchDaemons/com.4alldigital.drudock.plist';
-      $this->runcommand($command, $io, TRUE);
     }
   }
 

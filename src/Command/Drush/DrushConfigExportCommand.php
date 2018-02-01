@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\DrushConfigExportCommand.
  */
 
 namespace Docker\Drupal\Command\Drush;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DemoCommand
+ * Class DrushConfigExportCommand
  *
  * @package Docker\Drupal\Command
  */
@@ -52,7 +52,7 @@ class DrushConfigExportCommand extends Command {
 
     switch ($config['apptype']) {
       case 'D8':
-        $cmd = implode(' ', array_merge(['config-import', $label], $options));
+        $cmd = implode(' ', array_merge(['config-export', $label], $options));
         break;
       case 'D7':
           $io->error('This command is only available for D8');

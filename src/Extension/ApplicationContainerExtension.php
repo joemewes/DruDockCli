@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Extension\DemoCommand.
+ * Contains \Docker\Drupal\Extension\ApplicationContainerExtension.
  */
 
 namespace Docker\Drupal\Extension;

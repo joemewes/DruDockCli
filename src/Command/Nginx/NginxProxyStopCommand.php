@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\NginxProxyStopCommand.
  */
 
 namespace Docker\Drupal\Command\Nginx;

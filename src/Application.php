@@ -30,7 +30,7 @@ class Application extends ParentApplication {
 
   const NAME = 'Docker Drupal';
 
-  const VERSION = '1.4-alpha1.0.6';
+  const VERSION = '1.4-alpha1.0.8';
 
   // const CDN = 'http://d1gem705zq3obi.cloudfront.net';
 
@@ -184,6 +184,8 @@ class Application extends ParentApplication {
     $commands[] = new Command\Drush\DrushModuleDisableCommand();
     $commands[] = new Command\Drush\DrushUpDbCommand();
     $commands[] = new Command\Drush\DrushInitConfigCommand();
+    $commands[] = new Command\Drush\DrushConfigExportCommand();
+    $commands[] = new Command\Drush\DrushConfigImportCommand();
 
     $commands[] = new Command\Redis\RedisMonitorCommand();
     $commands[] = new Command\Redis\RedisPingCommand();

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\BashCommand.
  */
 
 namespace Docker\Drupal\Command\App;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class StopCommand
+ * Class BashCommand
  *
  * @package Docker\Drupal\Command
  */

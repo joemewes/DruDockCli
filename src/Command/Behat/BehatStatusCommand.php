@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\BehatStatusCommand.
  */
 
 namespace Docker\Drupal\Command\Behat;

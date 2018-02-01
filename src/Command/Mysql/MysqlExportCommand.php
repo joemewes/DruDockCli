@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\MysqlExportCommand.
  */
 
 namespace Docker\Drupal\Command\Mysql;
@@ -17,7 +17,7 @@ use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
- * Class MysqlImportExportCommand
+ * Class MysqlExportCommand
  *
  * @package Docker\Drupal\Command\Mysql
  */

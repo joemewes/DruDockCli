@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\AboutCommand.
  */
 
 namespace Docker\Drupal\Command\App;
@@ -100,7 +100,7 @@ class AboutCommand extends Command {
   }
 
   /**
-   * @return boolean
+   * @param object
    */
   private function checkGitInstalled($io) {
     exec('which git', $output);
@@ -111,6 +111,4 @@ class AboutCommand extends Command {
       $io->error('GIT not found. Please install.');
     }
   }
-
-
 }
