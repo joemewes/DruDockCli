@@ -117,8 +117,8 @@ class InitCommand extends ContainerAwareCommand {
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
 
-    if ($application->getOs() == 'Darwin' && isset($appname) && !file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
-      $message = "If prompted, please type admin password to add app localhost details \n and COPY ifconfig alias.plist to /Library/LaunchDaemons/";
+    if ($application->getOs() == 'Darwin' && isset($appname))) {
+      $message = "If prompted, please type admin password to add app localhost details.";
       $io->info(' ');
       $io->info($message);
       $io->info(' ');

@@ -393,12 +393,6 @@ class ApplicationConfigExtension extends Application {
         exec($command);
       }
     }
-
-    if (!file_exists('/Library/LaunchDaemons/com.4alldigital.drudock.plist')) {
-      $this->tmpRemoteBundle('osx');
-      $command = 'sudo cp -R /tmp/osx/com.4alldigital.drudock.plist /Library/LaunchDaemons/com.4alldigital.drudock.plist';
-      $this->runcommand($command, $io, TRUE);
-    }
   }
 
   /**
