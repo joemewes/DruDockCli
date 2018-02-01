@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\AboutCommand.
  */
 
 namespace Docker\Drupal\Command\App;
@@ -18,7 +18,7 @@ use Docker\Drupal\Style\DruDockStyle;
  *
  * @package Docker\Drupal\Command
  */
-class AboutCommand extends Command {
+class ExecCommand extends Command {
 
   protected function configure() {
     $this

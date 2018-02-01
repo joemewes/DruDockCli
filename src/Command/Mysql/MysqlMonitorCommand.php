@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\MysqlMonitorCommand.
  */
 
 namespace Docker\Drupal\Command\Mysql;
@@ -15,7 +15,7 @@ use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
- * Class WatchCommand
+ * Class MysqlMonitorCommand
  *
  * @package Docker\Drupal\Command\Mysql
  */

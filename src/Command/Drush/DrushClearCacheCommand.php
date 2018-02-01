@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\DrushClearCacheCommand.
  */
 
 namespace Docker\Drupal\Command\Drush;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DemoCommand
+ * Class DrushClearCacheCommand
  *
  * @package Docker\Drupal\Command
  */

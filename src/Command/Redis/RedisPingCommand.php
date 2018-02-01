@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\RedisPingCommand.
  */
 
 namespace Docker\Drupal\Command\Redis;
@@ -15,7 +15,7 @@ use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 
 /**
- * Class WatchCommand
+ * Class RedisPingCommand
  *
  * @package Docker\Drupal\Command\redis
  */

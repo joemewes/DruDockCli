@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DemoCommand.
+ * Contains \Docker\Drupal\Command\InitCommand.
  */
 
 namespace Docker\Drupal\Command\App;
@@ -117,7 +117,7 @@ class InitCommand extends ContainerAwareCommand {
     $yaml = Yaml::dump($config);
     file_put_contents($system_appname . '/.config.yml', $yaml);
 
-    if ($application->getOs() == 'Darwin' && isset($appname))) {
+    if ($application->getOs() == 'Darwin' && isset($appname)) {
       $message = "If prompted, please type admin password to add app localhost details.";
       $io->info(' ');
       $io->info($message);
