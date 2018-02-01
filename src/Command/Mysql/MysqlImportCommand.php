@@ -18,6 +18,8 @@ use Docker\Drupal\Style\DruDockStyle;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 /**
  * Class MysqlImportExportCommand
@@ -26,6 +28,7 @@ use Symfony\Component\Finder\Finder;
 class MysqlImportCommand extends Command {
 
   const QUESTION = 'question';
+  const MYSQL_BACKUP_FOLDER = '_mysql_backups';
 
   protected function configure() {
     $this
@@ -60,13 +63,23 @@ class MysqlImportCommand extends Command {
     $path = $input->getOption('path');
     $importpath = null;
     if (!$path) {
-
       $finder = new Finder();
+      $fs = new Filesystem();
       $sqlFilter = function (\SplFileInfo $file) {
         return (substr($file, -4) === '.sql') ;
       };
 
-      $finder->files()->in('_mysql_backups')->filter($sqlFilter);
+      // Create backup directory if it does not exist.
+      if (!$fs->exists(self::MYSQL_BACKUP_FOLDER)) {
+        try {
+          $fs->mkdir(self::MYSQL_BACKUP_FOLDER);
+        }
+        catch (IOExceptionInterface $e) {
+          $io->error("An error occurred while creating your directory at " . $e->getPath());
+        }
+      }
+
+      $finder->files()->in(self::MYSQL_BACKUP_FOLDER)->filter($sqlFilter);
       $sqlDumpsNames = [];
       $sqlDumpsPaths = [];
 
@@ -111,9 +124,11 @@ class MysqlImportCommand extends Command {
 
         $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "drop database drudock_db;"';
         $application->runcommand($command, $io);
+        $io->info("Dropped `drudock_db` database.");
 
         // recreate dev_db
         $command = $container_application->getComposePath($appname, $io) . 'exec -T mysql mysql -u drudock -pMYSQLPASS -Bse "create database drudock_db;"';
+        $io->info("Importing database. This may take a few minutes depending on size of import. Please wait.");
         $application->runcommand($command, $io);
 
         // import new .sql file
