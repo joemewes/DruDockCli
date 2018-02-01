@@ -76,6 +76,8 @@ Install and setup Docker
     behat:status           Runs example command against running APP and current config
    drush
     drush:cc               [dcc] Run drush cache clear
+    drush:cex              [dcex] Run drush config-export
+    drush:cim              [dcim] Run drush config-import
     drush:dis              [dd] Disable/Uninstall Drupal module
     drush:en               [de] Enable Drupal module
     drush:init:config      [dicg] Run drush config init
