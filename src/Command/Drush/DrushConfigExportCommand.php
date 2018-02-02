@@ -38,7 +38,23 @@ class DrushConfigExportCommand extends Command {
     $container_application = new ApplicationContainerExtension();
 
     $label = $input->getArgument('label');
-    $options = $input->getOptions();
+    $options = array_filter($input->getOptions());
+
+    $cmd_options = ['config-export'];
+
+      if (!empty($label)) {
+          $cmd_options[] = $label;
+      }
+
+    foreach ($options as $option => $value) {
+      switch ($option) {
+        case 'yes':
+          $cmd_options[] = '-y';
+          break;
+        default:
+          $cmd_options[] = "--{$option} " . "\"{$value}\"";
+      }
+    }
 
     $io = new DruDockStyle($input, $output);
 
@@ -52,7 +68,7 @@ class DrushConfigExportCommand extends Command {
 
     switch ($config['apptype']) {
       case 'D8':
-        $cmd = implode(' ', array_merge(['config-export', $label], $options));
+        $cmd = implode(' ', $cmd_options);
         break;
       case 'D7':
           $io->error('This command is only available for D8');

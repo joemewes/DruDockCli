@@ -30,9 +30,9 @@ class DrushConfigImportCommand extends Command {
       ->setDescription('Run drush config-import ')
       ->setHelp("This command will import config from a config directory.")
       ->addArgument('label', InputArgument::OPTIONAL, "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'")
-      ->addOption('preview', 'p', InputOption::VALUE_OPTIONAL, "Preview config")
-      ->addOption('source', 's', InputOption::VALUE_OPTIONAL, 'Config source')
-      ->addOption('partial', 'P', InputOption::VALUE_OPTIONAL, 'Import configuration; do not remove missing configuration');
+      ->addOption('preview', 'p', InputOption::VALUE_NONE, "Preview config")
+      ->addOption('source', 's', InputOption::VALUE_NONE, 'Config source')
+      ->addOption('partial', 'P', InputOption::VALUE_NONE, 'Import configuration; do not remove missing configuration');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -40,7 +40,23 @@ class DrushConfigImportCommand extends Command {
     $container_application = new ApplicationContainerExtension();
 
     $label = $input->getArgument('label');
-    $options = $input->getOptions();
+    $options = array_filter($input->getOptions());
+    $cmd_options = ['config-import'];
+
+    if (!empty($label)) {
+        $cmd_options[] = $label;
+    }
+
+    foreach ($options as $option => $value) {
+        switch ($option) {
+            case 'yes':
+                $cmd_options[] = '-y';
+                break;
+            default:
+                $cmd_options[] = "--{$option}";
+        }
+    }
+
 
     $io = new DruDockStyle($input, $output);
 
@@ -54,7 +70,7 @@ class DrushConfigImportCommand extends Command {
 
     switch ($config['apptype']) {
       case 'D8':
-        $cmd = implode(' ', array_merge(['config-import', $label], $options));
+        $cmd = implode(' ', $cmd_options);
         break;
       case 'D7':
           $io->error('This command is only available for D8');

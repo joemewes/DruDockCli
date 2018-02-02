@@ -133,7 +133,7 @@ class Application extends ParentApplication {
         new InputOption('--ansi', '', InputOption::VALUE_NONE, 'Force ANSI output'),
         new InputOption('--no-ansi', '', InputOption::VALUE_NONE, 'Disable ANSI output'),
         new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question'),
-        //new InputOption('--yes', '-y', InputOption::VALUE_NONE, 'Answer "yes" to all prompts'),
+        new InputOption('--yes', '-y', InputOption::VALUE_NONE, 'Answer "yes" to all prompts'),
       ]
     );
   }
