@@ -28,9 +28,20 @@ class DrushConfigExportCommand extends Command {
       ->setName('drush:cex')
       ->setAliases(['dcex'])
       ->setDescription('Run drush config-export ')
-      ->setHelp("This command will export config to the default sync directory.")
-      ->addArgument('label', InputArgument::OPTIONAL, "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'")
-      ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, "An arbitrary directory that should receive the exported files. An alternative to label argument.");
+      ->setHelp(
+        "This command will export config to the default sync directory."
+      )
+      ->addArgument(
+        'label',
+        InputArgument::OPTIONAL,
+        "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'"
+      )
+      ->addOption(
+        'destination',
+        'd',
+        InputOption::VALUE_OPTIONAL,
+        "An arbitrary directory that should receive the exported files. An alternative to label argument."
+      );
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
