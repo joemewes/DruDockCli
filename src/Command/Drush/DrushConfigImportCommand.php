@@ -44,17 +44,19 @@ class DrushConfigImportCommand extends Command {
     $cmd_options = ['config-import'];
 
     if (!empty($label)) {
-        $cmd_options[] = $label;
+      $cmd_options[] = $label;
     }
 
     foreach ($options as $option => $value) {
-        switch ($option) {
-            case 'yes':
-                $cmd_options[] = '-y';
-                break;
-            default:
-                $cmd_options[] = "--{$option}";
-        }
+      switch ($option) {
+        case 'yes':
+          $cmd_options[] = '-y';
+          break;
+        case "preview":
+          $cmd_options[] = is_numeric($value) ? "--{$option}" : "--{$option}={$value}";
+        default:
+          $cmd_options[] = "--{$option}";
+      }
     }
 
 

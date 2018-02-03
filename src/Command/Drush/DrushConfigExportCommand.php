@@ -42,17 +42,21 @@ class DrushConfigExportCommand extends Command {
 
     $cmd_options = ['config-export'];
 
-      if (!empty($label)) {
-          $cmd_options[] = $label;
-      }
+    if (!empty($label)) {
+      $cmd_options[] = $label;
+    }
 
     foreach ($options as $option => $value) {
       switch ($option) {
         case 'yes':
           $cmd_options[] = '-y';
           break;
+        case 'destination':
+        case 'message':
+          $cmd_options[] = "--{$option}={$value}";
+          break;
         default:
-          $cmd_options[] = "--{$option} " . "\"{$value}\"";
+          $cmd_options[] = "--{$option}";
       }
     }
 
