@@ -64,6 +64,8 @@ class DrushConfigExportCommand extends Command {
           break;
         case 'destination':
         case 'message':
+        case 'branch':
+        case 'remote':
           $cmd_options[] = "--{$option}={$value}";
           break;
         default:
