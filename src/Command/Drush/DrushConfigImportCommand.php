@@ -54,6 +54,7 @@ class DrushConfigImportCommand extends Command {
           break;
         case "preview":
           $cmd_options[] = is_numeric($value) ? "--{$option}" : "--{$option}={$value}";
+          break;
         default:
           $cmd_options[] = "--{$option}";
       }
