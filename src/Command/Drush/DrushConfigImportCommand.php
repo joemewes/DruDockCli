@@ -29,10 +29,25 @@ class DrushConfigImportCommand extends Command {
       ->setAliases(['dcim'])
       ->setDescription('Run drush config-import ')
       ->setHelp("This command will import config from a config directory.")
-      ->addArgument('label', InputArgument::OPTIONAL, "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'")
-      ->addOption('preview', 'p', InputOption::VALUE_NONE, "Preview config")
+      ->addArgument(
+        'label',
+        InputArgument::OPTIONAL,
+        "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'"
+      )
+      ->addOption(
+        'preview',
+        'p',
+        InputOption::VALUE_OPTIONAL,
+        "Preview config",
+        'list'
+      )
       ->addOption('source', 's', InputOption::VALUE_NONE, 'Config source')
-      ->addOption('partial', 'P', InputOption::VALUE_NONE, 'Import configuration; do not remove missing configuration');
+      ->addOption(
+        'partial',
+        'P',
+        InputOption::VALUE_NONE,
+        'Import configuration; do not remove missing configuration'
+      );
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
