@@ -57,29 +57,24 @@ class NginxProxyStartCommand extends Command {
         $io->warning("Nginx proxy is for local development purposes and should be used with Development apps.");
       }
 
-      $command = 'docker ps -a -f name=drudock-proxy | grep drudock-proxy';
-      if (shell_exec($command)) {
-        $io->info("Running proxy container.");
-        $command = 'docker start drudock-proxy';
-        $application->runcommand($command, $io);
-      }
-      else {
-        $io->info("Creating proxy container.");
-        $command = 'docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro --name drudock-proxy --net drudock-frontend 4alldigital/drudock-nginx-proxy';
-        $application->runcommand($command, $io);
-      }
-
+      $io->info("Starting proxy container.");
       $system_appname = strtolower(str_replace(' ', '', $config[self::APPNAME]));
+      // $command = 'docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro --name drudock-proxy --net drudock-frontend 4alldigital/drudock-nginx-proxy';
+      $command = 'docker-compose -f ./docker_' . $system_appname . '/docker-compose-nginx-proxy.yml --project-name=proxy up -d';
+
+      $application->runcommand($command, $io);
+
       $base_yaml = file_get_contents('./docker_' . $system_appname . '/docker-compose.yml');
       $base_compose = Yaml::parse($base_yaml);
 
       if (!in_array('proxy', $base_compose['services']['nginx']["networks"])) {
         $base_compose['services']['nginx']["networks"][] = 'proxy';
         $base_compose['services']['nginx']['environment']['VIRTUAL_HOST'] = $config[self::HOST];
+        $base_compose['services']['nginx']['environment']['LETSENCRYPT_HOST'] = $config[self::HOST];
         $base_compose['services']['nginx']['environment']['VIRTUAL_NETWORK'] = 'nginx-proxy';
       }
 
-      $base_compose['networks']['proxy']['external']['name'] = 'drudock-frontend';
+      $base_compose['networks']['proxy']['external']['name'] = 'proxy_drudock-frontend';
 
       $app_yaml = Yaml::dump($base_compose, 8, 2);
       $application->renderFile('./docker_' . $system_appname . '/docker-compose.yml', $app_yaml);
