@@ -5,9 +5,6 @@ volumes :
   - app-data:/app:ro
   - ../app/www/sites/default/files:/app/www/sites/default/files:rw
 hostname: php
-dns:
-  - 8.8.8.8
-  - 8.8.4.4
 restart: always
 read_only: true
 tmpfs:
