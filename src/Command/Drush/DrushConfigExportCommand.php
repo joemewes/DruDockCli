@@ -28,9 +28,20 @@ class DrushConfigExportCommand extends Command {
       ->setName('drush:cex')
       ->setAliases(['dcex'])
       ->setDescription('Run drush config-export ')
-      ->setHelp("This command will export config to the default sync directory.")
-      ->addArgument('label', InputArgument::OPTIONAL, "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'")
-      ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, "An arbitrary directory that should receive the exported files. An alternative to label argument.");
+      ->setHelp(
+        "This command will export config to the default sync directory."
+      )
+      ->addArgument(
+        'label',
+        InputArgument::OPTIONAL,
+        "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'"
+      )
+      ->addOption(
+        'destination',
+        'd',
+        InputOption::VALUE_OPTIONAL,
+        "An arbitrary directory that should receive the exported files. An alternative to label argument."
+      );
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -38,7 +49,29 @@ class DrushConfigExportCommand extends Command {
     $container_application = new ApplicationContainerExtension();
 
     $label = $input->getArgument('label');
-    $options = $input->getOptions();
+    $options = array_filter($input->getOptions());
+
+    $cmd_options = ['config-export'];
+
+    if (!empty($label)) {
+      $cmd_options[] = $label;
+    }
+
+    foreach ($options as $option => $value) {
+      switch ($option) {
+        case 'yes':
+          $cmd_options[] = '-y';
+          break;
+        case 'destination':
+        case 'message':
+        case 'branch':
+        case 'remote':
+          $cmd_options[] = "--{$option}={$value}";
+          break;
+        default:
+          $cmd_options[] = "--{$option}";
+      }
+    }
 
     $io = new DruDockStyle($input, $output);
 
@@ -52,7 +85,7 @@ class DrushConfigExportCommand extends Command {
 
     switch ($config['apptype']) {
       case 'D8':
-        $cmd = implode(' ', array_merge(['config-export', $label], $options));
+        $cmd = implode(' ', $cmd_options);
         break;
       case 'D7':
           $io->error('This command is only available for D8');

@@ -9,11 +9,6 @@ environment:
   XDEBUG_CONFIG: "remote_host=docker.for.mac.localhost"
   PHP_IDE_CONFIG: "serverName=drudock.localhost"
   HOST_IP: "docker.for.mac.localhost"
-dns:
-  - 8.8.8.8
-  - 8.8.4.4
 hostname: php
-extra_hosts:
- - "drudock.localhost:docker.for.mac.localhost"
 networks:
   - default
