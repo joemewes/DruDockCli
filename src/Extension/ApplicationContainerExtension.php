@@ -149,13 +149,13 @@ class ApplicationContainerExtension extends Application {
   }
 
   public function createProxyNetwork($io) {
-    $command = 'docker network ls | grep drudock-frontend 2>&1 ';
+    $command = 'docker network ls | grep proxy_drudock-frontend 2>&1 ';
     if (shell_exec($command)) {
       $io->info("FRONTEND network exists.");
     }
     else {
       $io->info("Creating frontend network.");
-      $command = 'docker network create drudock-frontend';
+      $command = 'docker network create proxy_drudock-frontend';
       $this->runcommand($command, $io);
     }
   }
