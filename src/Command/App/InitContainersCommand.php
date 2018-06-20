@@ -38,8 +38,8 @@ class InitContainersCommand extends Command {
       $appname = $config['appname'];
     }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $io->warning("Container for this app already exist.  Try `drudock up:ct`");
+    if ($container_application->checkForAppContainers($appname, $io, TRUE)) {
+      $io->warning("Container for this app already exist.  Try `drudock app:update:containers`");
       return;
     }
 

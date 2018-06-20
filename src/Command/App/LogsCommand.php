@@ -15,16 +15,16 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class StatusCommand
+ * Class LogsCommand
  * @package Docker\Drupal\Command
  */
-class StatusCommand extends Command {
+class LogsCommand extends Command {
   protected function configure() {
     $this
-      ->setName('app:status')
-      ->setAliases(['as'])
-      ->setDescription('Get current status of all containers')
-      ->setHelp("This command will output a quick status healthcheck of all running containers.");
+      ->setName('app:logs')
+      ->setAliases(['al'])
+      ->setDescription('Get logs of all containers')
+      ->setHelp("This command will output a logs of all running app containers.");
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -40,6 +40,8 @@ class StatusCommand extends Command {
       $appname = 'app';
     }
 
-    $container_application->dockerHealthCheck($appname, $io);
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+    $command = $container_application->getComposePath($system_appname, $io) . 'logs -f';
+    $application->runcommand($command, $io);
   }
 }
