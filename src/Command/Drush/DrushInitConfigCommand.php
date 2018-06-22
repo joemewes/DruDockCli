@@ -51,7 +51,7 @@ class DrushInitConfigCommand extends Command {
 
       $commands = [
         'drush config-set \'system.site\' uuid ' . $uuid . ' -y',
-        'drush cr all',
+        'drush cache-rebuild',
         'drush ev "if(\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")){\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")->delete();};"',
         'drush cron',
         'drush entity-updates -y',
