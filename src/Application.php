@@ -30,7 +30,7 @@ class Application extends ParentApplication {
 
   const NAME = 'Docker Drupal';
 
-  const VERSION = '1.4-alpha1.0.10';
+  const VERSION = '1.4-alpha1.0.11';
 
   // const CDN = 'http://d1gem705zq3obi.cloudfront.net';
 
@@ -161,6 +161,7 @@ class Application extends ParentApplication {
     $commands[] = new Command\App\UpdateConfigCommand();
     $commands[] = new Command\App\OpenAppCommand();
     $commands[] = new Command\App\InitContainersCommand();
+    $commands[] = new Command\App\LogsCommand();
     $commands[] = new Command\App\SSHCommand();
     $commands[] = new Command\App\SelfUpdateCommand();
     $commands[] = new Command\App\UpdateServicesCommand();

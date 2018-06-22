@@ -66,13 +66,11 @@ class NginxProxyStartCommand extends Command {
       }
       else {
         $io->info("Creating proxy container.");
-        $command = 'docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro --name drudock-proxy --net drudock-frontend 4alldigital/drudock-nginx-proxy';
+        $command = 'docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro --name drudock-proxy --net proxy_drudock-frontend 4alldigital/drudock-nginx-proxy';
         $application->runcommand($command, $io);
       }
 
       $system_appname = strtolower(str_replace(' ', '', $config[self::APPNAME]));
-      $application->runcommand($command, $io);
-
       $base_yaml = file_get_contents('./docker_' . $system_appname . '/docker-compose.yml');
       $base_compose = Yaml::parse($base_yaml);
 

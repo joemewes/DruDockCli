@@ -20,36 +20,35 @@ const BUILDS = 'builds';
 class ApplicationContainerExtension extends Application {
 
   /**
+   * @param $appname
+   * @param $io
+   * @param $nomessage
+   *
    * @return Boolean
    */
-  public function checkForAppContainers($appname, $io) {
-
-    $system_appname = strtolower(str_replace(' ', '', $appname));
-    // Check for standard app containers
-    if (exec($this->getComposePath($appname, $io) . 'ps | grep ' . preg_replace("/[^A-Za-z0-9 ]/", '', $system_appname))) {
+  public function checkForAppContainers($appname, $io, $nomessage = FALSE) {
+    $command = $this->getComposePath($appname, $io) . 'ps | grep docker_';
+    if (exec($command)) {
       return TRUE;
     }
     else {
-      $io->warning("APP has no containers, try running `drudock app:build --help`");
+      if($nomessage) {
+        return FALSE;
+      }
+      $io->warning("APP has no containers, try running `drudock app:init:containers --help`");
     }
   }
 
   /**
    * @output status table
+   *
+   * @param $appname
+   * @param $io
    */
-  public function dockerHealthCheck($io) {
-    $names = shell_exec("echo $(docker ps --format '{{.Names}}|{{.Status}}:')");
-    $n_array = explode(':', $names);
-    $rows = [];
-    foreach ($n_array as $i => $n) {
-      $c = explode('|', $n);
-      if ($c[0] && $c[1]) {
-        $rows[$i]['Name'] = str_replace(' ', '', $c[0]);
-        $rows[$i]['Status'] = $c[1];
-      }
-    }
-    $headers = ['Container Name', 'Status'];
-    $io->table($headers, $rows);
+  public function dockerHealthCheck($appname, $io) {
+    $system_appname = strtolower(str_replace(' ', '', $appname));
+    $command = $this->getComposePath($system_appname, $io) . 'ps';
+    $this->runcommand($command, $io);
   }
 
   /**
@@ -61,6 +60,9 @@ class ApplicationContainerExtension extends Application {
   }
 
   /**
+   * @param $appname
+   * @param $io
+   *
    * @return string
    */
   public function getComposePath($appname, $io) {
@@ -149,13 +151,13 @@ class ApplicationContainerExtension extends Application {
   }
 
   public function createProxyNetwork($io) {
-    $command = 'docker network ls | grep drudock-frontend 2>&1 ';
+    $command = 'docker network ls | grep proxy_drudock-frontend 2>&1 ';
     if (shell_exec($command)) {
       $io->info("FRONTEND network exists.");
     }
     else {
       $io->info("Creating frontend network.");
-      $command = 'docker network create drudock-frontend';
+      $command = 'docker network create proxy_drudock-frontend';
       $this->runcommand($command, $io);
     }
   }
