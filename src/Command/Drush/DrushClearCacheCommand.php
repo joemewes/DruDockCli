@@ -44,7 +44,7 @@ class DrushClearCacheCommand extends Command {
 
     switch ($config['apptype']) {
       case 'D8':
-        $cmd = 'cr all';
+        $cmd = 'cache-rebuild';
         break;
       case 'D7':
         $cmd = 'cc all';
