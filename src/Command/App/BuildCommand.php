@@ -132,7 +132,7 @@ class BuildCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-      // check if this folder is has APP config
+        // check if this folder is has APP config
         if (!file_exists('.config.yml')) {
             $this->io->error('You\'re not currently in an APP directory');
             return;

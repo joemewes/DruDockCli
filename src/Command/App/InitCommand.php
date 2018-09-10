@@ -83,7 +83,7 @@ class InitCommand extends ContainerAwareCommand
         $apphost = $this->cfa->getSetHost($io, $input, $output, $this);
         $service_types = $this->cfa->getSetServices($io, $input, $output, $this);
 
-      // Setup app initial folder structure.
+        // Setup app initial folder structure.
         $system_appname = strtolower(str_replace(' ', '', $appname));
         if (!$fs->exists($system_appname)) {
             $fs->mkdir($system_appname, 0755);
