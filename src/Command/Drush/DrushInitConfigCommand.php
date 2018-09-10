@@ -22,48 +22,49 @@ const SERVICE_NAME = 'php';
  *
  * @package Docker\Drupal\Command
  */
-class DrushInitConfigCommand extends Command {
+class DrushInitConfigCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('drush:init:config')
-      ->setAliases(['dicg'])
-      ->setDescription('Run drush config init')
-      ->setHelp("This command will force import existing config into fresh installation.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-
-    $io = new DruDockStyle($input, $output);
-    $io->section("PHP ::: drush config init");
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
+    protected function configure()
+    {
+        $this
+        ->setName('drush:init:config')
+        ->setAliases(['dicg'])
+        ->setDescription('Run drush config init')
+        ->setHelp("This command will force import existing config into fresh installation.");
     }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
 
-      $site_settings = './app/config/sync/system.site.yml';
-      $site_config = Yaml::parse(file_get_contents($site_settings));
-      $uuid = $site_config['uuid'];
+        $io = new DruDockStyle($input, $output);
+        $io->section("PHP ::: drush config init");
 
-      $commands = [
-        'drush config-set \'system.site\' uuid ' . $uuid . ' -y',
-        'drush cr all',
-        'drush ev "if(\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")){\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")->delete();};"',
-        'drush cron',
-        'drush entity-updates -y',
-        'drush config-import -y',
-      ];
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        }
 
-      foreach ($commands as $cmd) {
-        $command = $container_application->getComposePath($appname, $io) . ' exec -T ' . SERVICE_NAME . $cmd;
-        $io->info($cmd);
-        $application->runcommand($command, $io);
-      }
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $site_settings = './app/config/sync/system.site.yml';
+            $site_config = Yaml::parse(file_get_contents($site_settings));
+            $uuid = $site_config['uuid'];
+
+            $commands = [
+            'drush config-set \'system.site\' uuid ' . $uuid . ' -y',
+            'drush cr all',
+            'drush ev "if(\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")){\Drupal::entityManager()->getStorage(\"shortcut_set\")->load(\"default\")->delete();};"',
+            'drush cron',
+            'drush entity-updates -y',
+            'drush config-import -y',
+            ];
+
+            foreach ($commands as $cmd) {
+                $command = $container_application->getComposePath($appname, $io) . ' exec -T ' . SERVICE_NAME . $cmd;
+                $io->info($cmd);
+                $application->runcommand($command, $io);
+            }
+        }
     }
-  }
 }
-

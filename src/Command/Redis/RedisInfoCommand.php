@@ -18,28 +18,31 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
  * Class RedisInfoCommand
  * @package Docker\Drupal\Command\redis
  */
-class RedisInfoCommand extends Command {
-  protected function configure() {
-    $this
-      ->setName('redis:info')
-      ->setDescription('Get Redis running config information')
-      ->setHelp("This command will output current running REDIS instance information/config.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-    $io = new DruDockStyle($input, $output);
-
-    $io->section("REDIS ::: Info");
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
+class RedisInfoCommand extends Command
+{
+    protected function configure()
+    {
+        $this
+        ->setName('redis:info')
+        ->setDescription('Get Redis running config information')
+        ->setHelp("This command will output current running REDIS instance information/config.");
     }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T redis redis-cli info';
-      $application->runcommand($command, $io);
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
+        $io = new DruDockStyle($input, $output);
+
+        $io->section("REDIS ::: Info");
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        }
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $command = $container_application->getComposePath($appname, $io) . 'exec -T redis redis-cli info';
+            $application->runcommand($command, $io);
+        }
     }
-  }
 }

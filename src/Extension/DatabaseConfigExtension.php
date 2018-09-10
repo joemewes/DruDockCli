@@ -16,14 +16,13 @@ use Symfony\Component\Yaml\Parser;
 
 class DatabaseConfigExtension extends Extension
 {
-    public function load( array $configs, ContainerBuilder $container )
+    public function load(array $configs, ContainerBuilder $container)
     {
-    $configuration = new Configuration();
-    $processedConfig = $this->processConfiguration( $configuration, $configs );
+        $configuration = new Configuration();
+        $processedConfig = $this->processConfiguration($configuration, $configs);
 
     // Do not add a parameter now, just continue reading the services.
-    $loader = new YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ) );
-    $loader->load( '../config/database.yml' );
-
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('../config/database.yml');
     }
 }

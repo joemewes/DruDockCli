@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Docker\Drupal\Command\DrushClearCacheCommand.
+ * Contains \Docker\Drupal\Command\DemoCommand.
  */
 
 namespace Docker\Drupal\Command\Drush;
@@ -11,52 +11,50 @@ use Docker\Drupal\Application;
 use Docker\Drupal\Extension\ApplicationContainerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Docker\Drupal\Style\DruDockStyle;
 
 /**
- * Class DrushClearCacheCommand
+ * Class DrushCommand
  *
  * @package Docker\Drupal\Command
  */
-class DrushClearCacheCommand extends Command
+class DrushCommand extends Command
 {
 
     protected function configure()
     {
         $this
-        ->setName('drush:cc')
-        ->setAliases(['dcc'])
-        ->setDescription('Run drush cache clear ')
-        ->setHelp("This command will clear Drupal APP caches.");
+        ->setName('drush:cmd')
+        ->setAliases(['dcmd'])
+        ->setDescription('Run drush commands ')
+        ->setHelp("This command will execute Drush commands directly against your Drupal APP.")
+        ->addOption('cmd', 'c', InputOption::VALUE_OPTIONAL, 'Specify the command ["bash"]');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $application = new Application();
         $container_application = new ApplicationContainerExtension();
+
+        $cmd = $input->getOption('cmd');
+
         $io = new DruDockStyle($input, $output);
-
-        if (!$config = $application->getAppConfig($io)) {
-            $io->error('No config found. You\'re not currently in an Drupal APP directory');
-            return;
-        } else {
-            $appname = $config['appname'];
-        }
-
-        switch ($config['apptype']) {
-            case 'D8':
-                $cmd = 'cr all';
-                break;
-            case 'D7':
-                $cmd = 'cc all';
-                break;
-            default:
-                $io->error('You\'re not currently in an Drupal APP directory');
-                return;
-        }
-
         $io->section('PHP ::: drush ' . $cmd);
+
+        if (!$cmd) {
+            $helper = $this->getHelper('question');
+            $question = new Question('Enter command : ', 'bash');
+            $cmd = $helper->ask($input, $output, $question);
+        }
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        } else {
+            $appname = 'app';
+        }
 
         if ($container_application->checkForAppContainers($appname, $io)) {
             $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
