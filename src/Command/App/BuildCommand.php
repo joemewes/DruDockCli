@@ -238,10 +238,6 @@ class BuildCommand extends ContainerAwareCommand {
       // Setup local configuration files.
       $this->setLocalConfig($type, $app_dest, $config);
 
-      // Setup directory permissions.
-      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/files', 0775, 0000, TRUE);
-      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . '/sites/default/settings.php', 0775, 0000, TRUE);
-      $this->fs->chmod($app_dest . '/' . $config[self::WEBROOT] . self::SETTINGS_LOCAL, 0775, 0000, TRUE);
       if($type === 'd8') {
         $this->fs->mkdir($app_dest . '/config/sync');
       }
@@ -263,7 +259,6 @@ class BuildCommand extends ContainerAwareCommand {
     $this->cfa->tmpRemoteBundle($fd);
     if (is_dir(self::TMP . $fd) && is_dir($app_dest)) {
       $dfiles = self::TMP . $fd;
-      $this->fs->chmod($app_dest, 0775, 0000, true);
 
       if($fd === 'd8') {
         $this->fs->copy($dfiles . '/development.services.yml', $app_dest . '/' . $config[self::WEBROOT] . '/sites/development.services.yml', TRUE);
