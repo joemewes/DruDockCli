@@ -46,7 +46,7 @@ class SelfUpdateCommand extends Command
         $io = new DruDockStyle($input, $output);
         $io->section("Drudock ::: Updating");
 
-        $command = 'curl -O --progress-bar http://d1gem705zq3obi.cloudfront.net/drudock.phar && \
+        $command = 'curl -O --progress-bar https://s3.eu-west-2.amazonaws.com/drudock/drudock.phar && \
     mv drudock.phar /usr/local/bin/drudock && \
     chmod +x /usr/local/bin/drudock';
       // Do download.
