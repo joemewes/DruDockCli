@@ -19,33 +19,35 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
  *
  * @package Docker\Drupal\Command\Mysql
  */
-class MysqlMonitorCommand extends Command {
+class MysqlMonitorCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('mysql:log')
-      ->setDescription('Monitor mysql activity')
-      ->setHelp("This command will output MySQL activity.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-    $io = new DruDockStyle($input, $output);
-
-    $io->section("MySQL ::: Monitor");
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
-    }
-    else {
-      $appname = 'app';
+    protected function configure()
+    {
+        $this
+        ->setName('mysql:log')
+        ->setAliases(['mlog'])
+        ->setDescription('Monitor mysql activity')
+        ->setHelp("This command will output MySQL activity.");
     }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . 'logs -f mysql';
-      $application->runcommand($command, $io);
-    }
-  }
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
+        $io = new DruDockStyle($input, $output);
 
+        $io->section("MySQL ::: Monitor");
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        } else {
+            $appname = 'app';
+        }
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $command = $container_application->getComposePath($appname, $io) . 'logs -f mysql';
+            $application->runcommand($command, $io);
+        }
+    }
 }

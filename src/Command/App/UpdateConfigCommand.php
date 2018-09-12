@@ -19,56 +19,58 @@ use Docker\Drupal\Style\DruDockStyle;
  *
  * @package Docker\Drupal\Command
  */
-class UpdateConfigCommand extends Command {
+class UpdateConfigCommand extends Command
+{
 
-  const QUESTION = 'question';
+    const QUESTION = 'question';
 
-  protected function configure() {
-    $this
-      ->setName('app:update:config')
-      ->setAliases(['aucg'])
-      ->setDescription('Update APP config')
-      ->setHelp('This command will update all .config.yaml to include current drudock config requirements.');
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $config_application = new ApplicationConfigExtension();
-    $io = new DruDockStyle($input, $output);
-    $io->section('APP ::: UPDATING CONFIG');
-
-    $config = $application->getAppConfig($io, '', TRUE);
-
-    if (!isset($config['appname'])) {
-      $config['appname'] = $config_application->getSetAppname($io, $input, $output, $this);
+    protected function configure()
+    {
+        $this
+        ->setName('app:update:config')
+        ->setAliases(['aucg'])
+        ->setDescription('Update APP config')
+        ->setHelp('This command will update all .config.yaml to include current drudock config requirements.');
     }
 
-    if (!isset($config['host'])) {
-      $config['host'] = $config_application->getSetHost($io, $input, $output, $this);
-    }
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $config_application = new ApplicationConfigExtension();
+        $io = new DruDockStyle($input, $output);
+        $io->section('APP ::: UPDATING CONFIG');
 
-    if (!isset($config['dist'])) {
-      $config['dist'] = $config_application->getSetDistribution($io, $input, $output, $this);
-    }
+        $config = $application->getAppConfig($io, '', true);
 
-    if (!isset($config['src'])) {
-      $src = $config_application->getSetSource($io, $input, $output, $this);
-      if ($src === 'Git') {
-        $gitrepo = $config_application->getSetSCMSource($io, $input, $output, $src, $this);
-      }
-      else {
-        $gitrepo = '';
-      }
-      $config['src'] = $src;
-      $config['repo'] = $gitrepo;
-    }
+        if (!isset($config['appname'])) {
+            $config['appname'] = $config_application->getSetAppname($io, $input, $output, $this);
+        }
 
-    if (!isset($config['apptype'])) {
-      $config['apptype'] = $config_application->getSetType($io, $input, $output, $this);
-    }
+        if (!isset($config['host'])) {
+            $config['host'] = $config_application->getSetHost($io, $input, $output, $this);
+        }
 
-    $application->setConfig($config);
-    $io->info('  App config all up to date.');
-    $io->info('  ');
-  }
+        if (!isset($config['dist'])) {
+            $config['dist'] = $config_application->getSetDistribution($io, $input, $output, $this);
+        }
+
+        if (!isset($config['src'])) {
+            $src = $config_application->getSetSource($io, $input, $output, $this);
+            if ($src === 'Git') {
+                $gitrepo = $config_application->getSetSCMSource($io, $input, $output, $src, $this);
+            } else {
+                $gitrepo = '';
+            }
+            $config['src'] = $src;
+            $config['repo'] = $gitrepo;
+        }
+
+        if (!isset($config['apptype'])) {
+            $config['apptype'] = $config_application->getSetType($io, $input, $output, $this);
+        }
+
+        $application->setConfig($config);
+        $io->info('  App config all up to date.');
+        $io->info('  ');
+    }
 }

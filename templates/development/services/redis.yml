@@ -1,6 +1,4 @@
 image : 4alldigital/drudock-redis
 hostname: redis
-mem_limit: 100000000
-memswap_limit: 2000000000
 networks:
   - default

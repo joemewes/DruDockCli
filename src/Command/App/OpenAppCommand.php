@@ -20,45 +20,47 @@ use Docker\Drupal\Style\DruDockStyle;
  *
  * @package Docker\Drupal\Command
  */
-class OpenAppCommand extends Command {
+class OpenAppCommand extends Command
+{
 
-  protected $app;
+    protected $app;
 
-  protected $cfa;
+    protected $cfa;
 
-  protected $cta;
+    protected $cta;
 
-  protected function configure() {
-    $this
-      ->setName('app:open')
-      ->setAliases(['ao'])
-      ->setDescription('Open APP in default browser.')
-      ->setHelp("Example : [drudock open]");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-
-    $io = new DruDockStyle($input, $output);
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
-      $hosts = explode(' ', $config['host']);
-      $host = $hosts[0];
-    }
-    else {
-      $appname = 'app';
-      $host = 'drudock.localhost';
+    protected function configure()
+    {
+        $this
+        ->setName('app:open')
+        ->setAliases(['ao'])
+        ->setDescription('Open APP in default browser.')
+        ->setHelp("Example : [drudock open]");
     }
 
-    $io->section("APP ::: Opening " . $appname);
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $this->cfa = new ApplicationConfigExtension();
-      $system_appname = strtolower(str_replace(' ', '', $appname));
-      $nginx_port = $this->cfa->containerPort($system_appname,'nginx', '80');
-      exec('python -mwebbrowser http://' . $host . ':' . $nginx_port);
+        $io = new DruDockStyle($input, $output);
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+            $hosts = explode(' ', $config['host']);
+            $host = $hosts[0];
+        } else {
+            $appname = 'app';
+            $host = 'drudock.localhost';
+        }
+
+        $io->section("APP ::: Opening " . $appname);
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $this->cfa = new ApplicationConfigExtension();
+            $system_appname = strtolower(str_replace(' ', '', $appname));
+            $nginx_port = $this->cfa->containerPort($system_appname, 'nginx', '80');
+            exec('python -mwebbrowser http://' . $host . ':' . $nginx_port);
+        }
     }
-  }
 }

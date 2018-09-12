@@ -18,30 +18,32 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
  * Class RedisFlushCommand
  * @package Docker\Drupal\Command\redis
  */
-class RedisFlushCommand extends Command {
+class RedisFlushCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('redis:flush')
-      ->setDescription('Flush Redis cache')
-      ->setHelp("This command will flush all data REDIS key/value store (cache).");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-    $io = new DruDockStyle($input, $output);
-
-    $io->section("REDIS ::: flushall");
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
+    protected function configure()
+    {
+        $this
+        ->setName('redis:flush')
+        ->setDescription('Flush Redis cache')
+        ->setHelp("This command will flush all data REDIS key/value store (cache).");
     }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . ' exec -T redis redis-cli flushall';
-      $application->runcommand($command, $io);
-    }
-  }
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
+        $io = new DruDockStyle($input, $output);
 
+        $io->section("REDIS ::: flushall");
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        }
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $command = $container_application->getComposePath($appname, $io) . ' exec -T redis redis-cli flushall';
+            $application->runcommand($command, $io);
+        }
+    }
 }
