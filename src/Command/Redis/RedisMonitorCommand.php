@@ -19,29 +19,32 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
  *
  * @package Docker\Drupal\Command\redis
  */
-class RedisMonitorCommand extends Command {
+class RedisMonitorCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('redis:monitor')
-      ->setDescription('Monitor redis activity')
-      ->setHelp("This command will output REDIS activity.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-    $io = new DruDockStyle($input, $output);
-
-    $io->section('REDIS ::: Monitor');
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
+    protected function configure()
+    {
+        $this
+        ->setName('redis:monitor')
+        ->setDescription('Monitor redis activity')
+        ->setHelp("This command will output REDIS activity.");
     }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . 'exec -T redis redis-cli monitor  2>&1';
-      $application->runcommand($command, $io);
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
+        $io = new DruDockStyle($input, $output);
+
+        $io->section('REDIS ::: Monitor');
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        }
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $command = $container_application->getComposePath($appname, $io) . 'exec -T redis redis-cli monitor  2>&1';
+            $application->runcommand($command, $io);
+        }
     }
-  }
 }

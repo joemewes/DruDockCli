@@ -18,28 +18,23 @@ use Docker\Drupal\Style\DruDockStyle;
  * Class StatusCommand
  * @package Docker\Drupal\Command
  */
-class StatusCommand extends Command {
-  protected function configure() {
-    $this
-      ->setName('app:status')
-      ->setAliases(['as'])
-      ->setDescription('Get current status of all containers')
-      ->setHelp("This command will output a quick status healthcheck of all running containers.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-    $io = new DruDockStyle($input, $output);
-    $io->section("HEALTHCHECK");
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
-    }
-    else {
-      $appname = 'app';
+class StatusCommand extends Command
+{
+    protected function configure()
+    {
+        $this
+        ->setName('app:status')
+        ->setAliases(['as'])
+        ->setDescription('Get current status of all containers')
+        ->setHelp("This command will output a quick status healthcheck of all running containers.");
     }
 
-    $container_application->dockerHealthCheck($appname, $io);
-  }
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $container_application = new ApplicationContainerExtension();
+        $io = new DruDockStyle($input, $output);
+        $io->section("HEALTHCHECK");
+
+        $container_application->dockerHealthCheck($io);
+    }
 }

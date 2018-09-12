@@ -6,7 +6,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-
 class DruDockStyle extends SymfonyStyle
 {
     /**
@@ -43,7 +42,8 @@ class DruDockStyle extends SymfonyStyle
     public function comment($message, $newLine = true)
     {
         $this->block(
-            $message, null,
+            $message,
+            null,
             'bg=yellow;fg=black',
             ' ',
             true
@@ -53,7 +53,8 @@ class DruDockStyle extends SymfonyStyle
     public function note($message)
     {
         $this->block(
-            $message, null,
+            $message,
+            null,
             'bg=blue;fg=white',
             ' ',
             true
@@ -76,11 +77,11 @@ class DruDockStyle extends SymfonyStyle
   /**
    * {@inheritdoc}
    */
-  public function section($message)
-  {
-    // If we do not have the clean-output flag prevent outputting the sections.
-    if (false === $this->input->hasParameterOption(array('--clean-output', '-co'), true)) {
-      parent::section($message);
+    public function section($message)
+    {
+      // If we do not have the clean-output flag prevent outputting the sections.
+        if (false === $this->input->hasParameterOption(array('--clean-output', '-co'), true)) {
+            parent::section($message);
+        }
     }
-  }
 }

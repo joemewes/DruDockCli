@@ -20,77 +20,78 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  *
  * @package Docker\Drupal\Command
  */
-class DestroyCommand extends Command {
+class DestroyCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('app:destroy')
-      ->setAliases(['ad'])
-      ->setDescription('Disable and delete APP and containers')
-      ->setHelp("This command will completely remove all containers and volumes for the current APP via the docker-compose.yml file.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-
-    $application = new Application();
-    $cta = new ApplicationContainerExtension();
-
-    $io = new DruDockStyle($input, $output);
-    $io->section("REMOVING APP");
-
-    $helper = $this->getHelper('question');
-    $question = new ConfirmationQuestion(
-      'Are you sure you want to delete this app? [y/n] : ',
-      TRUE,
-      '/^(y)/i'
-    );
-
-    if (!$helper->ask($input, $output, $question)) {
-      return;
+    protected function configure()
+    {
+        $this
+        ->setName('app:destroy')
+        ->setAliases(['ad'])
+        ->setDescription('Disable and delete APP and containers')
+        ->setHelp("This command will completely remove all containers and volumes for the current APP via the docker-compose.yml file.");
     }
 
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
-      $dist = $config['dist'];
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+
+        $application = new Application();
+        $cta = new ApplicationContainerExtension();
+
+        $io = new DruDockStyle($input, $output);
+        $io->section("REMOVING APP");
+
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion(
+            'Are you sure you want to delete this app? [y/n] : ',
+            true,
+            '/^(y)/i'
+        );
+
+        if (!$helper->ask($input, $output, $question)) {
+            return;
+        }
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+            $dist = $config['dist'];
+        }
+
+        if (isset($dist) && ($dist == 'Development')) {
+            if ($cta->checkForAppContainers($appname, $io)) {
+                $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
+                $application->runcommand($command, $io);
+            }
+        }
+
+        if (isset($dist) && ($dist == 'Feature')) {
+            if ($cta->checkForAppContainers($appname, $io)) {
+                $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
+                $application->runcommand($command, $io);
+            }
+        }
+
+        if (isset($dist) && $dist == 'Production') {
+            if ($cta->checkForAppContainers($appname, $io)) {
+                $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
+                $application->runcommand($command, $io);
+            }
+
+            $command = $cta->getDataComposePath($appname, $io) . ' down -v 2>&1';
+            $application->runcommand($command, $io);
+
+            $command = $application->getProxyComposePath($appname, $io) . ' down -v 2>&1';
+            $application->runcommand($command, $io);
+        }
+
+        if (isset($dist) && $dist == 'Staging') {
+            if ($cta->checkForAppContainers($appname, $io)) {
+                $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
+                $application->runcommand($command, $io);
+            }
+
+            $command = $cta->getDataComposePath($appname, $io) . ' down -v 2>&1';
+            $application->runcommand($command, $io);
+        }
     }
-
-    if (isset($dist) && ($dist == 'Development')) {
-      if ($cta->checkForAppContainers($appname, $io)) {
-        $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
-        $application->runcommand($command, $io);
-      }
-    }
-
-    if (isset($dist) && ($dist == 'Feature')) {
-      if ($cta->checkForAppContainers($appname, $io)) {
-        $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
-        $application->runcommand($command, $io);
-      }
-    }
-
-    if (isset($dist) && $dist == 'Production') {
-      if ($cta->checkForAppContainers($appname, $io)) {
-        $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
-        $application->runcommand($command, $io);
-      }
-
-      $command = $cta->getDataComposePath($appname, $io) . ' down -v 2>&1';
-      $application->runcommand($command, $io);
-
-      $command = $application->getProxyComposePath($appname, $io) . ' down -v 2>&1';
-      $application->runcommand($command, $io);
-    }
-
-    if (isset($dist) && $dist == 'Staging') {
-      if ($cta->checkForAppContainers($appname, $io)) {
-        $command = $cta->getComposePath($appname, $io) . ' down -v 2>&1';
-        $application->runcommand($command, $io);
-      }
-
-      $command = $cta->getDataComposePath($appname, $io) . ' down -v 2>&1';
-      $application->runcommand($command, $io);
-    }
-
-  }
-
 }

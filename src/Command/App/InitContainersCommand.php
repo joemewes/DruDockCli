@@ -18,37 +18,40 @@ use Docker\Drupal\Style\DruDockStyle;
  * Class InitContainersCommand
  * @package Docker\Drupal\Command
  */
-class InitContainersCommand extends Command {
+class InitContainersCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('app:init:containers')
-      ->setAliases(['aic'])
-      ->setDescription('Create APP containers')
-      ->setHelp("This command will create app containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-    $io = new DruDockStyle($input, $output);
-    $io->section("UPDATING CONTAINERS");
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
+    protected function configure()
+    {
+        $this
+        ->setName('app:init:containers')
+        ->setAliases(['aic'])
+        ->setDescription('Create APP containers')
+        ->setHelp("This command will create app containers from https://hub.docker.com for the current APP via the docker-compose.yml file.");
     }
 
-    if ($container_application->checkForAppContainers($appname, $io, TRUE)) {
-      $io->warning("Container for this app already exist.  Try `drudock app:update:containers`");
-      return;
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
+        $io = new DruDockStyle($input, $output);
+        $io->section("UPDATING CONTAINERS");
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        }
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $io->warning("Container for this app already exist.  Try `drudock up:ct`");
+            return;
+        }
+
+        $container_application->createProxyNetwork($io);
+
+        $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
+        $application->runcommand($command, $io);
+
+        $command = $container_application->getComposePath($appname, $io) . ' up -d --force-recreate 2>&1';
+        $application->runcommand($command, $io);
     }
-
-    $container_application->createProxyNetwork($io);
-
-    $command = $container_application->getComposePath($appname, $io) . ' pull 2>&1';
-    $application->runcommand($command, $io);
-
-    $command = $container_application->getComposePath($appname, $io) . ' up -d --force-recreate 2>&1';
-    $application->runcommand($command, $io);
-  }
 }

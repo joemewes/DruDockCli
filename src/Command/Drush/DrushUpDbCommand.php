@@ -18,31 +18,33 @@ use Docker\Drupal\Extension\ApplicationContainerExtension;
  * Class DrushUpDbCommand
  * @package Docker\Drupal\Command
  */
-class DrushUpDbCommand extends Command {
+class DrushUpDbCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('drush:updb')
-      ->setAliases(['dudb'])
-      ->setDescription('Run Drush updb')
-      ->setHelp("This command will run all pending database updates for the current Drupal app.");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-
-    $io = new DruDockStyle($input, $output);
-    $io->section("PHP ::: drush updb -y");
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
+    protected function configure()
+    {
+        $this
+        ->setName('drush:updb')
+        ->setAliases(['dudb'])
+        ->setDescription('Run Drush updb')
+        ->setHelp("This command will run all pending database updates for the current Drupal app.");
     }
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush updb -y';
-      $application->runcommand($command, $io);
-    }
-  }
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
 
+        $io = new DruDockStyle($input, $output);
+        $io->section("PHP ::: drush updb -y");
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        }
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush updb -y';
+            $application->runcommand($command, $io);
+        }
+    }
 }

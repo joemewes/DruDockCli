@@ -21,86 +21,87 @@ use Docker\Drupal\Style\DruDockStyle;
  *
  * @package Docker\Drupal\Command
  */
-class DrushConfigExportCommand extends Command {
+class DrushConfigExportCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('drush:cex')
-      ->setAliases(['dcex'])
-      ->setDescription('Run drush config-export ')
-      ->setHelp(
-        "This command will export config to the default sync directory."
-      )
-      ->addArgument(
-        'label',
-        InputArgument::OPTIONAL,
-        "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'"
-      )
-      ->addOption(
-        'destination',
-        'd',
-        InputOption::VALUE_OPTIONAL,
-        "An arbitrary directory that should receive the exported files. An alternative to label argument."
-      );
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-
-    $label = $input->getArgument('label');
-    $options = array_filter($input->getOptions());
-
-    $cmd_options = ['config-export'];
-
-    if (!empty($label)) {
-      $cmd_options[] = $label;
+    protected function configure()
+    {
+        $this
+        ->setName('drush:cex')
+        ->setAliases(['dcex'])
+        ->setDescription('Run drush config-export ')
+        ->setHelp(
+            "This command will export config to the default sync directory."
+        )
+        ->addArgument(
+            'label',
+            InputArgument::OPTIONAL,
+            "A config directory label (i.e. a key in \$config_directories array in settings.php). Defaults to 'sync'"
+        )
+        ->addOption(
+            'destination',
+            'd',
+            InputOption::VALUE_OPTIONAL,
+            "An arbitrary directory that should receive the exported files. An alternative to label argument."
+        );
     }
 
-    foreach ($options as $option => $value) {
-      switch ($option) {
-        case 'yes':
-          $cmd_options[] = '-y';
-          break;
-        case 'destination':
-        case 'message':
-        case 'branch':
-        case 'remote':
-          $cmd_options[] = "--{$option}={$value}";
-          break;
-        default:
-          $cmd_options[] = "--{$option}";
-      }
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
+
+        $label = $input->getArgument('label');
+        $options = array_filter($input->getOptions());
+
+        $cmd_options = ['config-export'];
+
+        if (!empty($label)) {
+            $cmd_options[] = $label;
+        }
+
+        foreach ($options as $option => $value) {
+            switch ($option) {
+                case 'yes':
+                    $cmd_options[] = '-y';
+                    break;
+                case 'destination':
+                case 'message':
+                case 'branch':
+                case 'remote':
+                    $cmd_options[] = "--{$option}={$value}";
+                    break;
+                default:
+                    $cmd_options[] = "--{$option}";
+            }
+        }
+
+        $io = new DruDockStyle($input, $output);
+
+        if (!$config = $application->getAppConfig($io)) {
+            $io->error('No config found. You\'re not currently in an Drupal APP directory');
+            return;
+        } else {
+            $appname = $config['appname'];
+        }
+
+        switch ($config['apptype']) {
+            case 'D8':
+                $cmd = implode(' ', $cmd_options);
+                break;
+            case 'D7':
+                $io->error('This command is only available for D8');
+                break;
+            default:
+                $io->error('You\'re not currently in an Drupal APP directory');
+                return;
+        }
+
+        $io->section('PHP ::: drush ' . $cmd);
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
+            $application->runcommand($command, $io);
+        }
     }
-
-    $io = new DruDockStyle($input, $output);
-
-    if (!$config = $application->getAppConfig($io)) {
-      $io->error('No config found. You\'re not currently in an Drupal APP directory');
-      return;
-    }
-    else {
-      $appname = $config['appname'];
-    }
-
-    switch ($config['apptype']) {
-      case 'D8':
-        $cmd = implode(' ', $cmd_options);
-        break;
-      case 'D7':
-          $io->error('This command is only available for D8');
-        break;
-      default:
-        $io->error('You\'re not currently in an Drupal APP directory');
-        return;
-    }
-
-    $io->section('PHP ::: drush ' . $cmd);
-
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . ' exec -T php drush ' . $cmd;
-      $application->runcommand($command, $io);
-    }
-  }
-
 }

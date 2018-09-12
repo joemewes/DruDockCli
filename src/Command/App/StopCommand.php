@@ -19,34 +19,36 @@ use Docker\Drupal\Style\DruDockStyle;
  *
  * @package Docker\Drupal\Command
  */
-class StopCommand extends Command {
+class StopCommand extends Command
+{
 
-  protected function configure() {
-    $this
-      ->setName('app:stop')
-      ->setAliases(['stop'])
-      ->setDescription('Stop current APP containers')
-      ->setHelp("Example : [drudock stop]");
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $application = new Application();
-    $container_application = new ApplicationContainerExtension();
-
-    $io = new DruDockStyle($input, $output);
-
-    if ($config = $application->getAppConfig($io)) {
-      $appname = $config['appname'];
-    }
-    else {
-      $appname = 'app';
+    protected function configure()
+    {
+        $this
+        ->setName('app:stop')
+        ->setAliases(['stop'])
+        ->setDescription('Stop current APP containers')
+        ->setHelp("Example : [drudock stop]");
     }
 
-    $io->section("APP ::: Stopping " . $appname . " containers");
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $application = new Application();
+        $container_application = new ApplicationContainerExtension();
 
-    if ($container_application->checkForAppContainers($appname, $io)) {
-      $command = $container_application->getComposePath($appname, $io) . ' stop 2>&1';
-      $application->runcommand($command, $io);
+        $io = new DruDockStyle($input, $output);
+
+        if ($config = $application->getAppConfig($io)) {
+            $appname = $config['appname'];
+        } else {
+            $appname = 'app';
+        }
+
+        $io->section("APP ::: Stopping " . $appname . " containers");
+
+        if ($container_application->checkForAppContainers($appname, $io)) {
+            $command = $container_application->getComposePath($appname, $io) . ' stop 2>&1';
+            $application->runcommand($command, $io);
+        }
     }
-  }
 }
