@@ -213,7 +213,7 @@ class BuildCommand extends ContainerAwareCommand
                 $this->app->runcommand($command, $this->io);
             }
         } else {
-            $command = sprintf('composer create-project drupal-composer/drupal-project:' . $drupal_version . ' ' . $app_dest . ' -dir --stability dev --no-interaction');
+            $command = sprintf('COMPOSER_MEMORY_LIMIT=-1 composer create-project drupal-composer/drupal-project:' . $drupal_version . ' ' . $app_dest . ' --stability dev --no-interaction');
             $this->io->info(' ');
             $this->io->note('Download and configure Drupal ' . $drupal_version . '.... This may take a few minutes....');
             $this->app->runcommand($command, $this->io);
